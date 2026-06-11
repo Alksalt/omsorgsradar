@@ -1,140 +1,129 @@
-"""Top-level pipeline runner.
-
-Runs the full ingest → profile → analyze → verify → report → ML pipeline.
-Imports all modules and calls them in sequence.
+"""Registry-driven pipeline runner.
 
 Usage::
 
-    uv run python -m omsorgsradar.pipeline
+    uv run python -m omsorgsradar.pipeline                       # omsorgsradar
+    uv run python -m omsorgsradar.pipeline analyses/<name>       # any instance
 
-Or programmatically::
+Programmatic::
 
     from omsorgsradar.pipeline import run_pipeline
-    run_pipeline()
+    run_pipeline("analyses/omsorgsradar")
 """
 
 from __future__ import annotations
 
+import argparse
 import logging
-import sys
+import time
 from pathlib import Path
+
+from .core.config import load_run_config
+from .core.journal import RunJournal
+from .core.registry import (
+    PipelineGateError,
+    StageContext,
+    StageRegistry,
+    load_extensions,
+    resolve_stage_list,
+)
+from .stages import build_default_registry
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = Path(__file__).parent.parent.parent / "data"
-REPORTS_DIR = Path(__file__).parent.parent.parent / "reports"
-CACHE_DIR = DATA_DIR / "cache"
-DB_PATH = DATA_DIR / "omsorgsradar.duckdb"
+REPO_ROOT = Path(__file__).parent.parent.parent
+DEFAULT_ANALYSIS_DIR = REPO_ROOT / "analyses" / "omsorgsradar"
+DEFAULT_WORKFLOW = REPO_ROOT / "workflow.toml"
+DEFAULT_DATA_DIR = REPO_ROOT / "data"
+DEFAULT_REPORTS_DIR = REPO_ROOT / "reports"
 
 
 def run_pipeline(
+    analysis_dir: Path | str = DEFAULT_ANALYSIS_DIR,
+    *,
+    workflow_path: Path | str = DEFAULT_WORKFLOW,
+    data_dir: Path | str = DEFAULT_DATA_DIR,
+    reports_dir: Path | str = DEFAULT_REPORTS_DIR,
+    runs_dir: Path | str | None = None,
+    registry: StageRegistry | None = None,
     skip_ingest: bool = False,
     skip_ml: bool = False,
     use_llm: bool | None = None,
-) -> None:
-    """Run the full omsorgsradar pipeline.
+) -> Path | None:
+    """Run one analysis instance through its configured stages.
 
-    Args:
-        skip_ingest: If True, load data from DuckDB instead of re-fetching.
-        skip_ml: If True, skip the ML phase.
-        use_llm: If None, auto-detect from ANTHROPIC_API_KEY env var.
+    Returns the report path if a report stage ran, else None.
+
+    Raises:
+        PipelineGateError: verification failed — no report was produced.
     """
-    from .ingest import run_ingest, load_from_duckdb
-    from .profile import profile_all, save_quality_report, quality_report_summary_md
-    from .analyze import run_analysis, save_findings
-    from .report import run_report
-    from .ml import run_ml, save_ml_results, ml_results_summary_md
-
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(name)s %(levelname)s %(message)s",
         datefmt="%H:%M:%S",
     )
+    cfg = load_run_config(analysis_dir, workflow_path)
+    data_dir, reports_dir = Path(data_dir), Path(reports_dir)
+    data_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── P0: Ingest ────────────────────────────────────────────────────────────
-    if skip_ingest:
-        logger.info("P0: Loading from DuckDB (skip_ingest=True)")
-        import pandas as pd
-        datasets = {}
-        for table in ("kostra_pleie", "befolkning", "framskrivinger", "fhi_nokkel"):
-            try:
-                datasets[table] = load_from_duckdb(table, db_path=DB_PATH)
-                logger.info("Loaded %s: %d rows", table, len(datasets[table]))
-            except Exception as exc:
-                logger.warning("Could not load %s: %s", table, exc)
-                datasets[table] = pd.DataFrame()
-    else:
-        logger.info("P0: Running live ingest from SSB/FHI APIs")
-        datasets = run_ingest(db_path=DB_PATH, cache_dir=CACHE_DIR)
+    reg = registry if registry is not None else build_default_registry()
+    load_extensions(cfg.analysis_dir, reg)
 
-    # ── P0: Profile ───────────────────────────────────────────────────────────
-    logger.info("P0: Data profiling")
-    quality_report = profile_all(datasets)
-    quality_path = DATA_DIR / "quality_profile.json"
-    save_quality_report(quality_report, path=quality_path)
-    logger.info("Quality profile: %s", quality_path)
+    stages = resolve_stage_list(cfg.stage_list)
+    if skip_ml and "ml" in stages:
+        stages.remove("ml")
 
-    # ── P1: Analysis ──────────────────────────────────────────────────────────
-    logger.info("P1: Running analysis")
-    result = run_analysis(
-        df_kostra=datasets.get("kostra_pleie", __import__("pandas").DataFrame()),
-        df_pop=datasets.get("befolkning", __import__("pandas").DataFrame()),
-        df_proj=datasets.get("framskrivinger"),
+    journal = RunJournal.start(
+        Path(runs_dir) if runs_dir is not None
+        else REPO_ROOT / str(cfg.setting("analysis", "runs_dir", default="runs")),
+        analysis=cfg.name,
+        config_snapshot={"stages": stages, "workflow": cfg.workflow},
     )
-    save_findings(result, path=DATA_DIR / "findings.json")
-    logger.info("Findings: %d kommuner ranked", len(result.kommuner))
+    ctx = StageContext(
+        config=cfg, data_dir=data_dir, reports_dir=reports_dir, journal=journal
+    )
+    ctx.state["skip_ingest"] = skip_ingest
+    ctx.state["use_llm"] = use_llm
 
-    if result.kommuner:
-        top3 = result.kommuner[:3]
-        for km in top3:
-            logger.info(
-                "  #%d %s (knr %s): press=%.3f, coverage=%.1f",
-                km.rank, km.navn or "—", km.knr, km.press_index_norm, km.coverage_rate
-                if km.coverage_rate == km.coverage_rate else 0,
+    try:
+        for name in stages:
+            before = dict(ctx.artifacts)
+            t0 = time.monotonic()
+            logger.info("Stage: %s", name)
+            reg.get(name)(ctx)
+            journal.record_stage(
+                name,
+                artifacts=[
+                    str(p) for k, p in ctx.artifacts.items() if k not in before
+                ],
+                duration_s=round(time.monotonic() - t0, 3),
             )
+    except PipelineGateError as exc:
+        journal.record_stage("verify", meta={"error": str(exc)})
+        journal.finalize("gate_failed")
+        raise
+    except Exception:
+        journal.finalize("error")
+        raise
 
-    # ── P3: Report ────────────────────────────────────────────────────────────
-    logger.info("P3: Generating report and figures")
-    report_path, cost_info = run_report(
-        result=result,
-        quality_report=quality_report,
-        report_dir=REPORTS_DIR,
-        use_llm=use_llm,
+    journal.finalize("ok")
+    logger.info("=== Pipeline complete: %s ===", journal.run_dir / "run.json")
+    return ctx.artifacts.get("report")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Run an analysis instance.")
+    parser.add_argument(
+        "analysis_dir", nargs="?", default=str(DEFAULT_ANALYSIS_DIR),
+        help="Path to analyses/<name>/ (default: omsorgsradar)",
     )
-    logger.info("Report: %s (renderer: %s)", report_path, cost_info.get("renderer"))
-
-    # ── P4: ML ────────────────────────────────────────────────────────────────
-    if not skip_ml:
-        logger.info("P4: Running ML pipeline")
-        ml_results = run_ml(
-            df_kostra=datasets.get("kostra_pleie", __import__("pandas").DataFrame()),
-            df_pop=datasets.get("befolkning", __import__("pandas").DataFrame()),
-            figures_dir=REPORTS_DIR / "figures",
-        )
-        save_ml_results(ml_results, path=DATA_DIR / "ml_results.json")
-        logger.info("ML: XGB MAE=%.2f, naive MAE=%.2f",
-                    ml_results.mean_xgb_mae, ml_results.mean_naive_mae)
-
-        # Append ML section to report
-        ml_section = ml_results_summary_md(ml_results)
-        try:
-            existing = report_path.read_text(encoding="utf-8")
-            marker = "---\n\n*Rapporten er generert"
-            if marker in existing:
-                new_content = existing.replace(
-                    marker,
-                    ml_section + "\n\n---\n\n*Rapporten er generert",
-                )
-            else:
-                new_content = existing + "\n\n" + ml_section
-            report_path.write_text(new_content, encoding="utf-8")
-        except Exception as exc:
-            logger.warning("Could not append ML section to report: %s", exc)
-
-    logger.info("=== Pipeline complete ===")
-    logger.info("Report: %s", report_path)
-    logger.info("Figures: %s", REPORTS_DIR / "figures")
+    parser.add_argument("--skip-ingest", action="store_true")
+    parser.add_argument("--skip-ml", action="store_true")
+    args = parser.parse_args()
+    run_pipeline(
+        args.analysis_dir, skip_ingest=args.skip_ingest, skip_ml=args.skip_ml
+    )
 
 
 if __name__ == "__main__":
-    run_pipeline()
+    main()

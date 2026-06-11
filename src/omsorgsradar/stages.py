@@ -61,13 +61,7 @@ def stage_analyze(ctx: StageContext) -> None:
     )
     path = ctx.data_dir / "findings.json"
     save_findings(result, path=path)
-    # The findings schema requires analysis_year_range as a string;
-    # result_to_dict returns it as a tuple — normalise before validation only.
-    findings_dict = result_to_dict(result)
-    yr = findings_dict.get("analysis_year_range")
-    if isinstance(yr, (list, tuple)):
-        findings_dict["analysis_year_range"] = f"{yr[0]}-{yr[1]}"
-    validate_artifact("findings", findings_dict)
+    validate_artifact("findings", result_to_dict(result))
     write_manifest(
         path,
         artifact="findings",

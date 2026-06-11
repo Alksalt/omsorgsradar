@@ -90,7 +90,19 @@ FINDINGS_SCHEMA: dict[str, Any] = {
                 },
             },
         },
-        "analysis_year_range": {"type": "string"},
+        # result_to_dict persists this as a [start, end] pair; reports may
+        # render it as a "start-end" string — both are valid on disk.
+        "analysis_year_range": {
+            "oneOf": [
+                {"type": "string"},
+                {
+                    "type": "array",
+                    "items": {"type": ["integer", "number"]},
+                    "minItems": 2,
+                    "maxItems": 2,
+                },
+            ]
+        },
     },
 }
 
@@ -122,14 +134,26 @@ SCHEMAS: dict[str, dict[str, Any]] = {
 def validate_artifact(name: str, payload: dict[str, Any]) -> None:
     """Validate an artifact payload against its registered schema.
 
+    The payload is round-tripped through JSON first so what gets validated is
+    exactly what persists on disk (tuples become arrays). NaN is allowed to
+    match the writers' json.dumps defaults — quality profiles legitimately
+    carry NaN for missing series (tightening this is a G2 concern).
+
     Raises:
-        ArtifactValidationError: unknown artifact name or schema mismatch.
+        ArtifactValidationError: unknown artifact name, payload not
+            JSON-serializable, or schema mismatch.
     """
     schema = SCHEMAS.get(name)
     if schema is None:
         raise ArtifactValidationError(
             f"unknown artifact '{name}' (known: {sorted(SCHEMAS)})"
         )
+    try:
+        payload = json.loads(json.dumps(payload))
+    except (TypeError, ValueError) as exc:
+        raise ArtifactValidationError(
+            f"artifact '{name}' is not JSON-serializable: {exc}"
+        ) from exc
     try:
         jsonschema.validate(payload, schema)
     except jsonschema.ValidationError as exc:

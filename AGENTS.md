@@ -13,3 +13,22 @@ Same brief as CLAUDE.md for codex. Phases run only after explicit go. Sonnet imp
 - **P4 — ML (optional).** XGBoost walk-forward (3 windows) + SHAP + naive baseline + TabPFN-2.5 baseline.
 - **P5 — Package + publish.** README (Mermaid, bokmål summary), LIMITATIONS.md, COSTS.md, public repo
   under `Alksalt`, link from CV/profile README.
+
+## v2 — generalization (designed 2026-06-11, awaiting explicit go)
+
+Canonical design: `docs/specs/2026-06-11-v2-generalization-design.md` (supersedes the sketch in
+`docs/PLAN-v2-generalization.md`). Research: wiki `tech/agentic-healthcare-analysis-workflow-2026`.
+Architecture: deterministic engine (config-driven, LLM-free computation) + agentic shell (skills/hooks).
+
+- **G0 — Engine + config.** `core/` extraction; workflow.toml + analysis.toml + schema validation; stage
+  registry + instance extension point (`analyses/<name>/stages.py`); manifests; run journal; verify-gate
+  wired into pipeline; data-read hook; stage skills scaffold. 65 tests stay green.
+- **G1 — Adapters.** sotkanet + socialstyrelsen + kuhr + csv (pxweb extracted in G0); realness gates in
+  profile; NO/SE/FI geo harmonization.
+- **G2 — Nordic analysis.** `analyses/nordisk-omsorg/` end-to-end, bokmål report, planted-hallucination test.
+- **G3 — Agentic shell.** `/magic-analyze` (any dataset pointer) + `/add-dataset` skills + dataset registry.
+- **G4 — Anonymize stage.** Presidio (nb) + anonymeter receipts + identifiability artifact; BRFSS demo;
+  planted-PII test.
+- **G5 — Execution modes.** Subscription OAuth primary, API-key, local (LM Studio `ANTHROPIC_BASE_URL`)
+  + working local demo; Normen mapping.
+- **G6 — marimo + Pages + package.** marimo artifacts, GitHub Pages report site, README/LIMITATIONS/COSTS, push.

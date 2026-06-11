@@ -1,0 +1,39 @@
+{
+  "class": "dataset",
+  "label": "Pleie og omsorg - KOSTRA-nøkkeltall",
+  "source": "Statistisk sentralbyrå",
+  "updated": "2024-06-01",
+  "id": ["Region", "ContentsCode", "Tid"],
+  "size": [3, 2, 3],
+  "dimension": {
+    "Region": {
+      "label": "region",
+      "category": {
+        "index": {"0301 Oslo": 0, "1506 Molde": 1, "5001 Trondheim": 2},
+        "label": {"0301 Oslo": "0301 Oslo", "1506 Molde": "1506 Molde", "5001 Trondheim": "5001 Trondheim"}
+      }
+    },
+    "ContentsCode": {
+      "label": "statistikkvariabel",
+      "category": {
+        "index": {"BrukerHjem": 0, "PlassInst": 1},
+        "label": {"BrukerHjem": "Hjemmetjeneste-brukere", "PlassInst": "Institusjonsplasser"}
+      }
+    },
+    "Tid": {
+      "label": "år",
+      "category": {
+        "index": {"2022": 0, "2023": 1, "2024": 2},
+        "label": {"2022": "2022", "2023": "2023", "2024": "2024"}
+      }
+    }
+  },
+  "value": [
+    5000, 5100, 5200,
+    800, 810, 820,
+    1200, 1210, 1220,
+    150, 155, 160,
+    3800, 3850, 3900,
+    520, 525, 530
+  ]
+}

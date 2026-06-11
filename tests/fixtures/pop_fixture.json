@@ -1,0 +1,50 @@
+{
+  "class": "dataset",
+  "label": "Folkemengde etter alder",
+  "id": ["Region", "Kjonn", "Alder", "Tid"],
+  "size": [3, 1, 4, 2],
+  "dimension": {
+    "Region": {
+      "label": "region",
+      "category": {
+        "index": {"0301 Oslo": 0, "1506 Molde": 1, "5001 Trondheim": 2},
+        "label": {"0301 Oslo": "0301 Oslo", "1506 Molde": "1506 Molde", "5001 Trondheim": "5001 Trondheim"}
+      }
+    },
+    "Kjonn": {
+      "label": "kjønn",
+      "category": {
+        "index": {"0": 0},
+        "label": {"0": "Begge kjønn"}
+      }
+    },
+    "Alder": {
+      "label": "alder",
+      "category": {
+        "index": {"70 år": 0, "75 år": 1, "80 år": 2, "85 år": 3},
+        "label": {"70 år": "70 år", "75 år": "75 år", "80 år": "80 år", "85 år": "85 år"}
+      }
+    },
+    "Tid": {
+      "label": "år",
+      "category": {
+        "index": {"2023": 0, "2024": 1},
+        "label": {"2023": "2023", "2024": "2024"}
+      }
+    }
+  },
+  "value": [
+    12000, 11800,
+    11000, 10900,
+    8000, 7900,
+    5000, 4900,
+    2200, 2180,
+    2000, 1980,
+    1200, 1180,
+    700, 690,
+    45000, 44500,
+    40000, 39500,
+    28000, 27500,
+    18000, 17500
+  ]
+}

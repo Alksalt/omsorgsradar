@@ -3,7 +3,7 @@ kommune IDs, and persists to DuckDB.
 
 Design notes
 ------------
-- All HTTP calls go through :func:`_post_px` / :func:`_get_json`.  A
+- All HTTP calls go through :class:`.core.adapters.pxweb.PxWebAdapter`.  A
   ``cache_dir`` argument writes raw responses to disk so tests and re-runs
   avoid network round-trips.
 - The entire SSB JSON-stat2 payload → DataFrame path is deterministic and
@@ -29,9 +29,7 @@ FHI NOKKEL endpoint
 
 from __future__ import annotations
 
-import json
 import logging
-import os
 import time
 from pathlib import Path
 from typing import Any
@@ -40,6 +38,10 @@ import duckdb
 import pandas as pd
 import requests
 
+from .core.adapters.pxweb import (  # noqa: F401  (backwards-compat re-exports)
+    PxWebAdapter,
+    jsonstat2_to_df,
+)
 from .kommune_mergers import normalize_knr_series
 
 logger = logging.getLogger(__name__)
@@ -48,185 +50,37 @@ logger = logging.getLogger(__name__)
 # Constants
 # ──────────────────────────────────────────────────────────────────────────────
 
-SSB_BASE = "https://data.ssb.no/api/v0/no/table"
-FHI_BASE = "https://statistikk-data.fhi.no/api/open/v1"
-
 DEFAULT_DB = Path(__file__).parent.parent.parent / "data" / "omsorgsradar.duckdb"
 DEFAULT_CACHE = Path(__file__).parent.parent.parent / "data" / "cache"
 
-# Variables we need from KOSTRA table 12209
-# (pleie og omsorg — kommuner)
-KOSTRA_PLEIE_VARS = [
-    "Bruker0_Stat",    # brukere totalt
-    "BrukerHjem",      # hjemmebaserte tjenester — brukere
-    "BrukerInst",      # institusjonsplasser — brukere
-    "PlassInst",       # institusjonsplasser totalt
-    "Driftsutg",       # driftsutgifter pleie og omsorg (1000 kr)
-]
-
-# Real SSB variable codes in KOSTRA 12209 (discovered from API metadata)
-# Maps our logical name → SSB variable code
-KOSTRA_VAR_MAP = {
-    "hjemmetjeneste_andel": "KOShjtj80aarover0001",   # andel innbyggere 80+ med hjemmetjenester
-    "institusjon_andel": "KOSsykhjand80aar0000",       # andel 80+ med institusjonsopphold
-    "aarsverk_per_bruker": "KOSaarsvbrukerom0000",      # årsverk per bruker
-    "utgifter_per_innbygger": "KOSbduFKG9innbyg0000",  # utgifter per innbygger
-}
-
-# All SSB variable codes we want from 12209
-KOSTRA_WANTED_CODES = list(KOSTRA_VAR_MAP.values())
-
-REQUEST_TIMEOUT = 60  # seconds
 REQUEST_PAUSE = 0.5   # pause between SSB requests (be polite)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# HTTP helpers
+# SSB table metadata discovery
 # ──────────────────────────────────────────────────────────────────────────────
 
-def _post_px(
-    table_id: str,
-    query: dict[str, Any],
-    cache_dir: Path | None = None,
-    cache_key: str | None = None,
-) -> dict[str, Any]:
-    """POST a PxWebAPI v2 query and return the parsed JSON response.
-
-    Args:
-        table_id: SSB table identifier, e.g. ``"12209"``.
-        query: PxWebAPI v2 query dict.
-        cache_dir: If supplied, save/load raw JSON here.
-        cache_key: File stem for the cache file (defaults to table_id).
-
-    Returns:
-        Parsed JSON dict (JSON-stat2 or PxAPI2 format).
-
-    Raises:
-        requests.HTTPError: on non-2xx response.
-    """
-    key = cache_key or table_id
-    if cache_dir is not None:
-        cache_dir = Path(cache_dir)
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_file = cache_dir / f"{key}.json"
-        if cache_file.exists():
-            logger.debug("Cache hit: %s", cache_file)
-            return json.loads(cache_file.read_text(encoding="utf-8"))
-
-    url = f"{SSB_BASE}/{table_id}"
-    logger.info("POST %s", url)
-    resp = requests.post(url, json=query, timeout=REQUEST_TIMEOUT)
+def _discover_ssb_table(base_url: str, table_id: str) -> dict[str, Any]:
+    """Fetch the metadata for an SSB table to discover available variables."""
+    from .core.adapters.pxweb import REQUEST_TIMEOUT
+    url = f"{base_url.rstrip('/')}/{table_id}"
+    resp = requests.get(url, timeout=REQUEST_TIMEOUT)
     resp.raise_for_status()
-    data = resp.json()
-
-    if cache_dir is not None:
-        cache_file.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-    return data
-
-
-def _get_json(
-    url: str,
-    params: dict[str, Any] | None = None,
-    cache_dir: Path | None = None,
-    cache_key: str | None = None,
-) -> Any:
-    """GET JSON from an arbitrary URL with optional caching."""
-    if cache_dir is not None and cache_key is not None:
-        cache_dir = Path(cache_dir)
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_file = cache_dir / f"{cache_key}.json"
-        if cache_file.exists():
-            logger.debug("Cache hit: %s", cache_file)
-            return json.loads(cache_file.read_text(encoding="utf-8"))
-
-    logger.info("GET %s", url)
-    resp = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
-    resp.raise_for_status()
-    data = resp.json()
-
-    if cache_dir is not None and cache_key is not None:
-        cache_file.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-    return data
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# JSON-stat2 → DataFrame
-# ──────────────────────────────────────────────────────────────────────────────
-
-def jsonstat2_to_df(
-    payload: dict[str, Any],
-    use_codes: bool = False,
-) -> pd.DataFrame:
-    """Convert a JSON-stat2 response (SSB PxWebAPI v2 format) to a DataFrame.
-
-    Handles nested ``dimension`` objects and a flat ``value`` list.
-
-    Args:
-        payload: Parsed JSON-stat2 dict.
-        use_codes: If True, use the raw category codes (e.g. "3101") as cell
-            values instead of human-readable labels (e.g. "Halden").
-            Default is False (use labels) for backwards compatibility with
-            the test fixtures.
-
-    Returns:
-        Tidy DataFrame with one column per dimension plus a ``value`` column.
-
-    Raises:
-        KeyError: if the payload is missing required JSON-stat2 keys.
-    """
-    dims = payload["dimension"]
-    dim_ids: list[str] = payload["id"]
-    dim_sizes: list[int] = payload["size"]
-    values: list[float | None] = payload["value"]
-
-    # Build index arrays (cartesian product of dimension categories)
-    import itertools
-
-    category_lists = []
-    for dim_id, size in zip(dim_ids, dim_sizes):
-        cats = dims[dim_id]["category"]
-        label_map = cats.get("label", {})
-        index_map = cats.get("index", {})
-        # Reorder by index position
-        if isinstance(index_map, dict):
-            ordered = sorted(index_map.items(), key=lambda x: x[1])
-            ordered_ids = [k for k, _ in ordered]
-        else:
-            ordered_ids = list(index_map)
-        if use_codes:
-            # Keep the raw codes (e.g. "3101", "KOShjtj80aarover0001", "2022")
-            category_lists.append(ordered_ids)
-        else:
-            # Use human-readable labels (e.g. "Halden", "Andel...", "2022")
-            labels = [label_map.get(k, k) for k in ordered_ids]
-            category_lists.append(labels)
-
-    rows = list(itertools.product(*category_lists))
-    df = pd.DataFrame(rows, columns=dim_ids)
-    df["value"] = values
-    return df
+    return resp.json()
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # SSB fetchers
 # ──────────────────────────────────────────────────────────────────────────────
 
-def _discover_ssb_table(table_id: str) -> dict[str, Any]:
-    """Fetch the metadata for an SSB table to discover available variables."""
-    url = f"{SSB_BASE}/{table_id}"
-    resp = requests.get(url, timeout=REQUEST_TIMEOUT)
-    resp.raise_for_status()
-    return resp.json()
-
-
 def fetch_kostra_pleie(
-    cache_dir: Path | None = DEFAULT_CACHE,
+    *,
+    base_url: str,
+    table_id: str,
+    var_map: dict[str, str],
+    cache_dir: Path | None = None,
 ) -> pd.DataFrame:
-    """Fetch KOSTRA table 12209 — pleie og omsorg, alle kommuner, alle år.
+    """Fetch KOSTRA table (default 12209) — pleie og omsorg, alle kommuner, alle år.
 
     Returns a tidy DataFrame with columns:
         - ``knr_raw``: original kommune number from SSB
@@ -239,8 +93,10 @@ def fetch_kostra_pleie(
     Raises:
         requests.HTTPError: on API failure.
     """
-    logger.info("Discovering KOSTRA table 12209 metadata")
-    meta = _discover_ssb_table("12209")
+    wanted_codes = list(var_map.values())
+
+    logger.info("Discovering KOSTRA table %s metadata", table_id)
+    meta = _discover_ssb_table(base_url, table_id)
 
     variables = meta.get("variables", [])
     # Region variable has a long code in this table
@@ -258,7 +114,7 @@ def fetch_kostra_pleie(
 
     if region_var is None or time_var is None or contents_var is None:
         raise ValueError(
-            f"Unexpected table structure for 12209. "
+            f"Unexpected table structure for {table_id}. "
             f"Variables: {[v.get('code') for v in variables]}"
         )
 
@@ -267,10 +123,10 @@ def fetch_kostra_pleie(
     all_years: list[str] = time_var.get("values", [])
 
     # Pick the relevant KOSTRA variables (use discovered codes)
-    wanted_contents = [c for c in contents_values if c in KOSTRA_WANTED_CODES]
+    wanted_contents = [c for c in contents_values if c in wanted_codes]
     if not wanted_contents:
         logger.warning(
-            "KOSTRA_WANTED_CODES not found; available: %s. Using first 6.",
+            "var_map values not found; available: %s. Using first 6.",
             contents_values[:6],
         )
         wanted_contents = contents_values[:6]
@@ -293,7 +149,8 @@ def fetch_kostra_pleie(
         "response": {"format": "json-stat2"},
     }
 
-    payload = _post_px("12209", query, cache_dir=cache_dir)
+    adapter = PxWebAdapter(base_url=base_url, cache_dir=cache_dir)
+    payload = adapter.post_table(table_id, query)
     df = jsonstat2_to_df(payload, use_codes=True)
 
     # Build name lookup from region metadata (codes → human names via label dict)
@@ -317,7 +174,8 @@ def fetch_kostra_pleie(
     df["aar"] = pd.to_numeric(df["aar"], errors="coerce")
 
     logger.info(
-        "KOSTRA 12209: %d rows, %d kommuner, years %s–%s",
+        "KOSTRA %s: %d rows, %d kommuner, years %s–%s",
+        table_id,
         len(df),
         df["knr"].nunique(),
         int(df["aar"].min()),
@@ -327,9 +185,12 @@ def fetch_kostra_pleie(
 
 
 def fetch_population_current(
-    cache_dir: Path | None = DEFAULT_CACHE,
+    *,
+    base_url: str,
+    table_id: str,
+    cache_dir: Path | None = None,
 ) -> pd.DataFrame:
-    """Fetch current population by age (1-year classes) from SSB table 07459.
+    """Fetch current population by age (1-year classes) from SSB (default table 07459).
 
     Fetches only ages 80+ (codes 080–104) for all kommuner, both sexes summed,
     for the most recent 10 years.
@@ -341,8 +202,8 @@ def fetch_population_current(
         - ``aar``: year (int)
         - ``value``: population count
     """
-    logger.info("Fetching SSB table 07459 — folkemengde etter alder (80+)")
-    meta = _discover_ssb_table("07459")
+    logger.info("Fetching SSB table %s — folkemengde etter alder (80+)", table_id)
+    meta = _discover_ssb_table(base_url, table_id)
     variables = meta.get("variables", [])
 
     time_var = next(
@@ -360,14 +221,14 @@ def fetch_population_current(
 
     if time_var is None or age_var is None or region_var is None:
         raise ValueError(
-            f"Expected variables not found in 07459. Found: {[v.get('code') for v in variables]}"
+            f"Expected variables not found in {table_id}. Found: {[v.get('code') for v in variables]}"
         )
 
     all_years: list[str] = time_var.get("values", [])
     # Use most recent 10 years
     recent_years = all_years[-10:] if len(all_years) > 10 else all_years
 
-    # Find all 4-char komunne codes (exactly 4 digits → kommunenivå, not county/national)
+    # Find all 4-char kommune codes (exactly 4 digits → kommunenivå, not county/national)
     all_regions: list[str] = region_var.get("values", [])
     kommune_regions = [r for r in all_regions if len(r) == 4 and r.isdigit()]
 
@@ -412,7 +273,8 @@ def fetch_population_current(
     age_texts = age_var.get("valueTexts", age_vals)
     age_label_map: dict[str, str] = dict(zip(age_vals, age_texts))
 
-    payload = _post_px("07459", query, cache_dir=cache_dir)
+    adapter = PxWebAdapter(base_url=base_url, cache_dir=cache_dir)
+    payload = adapter.post_table(table_id, query)
     df = jsonstat2_to_df(payload, use_codes=True)
 
     # Rename
@@ -437,7 +299,8 @@ def fetch_population_current(
     df = df.groupby(group_cols, as_index=False)["value"].sum()
 
     logger.info(
-        "Population 07459 (80+): %d rows, %d kommuner, years %s–%s",
+        "Population %s (80+): %d rows, %d kommuner, years %s–%s",
+        table_id,
         len(df),
         df["knr"].nunique(),
         int(df["aar"].min()),
@@ -447,13 +310,16 @@ def fetch_population_current(
 
 
 def fetch_population_projections(
-    cache_dir: Path | None = DEFAULT_CACHE,
+    *,
+    base_url: str,
+    table_id: str,
+    cache_dir: Path | None = None,
 ) -> pd.DataFrame:
     """Fetch SSB population projections (medium scenario) at the national level.
 
     SSB's kommune-level projections are published in separate tables (e.g.
-    13873, 12880).  We try 13873 first, then 12880, then fall back to a
-    national-aggregate projection.
+    13873, 12880).  We try 13873 first, then the configured table_id (fallback),
+    then return an empty DataFrame.
 
     Returns a tidy DataFrame with columns:
         - ``knr``: kommune number (``"NATIONAL"`` if only aggregate available)
@@ -465,10 +331,12 @@ def fetch_population_projections(
     aggregates in the public PxWebAPI.  For municipality-level projections
     we use the national growth-rate adjustment method in the analysis module.
     """
-    for table_id in ("13873", "12880"):
+    # Try the discovery table first, then fall back to configured table_id
+    candidates = ["13873", table_id] if table_id != "13873" else [table_id]
+    for tid in candidates:
         try:
-            logger.info("Trying SSB projection table %s", table_id)
-            meta = _discover_ssb_table(table_id)
+            logger.info("Trying SSB projection table %s", tid)
+            meta = _discover_ssb_table(base_url, tid)
             variables = meta.get("variables", [])
             time_var = next(
                 (v for v in variables if v.get("code") in ("Tid", "AAR", "Aar")),
@@ -492,9 +360,8 @@ def fetch_population_projections(
                 "response": {"format": "json-stat2"},
             }
 
-            payload = _post_px(
-                table_id, query, cache_dir=cache_dir, cache_key=f"proj_{table_id}"
-            )
+            adapter = PxWebAdapter(base_url=base_url, cache_dir=cache_dir)
+            payload = adapter.post_table(tid, query, cache_key=f"proj_{tid}")
             df = jsonstat2_to_df(payload)
 
             rename_map: dict[str, str] = {}
@@ -506,14 +373,14 @@ def fetch_population_projections(
 
             logger.info(
                 "Projection table %s: %d rows, years %s",
-                table_id,
+                tid,
                 len(df),
                 sorted(df["aar"].unique()),
             )
             return df
 
         except Exception as exc:
-            logger.warning("Table %s failed: %s", table_id, exc)
+            logger.warning("Table %s failed: %s", tid, exc)
             time.sleep(REQUEST_PAUSE)
             continue
 
@@ -523,27 +390,33 @@ def fetch_population_projections(
 
 
 def fetch_fhi_nokkel(
-    indicator: str = "Andel80+",
-    cache_dir: Path | None = DEFAULT_CACHE,
+    *,
+    base_url: str,
+    source: str,
+    cache_dir: Path | None = None,
 ) -> pd.DataFrame:
     """Fetch a social/health indicator from FHI NOKKEL (folkehelsestatistikk).
 
     Tries to fetch a levekårs/eldreprofil indicator for all kommuner.
 
     Args:
-        indicator: NOKKEL indicator code or keyword.
+        base_url: FHI API base URL, e.g. ``"https://statistikk-data.fhi.no/api/open/v1"``.
+        source: NOKKEL data source identifier (e.g. ``"nokkel"``).
         cache_dir: Cache directory for raw responses.
 
     Returns:
         DataFrame with columns ``knr``, ``aar``, ``indicator``, ``value``.
         May be empty if the endpoint is unreachable.
     """
+    indicator = "Andel80+"
+    adapter = PxWebAdapter(base_url=base_url, cache_dir=cache_dir)
+
     # Discover available indicators from the NOKKEL API
     try:
-        indicators_url = f"{FHI_BASE}/datakilder/nokkel/indikatorer"
+        indicators_url = f"{base_url.rstrip('/')}/datakilder/{source}/indikatorer"
         logger.info("Fetching FHI NOKKEL indicator list")
-        data = _get_json(
-            indicators_url, cache_dir=cache_dir, cache_key="fhi_indicators"
+        data = adapter.get_json(
+            indicators_url, cache_key="fhi_indicators"
         )
     except Exception as exc:
         logger.warning("FHI NOKKEL indicator list fetch failed: %s", exc)
@@ -568,11 +441,10 @@ def fetch_fhi_nokkel(
 
     # Fetch data for that indicator
     try:
-        data_url = f"{FHI_BASE}/datakilder/nokkel/data"
-        payload = _get_json(
+        data_url = f"{base_url.rstrip('/')}/datakilder/{source}/data"
+        payload = adapter.get_json(
             data_url,
             params={"indikatorId": ind_id, "geografi": "kommuner"},
-            cache_dir=cache_dir,
             cache_key=f"fhi_nokkel_{ind_id}",
         )
     except Exception as exc:
@@ -667,45 +539,41 @@ def load_from_duckdb(
 # Orchestration
 # ──────────────────────────────────────────────────────────────────────────────
 
+_FETCHERS = {
+    "kostra_pleie": lambda s, cache_dir: fetch_kostra_pleie(
+        base_url=s["base_url"], table_id=s["table"],
+        var_map=dict(s.get("var_map", {})), cache_dir=cache_dir),
+    "befolkning": lambda s, cache_dir: fetch_population_current(
+        base_url=s["base_url"], table_id=s["table"], cache_dir=cache_dir),
+    "framskrivinger": lambda s, cache_dir: fetch_population_projections(
+        base_url=s["base_url"], table_id=s["table"], cache_dir=cache_dir),
+    "fhi_nokkel": lambda s, cache_dir: fetch_fhi_nokkel(
+        base_url=s["base_url"], source=s["source"], cache_dir=cache_dir),
+}
+
+
 def run_ingest(
-    db_path: Path = DEFAULT_DB,
-    cache_dir: Path | None = DEFAULT_CACHE,
+    sources: list[dict[str, Any]],
+    *,
+    db_path: Path,
+    cache_dir: Path | None = None,
 ) -> dict[str, pd.DataFrame]:
-    """Run the full ingest pipeline and save all tables to DuckDB.
-
-    Args:
-        db_path: Target DuckDB file.
-        cache_dir: Cache directory for raw API responses.
-
-    Returns:
-        Dict mapping table name → DataFrame for all fetched datasets.
-    """
-    results: dict[str, pd.DataFrame] = {}
-
-    logger.info("=== Ingest: KOSTRA 12209 ===")
-    df_kostra = fetch_kostra_pleie(cache_dir=cache_dir)
-    save_to_duckdb(df_kostra, "kostra_pleie", db_path=db_path)
-    results["kostra_pleie"] = df_kostra
-    time.sleep(REQUEST_PAUSE)
-
-    logger.info("=== Ingest: Population 07459 ===")
-    df_pop = fetch_population_current(cache_dir=cache_dir)
-    save_to_duckdb(df_pop, "befolkning", db_path=db_path)
-    results["befolkning"] = df_pop
-    time.sleep(REQUEST_PAUSE)
-
-    logger.info("=== Ingest: Population projections ===")
-    df_proj = fetch_population_projections(cache_dir=cache_dir)
-    if not df_proj.empty:
-        save_to_duckdb(df_proj, "framskrivinger", db_path=db_path)
-    results["framskrivinger"] = df_proj
-    time.sleep(REQUEST_PAUSE)
-
-    logger.info("=== Ingest: FHI NOKKEL ===")
-    df_fhi = fetch_fhi_nokkel(cache_dir=cache_dir)
-    if not df_fhi.empty:
-        save_to_duckdb(df_fhi, "fhi_nokkel", db_path=db_path)
-    results["fhi_nokkel"] = df_fhi
-
-    logger.info("=== Ingest complete ===")
-    return results
+    """Fetch every configured source, persist to DuckDB, return DataFrames."""
+    datasets: dict[str, pd.DataFrame] = {}
+    for src in sources:
+        sid = src["id"]
+        fetcher = _FETCHERS.get(sid)
+        if fetcher is None:
+            raise ValueError(
+                f"no fetcher for source id '{sid}' (known: {sorted(_FETCHERS)})"
+            )
+        df = fetcher(src, cache_dir)
+        if df is None:
+            logger.warning("Source %s returned no data — skipped", sid)
+            df = pd.DataFrame()
+        datasets[sid] = df
+        if not df.empty:
+            save_to_duckdb(df, sid, db_path=db_path)
+        else:
+            logger.info("Source %s returned empty DataFrame — not persisted", sid)
+    return datasets

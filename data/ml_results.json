@@ -1,0 +1,107 @@
+{
+  "target": "coverage_rate",
+  "framing": "planleggingsstøtte — ikke klinisk beslutningsstøtte",
+  "folds": [
+    {
+      "fold": 1,
+      "train_years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022
+      ],
+      "test_years": [
+        2023
+      ],
+      "n_train": 2580,
+      "n_test": 379,
+      "xgb_mae": 2.169792068602227,
+      "xgb_rmse": 3.039027819919313,
+      "naive_mae": 2.2849604221635884,
+      "naive_rmse": 3.145178913158735,
+      "tabpfn_mae": null,
+      "tabpfn_rmse": null
+    },
+    {
+      "fold": 2,
+      "train_years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "test_years": [
+        2024
+      ],
+      "n_train": 2959,
+      "n_test": 261,
+      "xgb_mae": 2.0238584189579405,
+      "xgb_rmse": 2.735596863544899,
+      "naive_mae": 2.254214559386973,
+      "naive_rmse": 3.0652811087830214,
+      "tabpfn_mae": null,
+      "tabpfn_rmse": null
+    },
+    {
+      "fold": 3,
+      "train_years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "test_years": [
+        2025
+      ],
+      "n_train": 3220,
+      "n_test": 384,
+      "xgb_mae": 2.0516749719778695,
+      "xgb_rmse": 2.895155695007178,
+      "naive_mae": 2.3002604166666667,
+      "naive_rmse": 3.129850402442051,
+      "tabpfn_mae": null,
+      "tabpfn_rmse": null
+    }
+  ],
+  "mean_xgb_mae": 2.0817751531793456,
+  "mean_naive_mae": 2.2798117994057425,
+  "mean_tabpfn_mae": null,
+  "shap_top_features": [
+    {
+      "feature": "coverage_rate_lag1",
+      "mean_abs_shap": 5.0287
+    },
+    {
+      "feature": "year",
+      "mean_abs_shap": 0.7645
+    },
+    {
+      "feature": "coverage_rate_lag2",
+      "mean_abs_shap": 0.4152
+    },
+    {
+      "feature": "log_pop_80plus",
+      "mean_abs_shap": 0.4143
+    },
+    {
+      "feature": "inst_per_1000_80plus",
+      "mean_abs_shap": 0.3043
+    }
+  ],
+  "notes": [
+    "TabPFN: TabPFN runtime error: TabPFN requires a one-time license acceptance to download\nmodel weights for local inference, but no interactive terminal\nis available.\n\nTo authenticate in a non-interactive environment:\n  1. Open https://ux.priorlabs.ai in a browser and log in (or register)\n  2. Accept the license on the Licenses tab\n  3. Copy your API Key from https://ux.priorlabs.ai/account\n  4. Set the environment variable: export TABPFN_TOKEN=\"<your-api-key>\"\n     or in Python (before calling .fit()): import os; os.environ[\"TABPFN_TOKEN\"] = \"<your-api-key>\""
+  ],
+  "tabpfn_available": false
+}

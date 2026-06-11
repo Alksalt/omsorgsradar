@@ -72,3 +72,68 @@ def write_manifest(
 def read_manifest(artifact_path: Path) -> ArtifactManifest:
     payload = json.loads(_manifest_path(artifact_path).read_text(encoding="utf-8"))
     return ArtifactManifest(**payload)
+
+
+FINDINGS_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "required": ["kommuner", "analysis_year_range"],
+    "properties": {
+        "kommuner": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["knr", "rank", "press_index_norm"],
+                "properties": {
+                    "knr": {"type": "string"},
+                    "rank": {"type": "integer"},
+                    "press_index_norm": {"type": ["number", "null"]},
+                },
+            },
+        },
+        "analysis_year_range": {"type": "string"},
+    },
+}
+
+QUALITY_PROFILE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "required": ["datasets"],
+    "properties": {"datasets": {"type": "object"}},
+}
+
+VERIFICATION_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "required": ["verdict", "total_claims", "passed", "failed"],
+    "properties": {
+        "verdict": {"enum": ["PASS", "FAIL"]},
+        "total_claims": {"type": "integer"},
+        "passed": {"type": "integer"},
+        "failed": {"type": "integer"},
+        "failures": {"type": "array", "items": {"type": "string"}},
+    },
+}
+
+SCHEMAS: dict[str, dict[str, Any]] = {
+    "findings": FINDINGS_SCHEMA,
+    "quality_profile": QUALITY_PROFILE_SCHEMA,
+    "verification": VERIFICATION_SCHEMA,
+}
+
+
+def validate_artifact(name: str, payload: dict[str, Any]) -> None:
+    """Validate an artifact payload against its registered schema.
+
+    Raises:
+        ArtifactValidationError: unknown artifact name or schema mismatch.
+    """
+    schema = SCHEMAS.get(name)
+    if schema is None:
+        raise ArtifactValidationError(
+            f"unknown artifact '{name}' (known: {sorted(SCHEMAS)})"
+        )
+    try:
+        jsonschema.validate(payload, schema)
+    except jsonschema.ValidationError as exc:
+        loc = "/".join(str(p) for p in exc.absolute_path) or "<root>"
+        raise ArtifactValidationError(
+            f"artifact '{name}' invalid at '{loc}': {exc.message}"
+        ) from exc

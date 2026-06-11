@@ -16,6 +16,9 @@ wheels/
 data/cache/
 data/*.duckdb
 
+# Run journals — regenerable, snapshot the workflow config
+runs/
+
 # OS
 .DS_Store
 Thumbs.db

@@ -40,6 +40,8 @@ import requests
 
 from .core.adapters.pxweb import (  # noqa: F401  (backwards-compat re-exports)
     PxWebAdapter,
+    REQUEST_PAUSE,
+    REQUEST_TIMEOUT,
     jsonstat2_to_df,
 )
 from .kommune_mergers import normalize_knr_series
@@ -53,8 +55,6 @@ logger = logging.getLogger(__name__)
 DEFAULT_DB = Path(__file__).parent.parent.parent / "data" / "omsorgsradar.duckdb"
 DEFAULT_CACHE = Path(__file__).parent.parent.parent / "data" / "cache"
 
-REQUEST_PAUSE = 0.5   # pause between SSB requests (be polite)
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 # SSB table metadata discovery
@@ -62,7 +62,6 @@ REQUEST_PAUSE = 0.5   # pause between SSB requests (be polite)
 
 def _discover_ssb_table(base_url: str, table_id: str) -> dict[str, Any]:
     """Fetch the metadata for an SSB table to discover available variables."""
-    from .core.adapters.pxweb import REQUEST_TIMEOUT
     url = f"{base_url.rstrip('/')}/{table_id}"
     resp = requests.get(url, timeout=REQUEST_TIMEOUT)
     resp.raise_for_status()

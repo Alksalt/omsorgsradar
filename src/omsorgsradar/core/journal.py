@@ -31,7 +31,7 @@ class RunJournal:
         config_snapshot: dict[str, Any] | None = None,
     ) -> "RunJournal":
         run_id = (
-            datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + analysis
+            datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ") + "-" + analysis
         )
         run_dir = Path(runs_dir) / run_id
         run_dir.mkdir(parents=True, exist_ok=True)

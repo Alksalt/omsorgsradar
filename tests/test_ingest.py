@@ -2,11 +2,12 @@
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
 
-from omsorgsradar.ingest import jsonstat2_to_df
+from omsorgsradar.ingest import _FETCHERS, jsonstat2_to_df, run_ingest
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 
@@ -82,3 +83,61 @@ class TestJsonStat2ToDf:
         bad_payload = {"id": ["A"], "size": [2], "dimension": {}}
         with pytest.raises(KeyError):
             jsonstat2_to_df(bad_payload)
+
+
+class TestRunIngestOffline:
+    """Offline tests for run_ingest orchestration and _FETCHERS dispatch."""
+
+    def test_unknown_source_id_raises(self, tmp_path: Path) -> None:
+        sources = [{"id": "nonexistent_source", "base_url": "http://x", "table": "0"}]
+        with pytest.raises(ValueError, match="no fetcher for source id"):
+            run_ingest(sources, db_path=tmp_path / "test.duckdb")
+
+    def test_fetchers_dispatch_by_id(self, tmp_path: Path) -> None:
+        import pandas as pd
+
+        sentinel = pd.DataFrame({"knr": ["0301"], "aar": [2024], "value": [1.0]})
+
+        for sid in ("kostra_pleie", "befolkning", "framskrivinger", "fhi_nokkel"):
+            with patch.dict(
+                "omsorgsradar.ingest._FETCHERS",
+                {sid: lambda s, cache_dir, _sid=sid: sentinel},
+            ):
+                result = run_ingest([{"id": sid}], db_path=tmp_path / f"{sid}.duckdb")
+                assert sid in result
+                assert not result[sid].empty
+
+    def test_kostra_lambda_requires_base_url_and_table(self) -> None:
+        fetcher = _FETCHERS["kostra_pleie"]
+        with pytest.raises(KeyError):
+            fetcher({"base_url": "http://x"}, None)  # missing "table"
+
+    def test_fhi_nokkel_lambda_requires_source_key(self) -> None:
+        fetcher = _FETCHERS["fhi_nokkel"]
+        with pytest.raises(KeyError):
+            fetcher({"base_url": "http://x"}, None)  # missing "source"
+
+
+class TestCanonicalSourcesMatchFetchers:
+    """Every [[sources]] block in the canonical analysis.toml must carry the
+    keys its _FETCHERS lambda accesses — catches config/dispatch drift offline."""
+
+    REQUIRED_KEYS = {
+        "kostra_pleie": {"base_url", "table", "var_map"},
+        "befolkning": {"base_url", "table"},
+        "framskrivinger": {"base_url", "table"},
+        "fhi_nokkel": {"base_url", "source"},
+    }
+
+    def test_canonical_sources_have_required_keys(self) -> None:
+        from omsorgsradar.core.config import load_run_config
+
+        repo_root = Path(__file__).resolve().parents[1]
+        cfg = load_run_config(
+            repo_root / "analyses" / "omsorgsradar", repo_root / "workflow.toml"
+        )
+        for src in cfg.sources:
+            sid = src["id"]
+            assert sid in _FETCHERS, f"source id '{sid}' has no fetcher"
+            missing = self.REQUIRED_KEYS[sid] - set(src)
+            assert not missing, f"source '{sid}' missing keys: {missing}"

@@ -23,7 +23,7 @@ KOSTRA 12209 uses internal SSB variable codes (e.g. `KOShjtj80aarover0001`) rath
 | `KOSaarsvbrukerom0000` | Årsverk per bruker |
 | `KOSbduFKG9innbyg0000` | Utgifter per innbygger (kr) |
 
-These codes are fetched from the metadata endpoint and used as-is. The mapping is documented in `ingest.py:KOSTRA_VAR_MAP`.
+These codes are fetched from the metadata endpoint and used as-is. The mapping is configured in `analyses/omsorgsradar/analysis.toml` under `[sources.var_map]` and passed at runtime via `RunConfig.sources`.
 
 ### Population projection table 13873
 

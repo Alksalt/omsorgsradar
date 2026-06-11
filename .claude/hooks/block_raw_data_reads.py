@@ -6,6 +6,9 @@ profiles, and aggregates enter model context. Blocks Read/Grep on raw API
 caches and DuckDB files. Aggregate artifacts (findings.json,
 quality_profile.json, verification.json, reports) stay readable.
 Stdlib only — runs under any python3 without the project venv.
+
+NOT a security boundary: Bash/cat bypass this by design, and it fails open.
+Purpose is to keep row-level data out of *model context* by accident, nothing more.
 """
 
 import json

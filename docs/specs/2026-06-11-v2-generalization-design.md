@@ -112,6 +112,11 @@ before analysis, verdict published in the quality profile.
 4. **Run** the remaining stages on green; link report, figures, run journal; narrate findings from
    `findings.json` only (numbers come from artifacts, never from model memory).
 
+Security gate (review flag 2026-06-11): before any machine-authored analysis.toml is
+executed, tighten core/config.py — `base_url` pattern-locked to the known data hosts,
+`id`/cache keys restricted to `^[a-z0-9_]+$`, and pxweb cache writes must reject keys
+containing `/` or `..`.
+
 ### `/add-dataset <api-url>`
 1. Inspect the API (one sample call, schema sniff: JSON-stat2? PxWeb? CKAN? plain JSON/CSV?).
 2. Closest existing adapter → emit a `[[sources]]` block. New shape → write `core/adapters/<new>.py`
@@ -143,6 +148,10 @@ Codex CLI parity via AGENTS.md), API-key (anthropic/openai/openrouter), local (L
 `ANTHROPIC_BASE_URL`, Devstral-Small-2-class model) — selected by `[endpoint].mode`. v2 ships a
 working local demo of ≥1 stage. Privacy mapping (open→cloud, pseudonymized→EU-hosted Bedrock
 eu-central-1/Vertex EU, sensitive→local) + Normen skytjeneste-veileder reference in docs.
+
+Security gate (review flag 2026-06-11): when [endpoint.api] gains fields, set
+additionalProperties: false in WORKFLOW_SCHEMA and reject key-material field names
+(api_key/key/token/secret) — keys live in env, never in TOML, never in run journals.
 
 ## Testing strategy
 

@@ -1,0 +1,20 @@
+# Global workflow config — HOW the pipeline runs. Per-analysis settings in
+# analyses/<name>/analysis.toml override [defaults] here.
+
+[models]
+profile = "claude-sonnet-4-6"
+report = "claude-fable-5"
+
+[endpoint]
+mode = "subscription"   # subscription | api | local
+
+[endpoint.api]
+provider = "anthropic"  # anthropic | openai | openrouter
+
+[endpoint.local]
+base_url = "http://localhost:1234"
+
+[defaults]
+language = "nb"
+figure_style = "seaborn-v0_8-whitegrid"
+runs_dir = "runs"

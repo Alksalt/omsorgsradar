@@ -1,0 +1,40 @@
+[analysis]
+name = "omsorgsradar"
+question = "Hvilke kommuner får den hardeste skvisen mellom aldrende befolkning og dagens omsorgskapasitet fram mot 2035?"
+language = "nb"
+
+[stages]
+list = ["ingest", "profile", "analyze", "verify", "report", "ml"]
+
+[[sources]]
+adapter = "pxweb"
+id = "kostra_pleie"
+base_url = "https://data.ssb.no/api/v0/no/table"
+table = "12209"
+
+[sources.var_map]
+hjemmetjeneste_andel = "KOShjtj80aarover0001"
+institusjon_andel = "KOSsykhjand80aar0000"
+aarsverk_per_bruker = "KOSaarsvbrukerom0000"
+utgifter_per_innbygger = "KOSbduFKG9innbyg0000"
+
+[[sources]]
+adapter = "pxweb"
+id = "befolkning"
+base_url = "https://data.ssb.no/api/v0/no/table"
+table = "07459"
+
+[[sources]]
+adapter = "pxweb"
+id = "framskrivinger"
+base_url = "https://data.ssb.no/api/v0/no/table"
+table = "12880"
+
+[[sources]]
+adapter = "fhi"
+id = "fhi_nokkel"
+base_url = "https://statistikk-data.fhi.no/api/open/v1"
+source = "nokkel"
+
+[params]
+projection_year = 2035

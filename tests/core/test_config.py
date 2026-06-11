@@ -108,3 +108,23 @@ class TestRunConfig:
     def test_setting_falls_back_to_code_default(self, tmp_path: Path) -> None:
         cfg = self._cfg(tmp_path)
         assert cfg.setting("analysis", "nonexistent_key", default="fallback") == "fallback"
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+class TestCanonicalConfigs:
+    """The committed config files must always validate."""
+
+    def test_workflow_toml_valid(self) -> None:
+        cfg = load_workflow_config(REPO_ROOT / "workflow.toml")
+        assert cfg["endpoint"]["mode"] in ("subscription", "api", "local")
+
+    def test_omsorgsradar_analysis_valid(self) -> None:
+        cfg = load_run_config(
+            REPO_ROOT / "analyses" / "omsorgsradar", REPO_ROOT / "workflow.toml"
+        )
+        assert cfg.name == "omsorgsradar"
+        assert cfg.stage_list[0] == "ingest"
+        ids = [s["id"] for s in cfg.sources]
+        assert ids == ["kostra_pleie", "befolkning", "framskrivinger", "fhi_nokkel"]

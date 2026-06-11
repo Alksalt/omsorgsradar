@@ -19,7 +19,8 @@ ones.
   owner is «utdannet lege (master i medisin)», never bare «lege»; no real patient data (this project uses
   only open aggregate statistics — SSB/FHI).
 
-Status: **scaffold only (2026-06-11). Do not start the build without Oleksandr's explicit go.**
+Status: **v1 built + shipped (P0–P5, 2026-06-11) · v2 G0 (engine + config) shipped 2026-06-11 on
+owner's go · next: G1 (Nordic adapters) per `docs/specs/2026-06-11-v2-generalization-design.md`.**
 
 ## v2 engine (G0+)
 Config: `workflow.toml` (models/endpoint/defaults) + `analyses/<name>/analysis.toml`

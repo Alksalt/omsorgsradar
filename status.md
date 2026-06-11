@@ -21,6 +21,17 @@
   (Sotkanet+Socialstyrelsen+KUHR) · evolve this repo · subscription-OAuth primary execution + local demo.
   Plan: `docs/PLAN-v2-generalization.md` (G0–G5, ~5.5–6.5d). DECISIONS.md updated (7 new constraints).
   **Build awaits explicit go.**
+- **2026-06-11** — **G0 (engine + config) shipped** on owner's go, subagent-driven (9 sonnet implementers,
+  opus review panel). Engine extracted: `core/` (validated TOML config w/ precedence, artifact
+  contracts+manifests, crash-safe run journal, stage registry + instance extension point, PxWeb adapter),
+  registry-driven pipeline with hard verify-gate, data-read PreToolUse hook, `pipeline-stages` skill.
+  Canonical configs: `workflow.toml` + `analyses/omsorgsradar/analysis.toml` (zero hardcoded source
+  constants left in code). Review panel: correctness PASS, security PASS, integration BLOCK → 7 fixes
+  applied (journal run-id precision, offline ingest dispatch coverage, gitignore `runs/`, doc/constant
+  dedupe, security flags carried into spec for G3/G5). Tests: 65 → **114 green**. Smoke run: full
+  pipeline on cached SSB data, verify 5/5 PASS, findings byte-identical to v1 — behavior preserved.
+  **Next: G1 — Nordic adapters (sotkanet, socialstyrelsen, kuhr, csv) + realness gates; plan to be
+  written on go.**
 - **2026-06-11** — **v2 design finalized after owner brainstorm.** Additions: config system (per-stage
   models/endpoints, sources, stage list, language — analysis.toml > workflow.toml > defaults),
   `/magic-analyze <url|path|question>` (any dataset pointer), `/add-dataset` (agentic adapter authoring),

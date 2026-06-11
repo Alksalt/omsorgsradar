@@ -1,0 +1,11 @@
+{
+  "artifact": "findings",
+  "path": "/Users/ol/agents/ehelse_project/omsorgsradar/data/findings.json",
+  "sha256": "a4441945b237dd82438ba3dd467c530a301e267b75586aaf14b93461da321d4c",
+  "schema_version": "1",
+  "created_at": "2026-06-11T21:04:31.738236+00:00",
+  "producer": "analyze",
+  "inputs": [
+    "/Users/ol/agents/ehelse_project/omsorgsradar/data/quality_profile.json"
+  ]
+}

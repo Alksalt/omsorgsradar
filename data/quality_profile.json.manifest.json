@@ -1,0 +1,9 @@
+{
+  "artifact": "quality_profile",
+  "path": "/Users/ol/agents/ehelse_project/omsorgsradar/data/quality_profile.json",
+  "sha256": "86296ab3faba69814ce3fdb934d4b9c62c7a6dccb8713e89e8d5a27fddd10ce5",
+  "schema_version": "1",
+  "created_at": "2026-06-11T21:04:31.587746+00:00",
+  "producer": "profile",
+  "inputs": []
+}

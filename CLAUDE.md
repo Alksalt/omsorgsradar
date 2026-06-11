@@ -20,3 +20,11 @@ ones.
   only open aggregate statistics — SSB/FHI).
 
 Status: **scaffold only (2026-06-11). Do not start the build without Oleksandr's explicit go.**
+
+## v2 engine (G0+)
+Config: `workflow.toml` (models/endpoint/defaults) + `analyses/<name>/analysis.toml`
+(stages/sources/params); precedence analysis > workflow > code. Engine:
+`src/omsorgsradar/core/` (config, contracts, journal, registry, adapters) +
+`src/omsorgsradar/stages.py` (default stages). Variants = new instance folder,
+never core edits. Run/extend/debug: see skill `pipeline-stages`.
+Spec: `docs/specs/2026-06-11-v2-generalization-design.md`.

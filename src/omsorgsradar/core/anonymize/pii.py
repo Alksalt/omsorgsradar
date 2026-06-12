@@ -90,12 +90,27 @@ class _BlankSpacyNlpEngine(SpacyNlpEngine):
         super().__init__(models=[{"lang_code": lang, "model_name": "blank"}])
         self.nlp = {lang: spacy.blank(lang)}
 
+# Security gate: spacy.load() accepts a filesystem path and loading a pipeline can
+# execute model code. spacy_model comes from (possibly machine-authored) analysis.toml,
+# so it is allowlisted to known official model NAMES — never a bare path (mirrors the
+# G3 base_url host-allowlist for machine-authored configs).
+ALLOWED_SPACY_MODELS = frozenset({
+    "nb_core_news_lg", "nb_core_news_md", "nb_core_news_sm",
+})
+
+
 def build_analyzer(spacy_model: str | None = None) -> AnalyzerEngine:
     registry = RecognizerRegistry(supported_languages=[LANG])
     registry.add_recognizer(_FnrRecognizer())
     registry.add_recognizer(_phone_recognizer())
     registry.add_recognizer(_konto_recognizer())
     if spacy_model:
+        if spacy_model not in ALLOWED_SPACY_MODELS:
+            raise ValueError(
+                f"spacy_model {spacy_model!r} is not allowlisted "
+                f"(allowed: {sorted(ALLOWED_SPACY_MODELS)}); a path or unknown model is "
+                "rejected because spacy.load executes model code"
+            )
         nlp = SpacyNlpEngine(models=[{"lang_code": LANG, "model_name": spacy_model}])
     else:
         nlp = _BlankSpacyNlpEngine(LANG)

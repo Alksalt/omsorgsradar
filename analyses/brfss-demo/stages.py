@@ -176,7 +176,7 @@ def stage_verify_brfss(ctx: StageContext) -> None:
 
     # Load the anonymized CSV from disk — the single source of truth for verification
     anon_path = ctx.data_dir / "brfss_anonymized.csv"
-    df = pd.read_csv(anon_path, dtype={"state": str})
+    df = pd.read_csv(anon_path, dtype={"state": str, "sex": "Int64"})
 
     # Re-derive: age column may be stored as categorical label strings
     if "age" in df.columns:

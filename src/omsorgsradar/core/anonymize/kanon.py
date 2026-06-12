@@ -21,10 +21,6 @@ class KAnonResult:
     suppression_rate: float
     n_classes: int
 
-    def n_suppressed_below_k_zero(self) -> bool:
-        """True iff every released class meets k (min_class_size >= k)."""
-        return self.min_class_size >= self.k
-
 def generalize(df: pd.DataFrame, cfg: Mapping[str, Any]) -> pd.DataFrame:
     out = df.copy()
     gen = dict(cfg.get("generalize", {}))

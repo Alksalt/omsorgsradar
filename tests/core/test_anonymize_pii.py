@@ -48,3 +48,21 @@ class TestRedact:
         assert good not in out.loc[0, "notes"]
         assert "<NO_FODSELSNUMMER>" in out.loc[0, "notes"]
         assert n == 1
+
+
+class TestSpacyModelAllowlist:
+    """spacy.load executes model code → spacy_model must be an allowlisted name,
+    never a path (machine-authored-config security gate, mirrors G3 host allowlist)."""
+
+    def test_path_or_unknown_model_rejected(self):
+        from omsorgsradar.core.anonymize.pii import build_analyzer
+
+        with pytest.raises(ValueError, match="not allowlisted"):
+            build_analyzer(spacy_model="../evil/model")
+        with pytest.raises(ValueError, match="not allowlisted"):
+            build_analyzer(spacy_model="en_core_web_lg")
+
+    def test_offline_blank_path_constructs(self):
+        from omsorgsradar.core.anonymize.pii import build_analyzer
+
+        assert build_analyzer() is not None  # no model → spacy.blank, no download

@@ -89,13 +89,27 @@ class TestBrfssDemoIntegration:
             f"identifiability verdict must be PASS or WARN, got: {receipt['verdict']}"
         )
 
-    def test_planted_fnr_absent_from_anonymized_csv(self, pipeline_output):
+    def test_planted_pii_redacted_and_text_column_not_released(self, pipeline_output):
         anon_path = pipeline_output["data_dir"] / "brfss_anonymized.csv"
         assert anon_path.exists(), "brfss_anonymized.csv not written"
         anon_text = anon_path.read_text(encoding="utf-8")
-        planted = _valid_fnr("010190")
-        assert planted not in anon_text, (
-            f"Planted fnr {planted} still present in brfss_anonymized.csv — redaction failed"
+        # Data minimisation: the free-text column is scanned/redacted but NOT released.
+        header = anon_text.splitlines()[0].split(",")
+        assert "notes" not in header, "free-text 'notes' column must not be released"
+        # Both planted fnr (and the planted phone) are gone from the artifact.
+        for ddmmyy in ("010190", "150385"):
+            assert _valid_fnr(ddmmyy) not in anon_text, (
+                f"Planted fnr for {ddmmyy} still present in brfss_anonymized.csv"
+            )
+        assert "91123456" not in anon_text, "planted phone digits still in artifact"
+        # The receipt records that redaction actually happened upstream.
+        receipt = json.loads(
+            (pipeline_output["data_dir"] / "identifiability.json").read_text(encoding="utf-8")
+        )
+        pii = receipt.get("pii", {})
+        assert pii.get("total_redacted", 0) >= 2, "expected >=2 redacted PII entities"
+        assert "NO_FODSELSNUMMER" in pii.get("entity_types", []), (
+            "fødselsnummer not recorded as redacted in the receipt"
         )
 
     def test_min_class_size_at_least_k(self, pipeline_output):

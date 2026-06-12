@@ -146,6 +146,15 @@ def stage_anonymize(ctx: StageContext) -> None:
     receipt = assess_identifiability(kres, generalized, acfg)
     receipt["pii"] = pii_summary
 
+    # Data minimisation: free-text columns are scanned/redacted for the PII receipt
+    # but NOT released — offline regex+checksum redaction cannot catch every direct
+    # identifier (names, addresses, e-mails), and the WP216 receipt does not measure
+    # residual free-text risk. Drop them unless explicitly opted-in.
+    if text_cols and not acfg.get("keep_text_columns", False):
+        drop = [c for c in text_cols if c in kres.frame.columns]
+        if drop:
+            kres.frame = kres.frame.drop(columns=drop)
+
     anon_path = ctx.data_dir / f"{src_id}_anonymized.csv"
     kres.frame.to_csv(anon_path, index=False)
     write_manifest(anon_path, artifact="anonymized_table", producer="anonymize")

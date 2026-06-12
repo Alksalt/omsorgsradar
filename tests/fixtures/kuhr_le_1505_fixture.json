@@ -1,0 +1,57 @@
+{
+ "antall": 4,
+ "takstbruk": [
+  {
+   "ar": "2023",
+   "behandler_kommunenr": "1505",
+   "sum_antall_takst": 3999,
+   "takstkode": "2ad",
+   "fagomraade": "LE",
+   "praksis_type_kode": "FATU",
+   "samhandler_praksis_type": "LIS1-Lege",
+   "antall_regninger": 3999,
+   "sum_refusjon": 301185.0,
+   "sum_egenandel_betalt_av_pasient": 421520.0,
+   "sum_egenandel_dekket_av_folketrygden": 235920.0
+  },
+  {
+   "ar": "2023",
+   "behandler_kommunenr": "1505",
+   "sum_antall_takst": 10,
+   "takstkode": "2ad",
+   "fagomraade": "LE",
+   "praksis_type_kode": "LEKO",
+   "samhandler_praksis_type": "Legevakt kommunal",
+   "antall_regninger": 10,
+   "sum_refusjon": 310.0,
+   "sum_egenandel_betalt_av_pasient": 1440.0,
+   "sum_egenandel_dekket_av_folketrygden": 160.0
+  },
+  {
+   "ar": "2023",
+   "behandler_kommunenr": "1505",
+   "sum_antall_takst": 5571,
+   "takstkode": "2ad",
+   "fagomraade": "LE",
+   "praksis_type_kode": "FALO",
+   "samhandler_praksis_type": "Fastlønnet",
+   "antall_regninger": 5571,
+   "sum_refusjon": 443411.0,
+   "sum_egenandel_betalt_av_pasient": 569630.0,
+   "sum_egenandel_dekket_av_folketrygden": 351050.0
+  },
+  {
+   "ar": "2023",
+   "behandler_kommunenr": "1505",
+   "sum_antall_takst": 57602,
+   "takstkode": "2ad",
+   "fagomraade": "LE",
+   "praksis_type_kode": "FALE",
+   "samhandler_praksis_type": "Fastlege",
+   "antall_regninger": 57602,
+   "sum_refusjon": 4756525.0,
+   "sum_egenandel_betalt_av_pasient": 5697640.0,
+   "sum_egenandel_dekket_av_folketrygden": 3806230.0
+  }
+ ]
+}

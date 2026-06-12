@@ -187,6 +187,7 @@ def stage_report(ctx: StageContext) -> None:
         quality_report=ctx.state["quality_report"],
         report_dir=ctx.reports_dir,
         use_llm=ctx.state.get("use_llm"),
+        workflow=ctx.config.workflow,
     )
     ctx.state["cost_info"] = cost_info
     ctx.artifacts["report"] = report_path

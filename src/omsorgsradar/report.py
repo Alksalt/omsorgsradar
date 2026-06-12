@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -381,35 +380,23 @@ def render_llm(
     result: AnalysisResult,
     quality_report: dict[str, Any] | None = None,
     verification: VerificationReport | None = None,
-    n_top: int = 20,
+    client: Any = None,
     model: str = "claude-sonnet-4-5",
+    n_top: int = 20,
 ) -> tuple[str, dict[str, Any]]:
-    """Narrate findings using the Anthropic API.
-
-    Requires ``ANTHROPIC_API_KEY`` in environment.
+    """Narrate findings using a pre-built LLM client.
 
     Args:
         result: Analysis result.
         quality_report: Optional quality report dict.
         verification: Optional verification report.
+        client: LLMClient instance (from core.endpoint.build_client).
+        model: Model ID to pass to the client.
         n_top: Number of top kommuner to include.
-        model: Anthropic model ID.
 
     Returns:
         ``(report_markdown, cost_info)`` tuple.
-
-    Raises:
-        ImportError: if the ``anthropic`` package is not installed.
-        RuntimeError: if ``ANTHROPIC_API_KEY`` is not set.
     """
-    import anthropic  # type: ignore[import]
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise RuntimeError(
-            "ANTHROPIC_API_KEY not set. Use render_template() for the key-free path."
-        )
-
     from .analyze import result_to_dict
 
     findings_dict = result_to_dict(result)
@@ -452,22 +439,14 @@ Rapporten skal:
 
 Ikke repeter tabellen. Ikke hallusiner nye tall. All tekst på bokmål."""
 
-    client = anthropic.Anthropic(api_key=api_key)
-    message = client.messages.create(
-        model=model,
-        max_tokens=2000,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    llm_text = message.content[0].text
+    resp = client.complete(prompt, model=model, max_tokens=2000)
+    llm_text = resp.text
+    from .core.endpoint import estimate_cost
     cost_info = {
         "model": model,
-        "input_tokens": message.usage.input_tokens,
-        "output_tokens": message.usage.output_tokens,
-        "estimated_cost_usd": (
-            message.usage.input_tokens / 1_000_000 * 3.0
-            + message.usage.output_tokens / 1_000_000 * 15.0
-        ),
+        "input_tokens": resp.input_tokens,
+        "output_tokens": resp.output_tokens,
+        "estimated_cost_usd": estimate_cost(model, resp.input_tokens, resp.output_tokens),
     }
 
     # Combine: LLM intro + template table + verification block
@@ -528,6 +507,7 @@ def run_report(
     quality_report: dict[str, Any] | None = None,
     report_dir: Path = REPORT_DIR,
     use_llm: bool | None = None,
+    workflow: dict[str, Any] | None = None,
 ) -> tuple[Path, dict[str, Any]]:
     """Generate the full report: figures + markdown.
 
@@ -535,7 +515,8 @@ def run_report(
         result: Analysis result.
         quality_report: Optional quality report dict.
         report_dir: Output directory for the report.
-        use_llm: If None, auto-detect from ``ANTHROPIC_API_KEY``.
+        use_llm: If False, force template path. If None, defer to workflow config.
+        workflow: Workflow config dict (from workflow.toml). If None, use template path.
 
     Returns:
         ``(report_path, cost_info)`` tuple.
@@ -555,23 +536,24 @@ def run_report(
     claims = build_standard_claims(result)
     verification = verifier.verify_all(claims)
 
-    cost_info: dict[str, Any] = {"path": "key-free template renderer"}
+    from .core.endpoint import build_client
+    cost_info: dict[str, Any] = {"path": "key-free template renderer", "renderer": "template"}
 
-    # Choose rendering path
-    if use_llm is None:
-        use_llm = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    client, model = (None, None)
+    if workflow is not None and use_llm is not False:
+        client, model = build_client(workflow, role="report")
 
-    if use_llm:
+    if client is not None and model is not None:
         try:
-            report_md, cost_info = render_llm(result, quality_report, verification)
+            report_md, cost_info = render_llm(result, quality_report, verification,
+                                              client=client, model=model)
             cost_info["renderer"] = "llm"
         except Exception as exc:
             logger.warning("LLM renderer failed (%s); falling back to template", exc)
             report_md = render_template(result, quality_report, verification)
-            cost_info["renderer"] = "template_fallback"
+            cost_info = {"renderer": "template_fallback", "error": str(exc)}
     else:
         report_md = render_template(result, quality_report, verification)
-        cost_info["renderer"] = "template"
 
     report_path = report_dir / "omsorgsradar_rapport.md"
     report_path.write_text(report_md, encoding="utf-8")

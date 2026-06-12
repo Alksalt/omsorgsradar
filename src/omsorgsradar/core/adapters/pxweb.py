@@ -6,13 +6,14 @@ naming (``<cache_key|table_id>.json``), same timeouts, same JSON-stat2 parse.
 
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
 from typing import Any, Mapping
 
 import pandas as pd
 import requests
+
+from .cache import JsonCache
 
 logger = logging.getLogger(__name__)
 
@@ -86,26 +87,15 @@ class PxWebAdapter:
         timeout: int = REQUEST_TIMEOUT,
     ) -> None:
         self.base_url = base_url.rstrip("/")
-        self.cache_dir = Path(cache_dir) if cache_dir is not None else None
+        self.cache = JsonCache(cache_dir)
         self.timeout = timeout
 
     # ── cache ────────────────────────────────────────────────────────────────
     def _cache_load(self, key: str) -> Any | None:
-        if self.cache_dir is None:
-            return None
-        f = self.cache_dir / f"{key}.json"
-        if f.exists():
-            logger.debug("Cache hit: %s", f)
-            return json.loads(f.read_text(encoding="utf-8"))
-        return None
+        return self.cache.load(key)
 
     def _cache_save(self, key: str, data: Any) -> None:
-        if self.cache_dir is None:
-            return
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        (self.cache_dir / f"{key}.json").write_text(
-            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+        self.cache.save(key, data)
 
     # ── HTTP ─────────────────────────────────────────────────────────────────
     def post_table(

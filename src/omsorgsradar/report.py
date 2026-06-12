@@ -12,6 +12,7 @@ Figures:
 - ``press_index_bar.png``: top-20 kommuner by press index (horizontal bar chart)
 - ``coverage_scatter.png``: coverage rate vs 80+ growth rate scatter plot
 - ``national_trend.png``: national 80+ population trend + projection
+- ``press_index_choropleth.png``: choropleth map of press index per kommune
 """
 
 from __future__ import annotations
@@ -215,6 +216,69 @@ def plot_national_trend(
     return out_path
 
 
+def plot_press_index_choropleth(
+    result: AnalysisResult,
+    out_dir: Path = FIGURES_DIR,
+) -> Path | None:
+    """Choropleth map of normalised press index per kommune (figure 4).
+
+    Requires the committed asset ``assets/geo/kommuner_simplified.geojson``.
+    If the asset is missing, logs a warning and returns None so the report
+    still builds without the map figure.
+
+    Args:
+        result: Analysis result containing per-kommune press_index_norm values.
+        out_dir: Output directory for the figure.
+
+    Returns:
+        Path to the saved PNG, or None if the asset is unavailable.
+    """
+    from .maps import render_choropleth, DEFAULT_GEO_PATH
+
+    if not DEFAULT_GEO_PATH.exists():
+        logger.warning(
+            "Geo asset not found (%s) — skipping choropleth figure", DEFAULT_GEO_PATH
+        )
+        return None
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "press_index_choropleth.png"
+
+    # Build values dict: 4-digit zero-padded knr → press_index_norm
+    # knr in findings is already a 4-digit string; zfill guards against edge cases
+    # Use try/except for isnan to handle int/None from deserialized JSON as well
+    def _is_valid(v: Any) -> bool:
+        try:
+            return not np.isnan(float(v))
+        except (TypeError, ValueError):
+            return False
+
+    values: dict[str, float] = {
+        km.knr.zfill(4): float(km.press_index_norm)
+        for km in result.kommuner
+        if _is_valid(km.press_index_norm)
+    }
+
+    attribution = "Kartgrunnlag: Kartverket via robhop/fylker-og-kommuner (CC BY 4.0)"
+    choropleth_result = render_choropleth(
+        DEFAULT_GEO_PATH,
+        values,
+        out_path,
+        title="Press-indeks per kommune mot 2035",
+        value_label="Press-indeks (normalisert 0–1)",
+        attribution=attribution,
+    )
+
+    n_missing = choropleth_result["missing"]
+    logger.info(
+        "Choropleth: %d kommuner plottet, %d uten data (grå)",
+        choropleth_result["plotted"],
+        n_missing,
+    )
+    return out_path
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Template renderer (deterministic, key-free path)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -325,6 +389,13 @@ def render_template(
     lines.append("![Dekning vs vekst](figures/coverage_scatter.png)")
     lines.append("")
     lines.append("![Nasjonal trend](figures/national_trend.png)")
+    lines.append("")
+    lines.append("![Press-indeks koropleth](figures/press_index_choropleth.png)")
+    lines.append("")
+    lines.append(
+        "*Kartgrunnlag: Kartverket via robhop/fylker-og-kommuner (CC BY 4.0). "
+        "Kommuner uten data er vist i grått.*"
+    )
     lines.append("")
     lines.append("---")
     lines.append("")
@@ -530,6 +601,7 @@ def run_report(
     plot_press_index_bar(result, out_dir=figures_dir)
     plot_coverage_scatter(result, out_dir=figures_dir)
     plot_national_trend(result, out_dir=figures_dir)
+    plot_press_index_choropleth(result, out_dir=figures_dir)
 
     # Verify findings
     verifier = Verifier(result)

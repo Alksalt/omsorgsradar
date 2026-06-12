@@ -51,3 +51,14 @@ def test_empty_reports_dir_produces_index_not_crash(tmp_path):
     out = tmp_path / "site"
     build_site(reports_dir=tmp_path, out_dir=out)
     assert (out / "index.html").exists()
+
+
+def test_marimo_notebook_is_valid_app():
+    import importlib.util
+    from pathlib import Path
+    nb = Path(__file__).parent.parent / "notebooks" / "explore_nordisk.py"
+    spec = importlib.util.spec_from_file_location("explore_nordisk", nb)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)          # must import without executing cells
+    import marimo
+    assert isinstance(mod.app, marimo.App)

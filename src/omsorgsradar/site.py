@@ -92,13 +92,36 @@ def build_site(reports_dir: Path | str, out_dir: Path | str,
     return out_dir
 
 
+def export_marimo(notebook: Path | str, out_dir: Path | str) -> Path:
+    """Export a marimo notebook to WASM HTML under out_dir/explore/.
+
+    Raises RuntimeError loudly if the export fails — a dead 'Utforsk' link
+    must never be silently shipped.
+    """
+    import subprocess
+    target = Path(out_dir) / "explore"
+    target.mkdir(parents=True, exist_ok=True)
+    res = subprocess.run(
+        ["marimo", "export", "html-wasm", str(notebook), "-o", str(target), "--mode", "run"],
+        capture_output=True, text=True)
+    index = target / "index.html"
+    if res.returncode != 0 or not index.exists():
+        raise RuntimeError(f"marimo wasm export failed: {res.stderr or res.stdout}")
+    return target
+
+
 def main() -> None:
     import argparse
     p = argparse.ArgumentParser(description="Build the static report site.")
     p.add_argument("--reports-dir", default="reports")
     p.add_argument("--out", default="site")
+    p.add_argument("--marimo", default=None, metavar="NOTEBOOK",
+                   help="Path to a marimo notebook to export as WASM into out/explore/")
     args = p.parse_args()
-    out = build_site(args.reports_dir, args.out)
+    out = build_site(args.reports_dir, args.out,
+                     marimo_embedded=args.marimo is not None)
+    if args.marimo:
+        export_marimo(args.marimo, args.out)
     print(f"site built: {out} ({len(discover_reports(Path(args.reports_dir)))} analyses)")
 
 

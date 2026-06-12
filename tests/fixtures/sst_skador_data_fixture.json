@@ -1,0 +1,6572 @@
+[
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "39,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "58"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "133"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "76"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "39,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "14,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "360,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "226,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "150"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "373,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "414,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "601,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "634,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "2399,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "155"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "123,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "257,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "151,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "101,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "65,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "855"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "4"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "96"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "233,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "104,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "30"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "11,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "480"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "56,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "100"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "179"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "108,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "89"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "51,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "584,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "12,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "50"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "175,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "246"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "486,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "426"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "438"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1032,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "796,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "829"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "684"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "4206,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "24"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "37,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "95,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "48,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "36,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "14"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "256,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "131,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "82,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "215,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "419,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1245,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "2693"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "4787,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "108"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "50"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "101,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "81,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "122"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "182"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "645"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "94,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "190,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "97,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "36,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "33,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "459,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "44"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "49,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "91,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "53"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "78,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "143,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "460"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "2"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "56,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "407,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1124,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1590,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "272,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "270"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "673"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "725,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1510,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "2814,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "6266"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "63,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "95,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "228,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "124,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "76"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "28,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "616,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "357,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "232,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "589"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "833,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1847"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "3327,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "7187,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "263"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "173,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "358,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "233,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "223,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "247,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1500"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "11"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "190,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "424"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "202,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "66,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "45,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "939,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "100,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "149,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "270,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "161,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "167,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "195,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1044,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "14,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "106,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "582,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1370,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "2077,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "698,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "708"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1705,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "1522"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "2339,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "3498,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0180",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1995-1997",
+  "varde": "10472,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "16,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "24,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "24,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "13,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "6,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "3,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "89"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "55,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "26,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "29"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "39"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "55,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "48,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "254"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "29,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "37,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "37"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "17,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "13"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "3,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "138"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "10,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "26,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "8,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "47"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "33,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "29"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "23,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "13,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "8,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "2"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "110,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "3,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "0,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "0,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "5,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "23,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "25,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "59,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "122"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "161"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "199,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "113"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "107,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "63"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "766"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "10,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "13,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "12"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "9,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "8,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "55,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "32,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "11,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "21"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "43,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "121,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "163"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "393,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "21"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "10"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "10,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "8,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "11,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "11,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "73,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "13,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "21,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "10,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "5,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "0580",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "53,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "0580",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1988-1990",
+  "varde": "21,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "14,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "16,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "36"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "41,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "24"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "8,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "141"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "85"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "26"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "56"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "109"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "210"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "288"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "774"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "53,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "38"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "75,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "43,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "33,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "15"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "258,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "2"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "24,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "30,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "22,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "9,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "3,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "93"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "22,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "4,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "5,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "4"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "5,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "5,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "47,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "1,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "13,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "49,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "79,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "144,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "158,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "103,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "200,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "245,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "317"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "318,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "1343"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "8,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "8,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "18,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "30,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "21,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "11"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "98,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "67"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "10"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "38"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "90,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "265"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "639,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "1110"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "28"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "12,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "37"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "31"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "31"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "30,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "170"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "22,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "20,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "8,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "5,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "6"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "66,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "17,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "2,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "3,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "2,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "3,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "8"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "37,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "0,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "14,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "58"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "211"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "285,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "110,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "54,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "154,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "207"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "340,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "655,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "1522,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "23"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "25,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "54,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "71,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "45,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "19,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "239,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "152"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "36"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "94"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "199,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "475"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "927,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "1884"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "81,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "50,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "112,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "74,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "64,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "45,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "428,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "5"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "47"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "51,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "31,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "15"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "9,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "159,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "40,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "8,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "6,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "8,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "13,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "85"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "1"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "28,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "107,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "290,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "430"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "269"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "158"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "354,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "452,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "657,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "973,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1280",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2019-2021",
+  "varde": "2865,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "42"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "71,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "99,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "63"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "17,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "8,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "301,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "296,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "126"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "179,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "272,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "284,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "392,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1552"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "105"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "106"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "163,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "102"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "48,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "26,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "551,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "6"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "83,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "143"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "72,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "12,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "324,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "70,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "40"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "31,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "31,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "15,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "10,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "199,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "0,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "6,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "28"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "82,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "173,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "292,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "452,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "389,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "629"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "559,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "421,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "436,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "2889"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "29,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "37,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "44,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "39"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "18"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "9"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "177,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "219,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "47"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "99"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "259"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "451"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1176,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "2252"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "66,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "46"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "67,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "54,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "33,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "46"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "314"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "10,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "108,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "113,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "69"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "14,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "6,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "322,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "62"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "20"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "17,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "19,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "12,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "26,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "158"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "0,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "31,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "142"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "481,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "657,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "324,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "257,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "385"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "498,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "570,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1198,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "3234,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "71,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "108,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "144"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "102"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "35,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "17,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "479,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "516"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "173"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "278,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "531,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "735,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1569"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "3804"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "171,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "152"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "231"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "156,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "82,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "72,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "865,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "16,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "192"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "256,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "141,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "26,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "13,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "647"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "132,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "60"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "49,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "51"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "27,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "37,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "357,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "2"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "7,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "59,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "224,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "655"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "950"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "777"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "647,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1014"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1058"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "992"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "1635,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "1480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "2006-2008",
+  "varde": "6123,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "21,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "27,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "48"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "16,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "9"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "5"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "127,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "76,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "41,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "61"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "76"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "68,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "52"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "376"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "55"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "30"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "46,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "34,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "17"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "4,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "187,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "1"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "9"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "28"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "10,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "3,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "52"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "49,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "28,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "38,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "23,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "13"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "6"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "159,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "1,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "7,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "16"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "22"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "47,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "151"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "102,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "172,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "133,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "95"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "56,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 1,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "711,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "15,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "18"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "29,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "22,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "13,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "1,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "100"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "53,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "31"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "33,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "65,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "126,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "157"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "467,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "30,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "12,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "17"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "6,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "17"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "17,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "101"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "0,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "18,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "33,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "13"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "69"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "41,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "22"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "20,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "17,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "12,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "14,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "128,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "9,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "39,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "53,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "103"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "97,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "76,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "110,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "109"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "160,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "157,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 2,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "711,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "36,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "45,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "77,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "39"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "22,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "6,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "1",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "227,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "130,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "72,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "94,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "141,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "195"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "209"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "2",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "843,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "85,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "42,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "63,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "40,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "34"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "21,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "3",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "288,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "1,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "27,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "61,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "23,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "6,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "0,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "4",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "121"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "90,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "50,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "59,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "41"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "25,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "20,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "5",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "287,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "0,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "2"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "16,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "55,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "75,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "6",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "150,3"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 1,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "248,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 2,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "179"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 3,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "283"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 4,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "242,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 5,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "255,7"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 6,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "214"
+ },
+ {
+  "vardformId": "SV",
+  "typId": "9",
+  "regionId": "2480",
+  "alderId": 9,
+  "konId": 3,
+  "mattId": 1,
+  "ar": "1993-1995",
+  "varde": "1423"
+ }
+]

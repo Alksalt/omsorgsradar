@@ -1,0 +1,37 @@
+[
+ {
+  "id": "00",
+  "kod": "00",
+  "text": "Riket"
+ },
+ {
+  "id": "01",
+  "kod": "01",
+  "text": "Stockholms län"
+ },
+ {
+  "id": "0180",
+  "kod": "0180",
+  "text": "Stockholm"
+ },
+ {
+  "id": "0580",
+  "kod": "0580",
+  "text": "Linköping"
+ },
+ {
+  "id": "1280",
+  "kod": "1280",
+  "text": "Malmö"
+ },
+ {
+  "id": "1480",
+  "kod": "1480",
+  "text": "Göteborg"
+ },
+ {
+  "id": "2480",
+  "kod": "2480",
+  "text": "Umeå"
+ }
+]

@@ -208,6 +208,41 @@ def _rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     return float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
 
 
+def _resolve_n_folds(df: pd.DataFrame, n_folds: int) -> tuple[int, list]:
+    """Return (effective_n_folds, all_years) after reducing if needed."""
+    all_years = sorted(df["year"].unique())
+    if len(all_years) < n_folds + 2:
+        logger.warning(
+            "Not enough years (%d) for %d folds; reducing to 1 fold", len(all_years), n_folds
+        )
+        n_folds = max(1, len(all_years) - 2)
+    return n_folds, all_years
+
+
+def _iter_fold_splits(
+    df: pd.DataFrame,
+    all_years: list,
+    n_folds: int,
+    feature_cols: list[str],
+):
+    """Yield (fold_index_0based, X_train, y_train, X_test, y_test, train_df, test_df) per fold.
+
+    Shared by walk_forward_cv (XGBoost) and run_tabpfn_on_folds (TabPFN) so both
+    models see identical expanding-window splits.
+    """
+    test_years_list = all_years[-n_folds:]
+    for i, test_year in enumerate(test_years_list):
+        train_df = df[df["year"] < test_year].copy()
+        test_df = df[df["year"] == test_year].copy()
+        if train_df.empty or test_df.empty:
+            continue
+        X_train = train_df[feature_cols].fillna(0).values
+        y_train = train_df["coverage_rate"].values
+        X_test = test_df[feature_cols].fillna(0).values
+        y_test = test_df["coverage_rate"].values
+        yield i, X_train, y_train, X_test, y_test, train_df, test_df
+
+
 def walk_forward_cv(
     df: pd.DataFrame,
     n_folds: int = 3,
@@ -226,35 +261,15 @@ def walk_forward_cv(
     if df.empty:
         return [], None, []  # type: ignore[return-value]
 
-    all_years = sorted(df["year"].unique())
-    if len(all_years) < n_folds + 2:
-        logger.warning(
-            "Not enough years (%d) for %d folds; reducing to 1 fold", len(all_years), n_folds
-        )
-        n_folds = max(1, len(all_years) - 2)
-
-    # Walk-forward split: each fold adds more training data
-    # Fold 1: train up to year[-n_folds-1], test on year[-n_folds]
-    # Fold 2: train up to year[-n_folds],   test on year[-n_folds+1]
-    # Fold 3: train up to year[-n_folds+1], test on year[-n_folds+2]
-    fold_cutoffs = all_years[-(n_folds + 1):-1]  # test year start indices
-    test_years_list = all_years[-(n_folds):]
-
+    n_folds, all_years = _resolve_n_folds(df, n_folds)
     feature_cols = [c for c in FEATURE_COLS if c in df.columns]
     folds: list[CVFold] = []
     final_model = None
 
-    for i, test_year in enumerate(test_years_list):
-        train_df = df[df["year"] < test_year].copy()
-        test_df = df[df["year"] == test_year].copy()
-
-        if train_df.empty or test_df.empty:
-            continue
-
-        X_train = train_df[feature_cols].fillna(0).values
-        y_train = train_df["coverage_rate"].values
-        X_test = test_df[feature_cols].fillna(0).values
-        y_test = test_df["coverage_rate"].values
+    for i, X_train, y_train, X_test, y_test, train_df, test_df in _iter_fold_splits(
+        df, all_years, n_folds, feature_cols
+    ):
+        test_year = int(test_df["year"].iloc[0])
 
         # XGBoost
         model = xgb.XGBRegressor(
@@ -275,7 +290,7 @@ def walk_forward_cv(
         fold = CVFold(
             fold=i + 1,
             train_years=sorted(train_df["year"].unique().tolist()),
-            test_years=[int(test_year)],
+            test_years=[test_year],
             n_train=len(train_df),
             n_test=len(test_df),
             xgb_mae=_mae(y_test, y_pred_xgb),
@@ -361,60 +376,104 @@ def compute_shap(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# TabPFN baseline
+# TabPFN baseline — fold-parallel (same 3 expanding windows as XGBoost)
 # ──────────────────────────────────────────────────────────────────────────────
 
+#: Environment variable that TabPFN reads for the PriorLabs API token.
+#: Set this to your key from https://ux.priorlabs.ai/account before running.
+TABPFN_TOKEN_ENV_VAR = "TABPFN_TOKEN"
 
-def run_tabpfn_baseline(
+#: Status message (bokmål) written when the token/weights are unavailable.
+_TABPFN_UNAVAILABLE_MSG = (
+    "TabPFN-2.5 ikke kjørt — krever konto/token hos priorlabs.ai (se COSTS.md). "
+    f"Sett miljøvariabelen {TABPFN_TOKEN_ENV_VAR} og kjør ml-steget på nytt."
+)
+
+
+def run_tabpfn_on_folds(
     df: pd.DataFrame,
-    feature_cols: list[str],
-) -> tuple[float | None, str]:
-    """Run TabPFN-2.5 as a no-training in-context baseline.
+    folds: list[CVFold],
+    n_folds: int = 3,
+    *,
+    _tabpfn_cls: Any = None,
+) -> "MLResults":
+    """Run TabPFN-2.5 over the same walk-forward folds as XGBoost.
+
+    Populates ``tabpfn_mae``/``tabpfn_rmse`` on each :class:`CVFold` in-place,
+    then returns a partial :class:`MLResults` with ``tabpfn_available`` and
+    ``mean_tabpfn_mae`` set.
 
     Args:
-        df: Feature DataFrame.
-        feature_cols: Feature column names.
+        df: Feature DataFrame from :func:`build_feature_df`.
+        folds: Fold list produced by :func:`walk_forward_cv` (mutated in-place).
+        n_folds: Number of folds (must match what was used for ``folds``).
+        _tabpfn_cls: Injectable regressor class for offline testing; if None,
+            ``tabpfn.TabPFNRegressor`` is imported at call time.
 
     Returns:
-        ``(mae, status_message)`` — mae is None if TabPFN is unavailable.
+        :class:`MLResults` with TabPFN fields populated.
     """
-    try:
-        from tabpfn import TabPFNRegressor  # type: ignore[import]
-    except ImportError:
-        return None, "tabpfn not installed"
+    results = MLResults()
 
-    all_years = sorted(df["year"].unique())
-    if len(all_years) < 3:
-        return None, "not enough years for TabPFN baseline"
+    if _tabpfn_cls is None:
+        try:
+            from tabpfn import TabPFNRegressor  # type: ignore[import]
+            _tabpfn_cls = TabPFNRegressor
+        except (ImportError, TypeError):
+            results.notes.append(_TABPFN_UNAVAILABLE_MSG)
+            return results
+    TabPFNRegressor = _tabpfn_cls
 
-    test_year = all_years[-1]
-    train_df = df[df["year"] < test_year].copy()
-    test_df = df[df["year"] == test_year].copy()
+    if df.empty or not folds:
+        results.notes.append("TabPFN: ingen data eller folds")
+        return results
 
-    if train_df.empty or test_df.empty:
-        return None, "empty train or test split"
+    effective_n_folds, all_years = _resolve_n_folds(df, len(folds))
+    feature_cols = [c for c in FEATURE_COLS if c in df.columns]
 
-    X_train = train_df[feature_cols].fillna(0).values
-    y_train = train_df["coverage_rate"].values
-    X_test = test_df[feature_cols].fillna(0).values
-    y_test = test_df["coverage_rate"].values
+    # Build a mapping from fold index → CVFold so we can update in-place
+    fold_by_index: dict[int, CVFold] = {f.fold - 1: f for f in folds}
 
-    # TabPFN has a 10k row limit; subsample if needed
-    if len(X_train) > 5000:
-        idx = np.random.RandomState(42).choice(len(X_train), 5000, replace=False)
-        X_train = X_train[idx]
-        y_train = y_train[idx]
+    any_success = False
+    for i, X_train, y_train, X_test, y_test, _train_df, _test_df in _iter_fold_splits(
+        df, all_years, effective_n_folds, feature_cols
+    ):
+        # Subsampling guard: TabPFN has a 10k row limit; seeded for reproducibility
+        if len(X_train) > 5000:
+            idx = np.random.RandomState(42).choice(len(X_train), 5000, replace=False)
+            X_train = X_train[idx]
+            y_train = y_train[idx]
 
-    try:
-        model = TabPFNRegressor(device="cpu")
-        model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
-        mae = _mae(y_test, y_pred)
-        logger.info("TabPFN baseline MAE: %.2f", mae)
-        return mae, "ok"
-    except Exception as exc:
-        logger.warning("TabPFN baseline failed: %s", exc)
-        return None, f"TabPFN runtime error: {exc}"
+        try:
+            model = TabPFNRegressor(device="cpu")
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            fold_mae = _mae(y_test, y_pred)
+            fold_rmse = _rmse(y_test, y_pred)
+        except Exception as exc:
+            # Catch TabPFNLicenseError, TabPFNHuggingFaceGatedRepoError, and
+            # any other runtime error.  Log the raw exception; surface only a
+            # clean bokmål string to artifacts.
+            logger.warning("TabPFN fold %d failed: %s", i + 1, exc)
+            results.notes.append(_TABPFN_UNAVAILABLE_MSG)
+            return results
+
+        # Update CVFold in-place
+        target_fold = fold_by_index.get(i)
+        if target_fold is not None:
+            target_fold.tabpfn_mae = fold_mae
+            target_fold.tabpfn_rmse = fold_rmse
+
+        any_success = True
+        logger.info("TabPFN fold %d MAE=%.2f", i + 1, fold_mae)
+
+    if any_success:
+        completed = [f for f in folds if f.tabpfn_mae is not None]
+        if completed:
+            results.tabpfn_available = True
+            results.mean_tabpfn_mae = float(np.mean([f.tabpfn_mae for f in completed]))
+
+    return results
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -468,16 +527,11 @@ def run_ml(
             final_model, X_all, feat_names, out_dir=figures_dir
         )
 
-    # TabPFN
-    tabpfn_mae, tabpfn_status = run_tabpfn_baseline(df, feature_cols)
-    if tabpfn_mae is not None:
-        results.tabpfn_available = True
-        results.mean_tabpfn_mae = tabpfn_mae
-        if folds:
-            for fold in results.folds:
-                fold.tabpfn_mae = tabpfn_mae  # assign to last fold as representative
-    else:
-        results.notes.append(f"TabPFN: {tabpfn_status}")
+    # TabPFN — same 3 folds as XGBoost for an honest comparison
+    tabpfn_partial = run_tabpfn_on_folds(df, folds, n_folds=3)
+    results.tabpfn_available = tabpfn_partial.tabpfn_available
+    results.mean_tabpfn_mae = tabpfn_partial.mean_tabpfn_mae
+    results.notes.extend(tabpfn_partial.notes)
 
     return results
 
@@ -526,28 +580,58 @@ def ml_results_summary_md(results: MLResults) -> str:
         f"**Mål:** {results.target}  ",
         f"**Ramme:** {results.framing}",
         "",
+        "**Nøkkelfunn:** Kommunal dekning er sterkt autoregressiv — "
+        "årets dekning predikerer neste års dekning nesten like godt som en tunet modell. "
+        "Modelltillegg over naiv persistens er beskjedent (~0.2 pp MAE). "
+        "Modellens verdi er avviksflagging (kommuner som avviker fra egen trend), "
+        "ikke punktprediksjon.",
+        "",
     ]
     if results.folds:
-        lines.append(
-            f"**Gjennomsnittlig MAE:** XGBoost {results.mean_xgb_mae:.2f} "
-            f"vs naiv baseline {results.mean_naive_mae:.2f}"
+        has_tabpfn = results.tabpfn_available and any(
+            f.tabpfn_mae is not None for f in results.folds
         )
+
+        mean_line = (
+            f"**Gjennomsnittlig MAE:** XGBoost {results.mean_xgb_mae:.2f} pp "
+            f"vs naiv persistens {results.mean_naive_mae:.2f} pp"
+        )
+        if has_tabpfn and results.mean_tabpfn_mae is not None:
+            mean_line += f" vs TabPFN {results.mean_tabpfn_mae:.2f} pp"
+        lines.append(mean_line)
         lines.append("")
-        lines.append("| Fold | Testår | XGB MAE | Naiv MAE |")
-        lines.append("|------|--------|---------|----------|")
-        for fold in results.folds:
-            lines.append(
-                f"| {fold.fold} | {fold.test_years[0] if fold.test_years else '—'} "
-                f"| {fold.xgb_mae:.2f} | {fold.naive_mae:.2f} |"
-            )
+
+        if has_tabpfn:
+            lines.append("| Fold | Testår | XGB MAE | Naiv MAE | TabPFN MAE |")
+            lines.append("|------|--------|---------|----------|------------|")
+            for fold in results.folds:
+                tabpfn_cell = f"{fold.tabpfn_mae:.2f}" if fold.tabpfn_mae is not None else "—"
+                lines.append(
+                    f"| {fold.fold} | {fold.test_years[0] if fold.test_years else '—'} "
+                    f"| {fold.xgb_mae:.2f} | {fold.naive_mae:.2f} | {tabpfn_cell} |"
+                )
+        else:
+            lines.append("| Fold | Testår | XGB MAE | Naiv MAE |")
+            lines.append("|------|--------|---------|----------|")
+            for fold in results.folds:
+                lines.append(
+                    f"| {fold.fold} | {fold.test_years[0] if fold.test_years else '—'} "
+                    f"| {fold.xgb_mae:.2f} | {fold.naive_mae:.2f} |"
+                )
         lines.append("")
     else:
         lines.append("*Walk-forward CV ikke gjennomført (for lite data).*")
         lines.append("")
 
-    if results.tabpfn_available and results.mean_tabpfn_mae is not None:
-        lines.append(f"**TabPFN-2.5 baseline MAE:** {results.mean_tabpfn_mae:.2f}")
-        lines.append("")
+    if not results.tabpfn_available:
+        # Show the one-line status from notes if present
+        tabpfn_note = next(
+            (n for n in results.notes if "priorlabs" in n.lower() or "TabPFN" in n),
+            None,
+        )
+        if tabpfn_note:
+            lines.append(f"*{tabpfn_note}*")
+            lines.append("")
 
     if results.shap_top_features:
         lines.append("**SHAP — viktigste features:**")
@@ -556,9 +640,14 @@ def ml_results_summary_md(results: MLResults) -> str:
             lines.append(f"- `{feat['feature']}`: mean |SHAP| = {feat['mean_abs_shap']:.4f}")
         lines.append("")
 
-    if results.notes:
+    # Include only non-TabPFN notes here (TabPFN status shown above)
+    other_notes = [
+        n for n in results.notes
+        if "priorlabs" not in n.lower() and "TabPFN" not in n
+    ]
+    if other_notes:
         lines.append("**Merknader:**")
-        for note in results.notes:
+        for note in other_notes:
             lines.append(f"- {note}")
         lines.append("")
 

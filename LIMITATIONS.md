@@ -40,8 +40,8 @@ Indeksen bør brukes som **startpunkt for videre analyse**, ikke som beslutnings
 - Prediksjonsmodellen (XGBoost) predikerer kommunal hjemmetjenestedekning i år Y+1 basert på historiske KOSTRA-andeler. Dette er **planleggingsstøtte**, ikke klinisk beslutningsstøtte.
 - Datasett: ~850 kommuner × 9 år = ~3600 rader. For lite for dype neurale nettverk (ingen dyp læring er brukt — med rette).
 - Walk-forward CV med 3 vinduer tester generaliserbarhet over tid, men 3 folds er begrenset statistisk evidens.
-- TabPFN-2.5 ble ikke kjørt (krever interaktiv lisensgodkjenning hos PriorLabs — se COSTS.md for detaljer).
-- MAE på ~2 prosentpoeng er moderat — mye av prediksjonskraften kommer fra lag-1 (forrige år), som er en enkel persistence-heuristikk.
+- TabPFN-2.5 kan nå kjøres over de samme 3 walk-forward-foldene som XGBoost. Status vises i rapporten — se COSTS.md for token-oppsett.
+- MAE på ~2 prosentpoeng er moderat. Kommunal dekning er sterkt autoregressiv: lag-1 (forrige år) er den dominerende prediktoren, og modellens tillegg over naiv persistens (~0.2 pp) er beskjedent. Modellens verdi er avviksflagging — kommuner som avviker fra sin egen historiske trend — ikke punktprediksjon.
 
 ## Aggregert nivå — ingen individdata
 

@@ -27,7 +27,12 @@ Heavier models cost more in proportion (e.g. `claude-sonnet-4-6` ≈ $0.02/run; 
 
 ### TabPFN-2.5
 
-TabPFN-2.5 was not run in v0.1 because it requires an interactive license acceptance via [priorlabs.ai](https://ux.priorlabs.ai). Once a `TABPFN_TOKEN` is set, TabPFN inference is free for research use (as of 2026). Local inference cost is compute only (CPU, ~30 seconds on ~3,000 rows).
+TabPFN-2.5 runs over the same 3 walk-forward folds as XGBoost for an honest comparison. To enable it:
+1. Register at [priorlabs.ai](https://ux.priorlabs.ai) (free for research as of 2026)
+2. Accept the license on the Licenses tab and copy your API key
+3. `export TABPFN_TOKEN="<your-api-key>"` and re-run the ml stage
+
+Local inference cost is compute only (CPU, ~30 seconds on ~3,000 rows). The token is read from the `TABPFN_TOKEN` environment variable at runtime — never stored or journaled.
 
 ### SSB / FHI API calls
 

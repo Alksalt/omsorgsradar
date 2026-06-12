@@ -158,7 +158,7 @@ XGBoost walk-forward CV (3 expanding windows) predicting % of 80+ using home ser
 | 3 | 2025 | 2.05 pp | 2.30 pp |
 | **Mean** | — | **2.08 pp** | **2.28 pp** |
 
-SHAP top feature: `coverage_rate_lag1` (prior-year rate dominates). TabPFN-2.5 not run (requires interactive license sign-up — future work).
+SHAP top feature: `coverage_rate_lag1` (prior-year rate dominates — kommunal dekning er sterkt autoregressiv). TabPFN-2.5 kan nå kjøres: registrer deg på [priorlabs.ai](https://ux.priorlabs.ai), sett `TABPFN_TOKEN=<din nøkkel>`, og kjør ml-steget på nytt.
 
 **Framing: planning support tool, not clinical decision support.**
 

@@ -178,3 +178,21 @@
   Tester: 303 → **382 offline + 5 live**. Pushet; Pages redeployet. **Eier-handling (valgfri,
   ikke-blokkerende): priorlabs.ai-konto → `export TABPFN_TOKEN=…` → kjør ml-steget på nytt for
   ekte TabPFN-MAE.**
+- **2026-06-12** — **G8 (åtte-agent-review-fikser) shipped.** Alle 27 funn fra panelet lukket
+  (se `docs/reviews/2026-06-12-eight-agent-full-repo-review.md`, statusblokk øverst). Høydepunkter:
+  (1) **nordisk-omsorg republisert på terminale koder** (5 av topp-10 geo_id-er var SSB-utgåtte
+  2024-koder på live-siten; n_dropped 157 → 25). (2) **Figur-troverdighet**: nasjonal-trend-tittelen
+  feilattribuerte trenden til SSB → nå «trendframskriving (+31,1 %; SSBs MMM-bane: +46,5 %)» med
+  stiplet SSB-referanselinje; fargeskala snudd (mørk rød = verst, aldri grønn); koroplet med
+  by-ankere + topp-10-etiketter; nb-NO tallformat i ALLE rapporter og figurer (komma-desimal).
+  (3) **Stille-feil-gater**: required-kilder (tom befolkning kan aldri mer publisere grønn
+  null-rapport), figurvakter (manglende PNG → abort, ikke døde lenker), nordisk per-land-vakt,
+  site-rmtree-fiksen (marimo-feil sletter ikke lenger ferdigbygd site). (4) **Sikkerhet**:
+  host-allowlist i run_ingest, redirect-pinning via safe_request i alle adaptere + discovery-GET,
+  anonymize-REKKEFØLGE-gate (ikke bare tilstedeværelse), FAIL-CSV slettes + hook-mønster.
+  (5) **DX**: dev-deps til [dependency-groups] (ren `uv sync` + pytest fungerer — bevist med
+  fresh clone), stier/flagg i README rettet, «Creating a new analysis»-seksjon, ci.yml-testjobb,
+  dataset-registry 12880→13599, CLAUDE/AGENTS/DECISIONS-orientering oppdatert. Landing-siden
+  forklarer nå at de to norske analysene bruker ulike metoder med vilje. Re-review: correctness
+  PASS, security PASS, domain BLOCK→fikset (nordisk nb-NO) → verifisert live. Tester: 382 →
+  **445 offline + 5 live**. CI: testjobb + Pages grønne.

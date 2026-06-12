@@ -1,5 +1,16 @@
 # Eight-agent full-repo review — 2026-06-12
 
+> **STATUS (post-G8, same day):** all P0–P4 findings (N1–N27) and the actionable P5 minors are
+> FIXED — commits `2d13ff5`/`b25c29b`/`c9bdfa1` (tasks B/A/C), `07461ce`/`ef4dc98` (controller
+> pass + republish), `dc98a89` (panel-fix round: nordisk nb-NO formatting, SSB discovery GET
+> through safe_request). Re-review panel: correctness PASS, security PASS (residual
+> `_discover_ssb_table` closed in dc98a89), domain BLOCK→fixed (nordisk nb-NO) → verified live.
+> Remaining open (deliberate): dependency CVE pass (owner call), interactive map,
+> absolute-headcount column (owner decision), security observation «https→http downgrade on
+> same-host redirect» (optional hardening), N13 residual: instance stages.py can shadow the
+> anonymize stage — accepted, since authoring stages.py is already code execution.
+> Tests 382 → 445 offline + 5 live.
+
 **Method:** 8 independent agents over the entire repo + live site. Four **blind** (no access to
 status.md / plans / review history — judged the artifact cold): correctness, security,
 fresh-user DX, Norwegian domain credibility (kommunehelsesjef + SSB-statistiker personas). Four

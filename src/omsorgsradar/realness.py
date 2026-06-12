@@ -128,14 +128,20 @@ def check_distribution(df: pd.DataFrame) -> GateCheck:
 
 
 def run_realness(df: pd.DataFrame, source: Mapping[str, Any]) -> dict[str, Any]:
-    """All five gates; verdict FAIL > WARN > PASS; all-SKIP data never gates."""
-    checks = [
-        check_provenance(source),
-        check_institution(source),
-        check_duplicates(df),
-        check_missingness(df),
-        check_distribution(df),
-    ]
+    """All five gates; verdict FAIL > WARN > PASS; all-SKIP data never gates.
+    For row_level=true sources the shape-dependent checks (duplicates / missingness
+    / distribution) are SKIPPED — identical rows are expected in microdata and are
+    not a fabrication signal; the identifiability gate covers row-level risk instead.
+    Provenance + named institution are always enforced."""
+    if bool(source.get("row_level")):
+        shape = [
+            GateCheck("duplicates", "SKIP", "row-level microdata: identical rows expected"),
+            GateCheck("missingness", "SKIP", "row-level microdata"),
+            GateCheck("distribution", "SKIP", "row-level microdata"),
+        ]
+    else:
+        shape = [check_duplicates(df), check_missingness(df), check_distribution(df)]
+    checks = [check_provenance(source), check_institution(source), *shape]
     statuses = {c.status for c in checks}
     if "FAIL" in statuses:
         verdict = "FAIL"

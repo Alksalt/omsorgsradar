@@ -154,10 +154,26 @@ VERIFICATION_SCHEMA: dict[str, Any] = {
     },
 }
 
+IDENTIFIABILITY_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "required": ["verdict", "criteria_ref", "singling_out", "linkability", "inference"],
+    "properties": {
+        "verdict": {"enum": ["PASS", "WARN", "FAIL", "SKIP"]},
+        "criteria_ref": {"type": "string"},
+        "framing": {"type": "string"},
+        "k_anonymity": {"type": "object"},
+        "pii": {"type": "object"},
+        "singling_out": {"type": "object", "required": ["verdict"]},
+        "linkability": {"type": "object", "required": ["verdict"]},
+        "inference": {"type": "object", "required": ["verdict"]},
+    },
+}
+
 SCHEMAS: dict[str, dict[str, Any]] = {
     "findings": FINDINGS_SCHEMA,
     "quality_profile": QUALITY_PROFILE_SCHEMA,
     "verification": VERIFICATION_SCHEMA,
+    "identifiability": IDENTIFIABILITY_SCHEMA,
 }
 
 

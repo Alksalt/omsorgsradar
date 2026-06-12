@@ -52,3 +52,9 @@ class TestHook:
             text=True, timeout=10,
         )
         assert proc.returncode == 0  # fail-open for malformed harness input
+
+    def test_microdata_path_blocked(self) -> None:
+        p = _run_hook(
+            {"tool_name": "Read", "tool_input": {"file_path": "analyses/brfss-demo/microdata/raw.csv"}}
+        )
+        assert p.returncode == 2

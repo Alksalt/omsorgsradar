@@ -117,6 +117,56 @@ def stage_verify(ctx: StageContext) -> None:
         raise PipelineGateError(vreport.summary())
 
 
+def stage_anonymize(ctx: StageContext) -> None:
+    """Redact direct identifiers, k-anonymize quasi-identifiers, publish a
+    measured-residual-risk receipt (WP216). Raw microdata is consumed here and
+    dropped from state; only the anonymized aggregate flows downstream."""
+    from .core.anonymize import assess_identifiability, generalize, k_suppress
+    from .core.anonymize.pii import redact_pii, scan_pii
+
+    acfg = dict(ctx.config.params.get("anonymize", {}))
+    if not acfg:
+        raise PipelineGateError("anonymize stage requires [params.anonymize] config")
+    src_id = acfg["source"]
+    datasets = ctx.state["datasets"]
+    raw = datasets[src_id]
+
+    text_cols = list(acfg.get("text_columns", []))
+    spacy_model = acfg.get("spacy_model")
+    pii_summary = {"total_redacted": 0, "entity_types": []}
+    work = raw
+    if text_cols:
+        scanned = scan_pii(raw, text_cols, spacy_model=spacy_model)
+        work, n = redact_pii(raw, text_cols, spacy_model=spacy_model)
+        types = sorted({t for row in scanned["entity_types"] for t in row})
+        pii_summary = {"total_redacted": int(n), "entity_types": types}
+
+    generalized = generalize(work, acfg)
+    kres = k_suppress(generalized, acfg)
+    receipt = assess_identifiability(kres, generalized, acfg)
+    receipt["pii"] = pii_summary
+
+    anon_path = ctx.data_dir / f"{src_id}_anonymized.csv"
+    kres.frame.to_csv(anon_path, index=False)
+    write_manifest(anon_path, artifact="anonymized_table", producer="anonymize")
+
+    rpath = ctx.data_dir / "identifiability.json"
+    rpath.write_text(json.dumps(receipt, ensure_ascii=False, indent=2), encoding="utf-8")
+    validate_artifact("identifiability", receipt)
+    write_manifest(rpath, artifact="identifiability", producer="anonymize",
+                   inputs=[str(anon_path)])
+
+    datasets[src_id] = kres.frame           # raw replaced; never left in state
+    ctx.state["identifiability"] = receipt
+    ctx.artifacts["anonymized_table"] = anon_path
+    ctx.artifacts["identifiability"] = rpath
+    if receipt["verdict"] == "FAIL":
+        raise PipelineGateError(
+            f"identifiability gate FAIL — singling_out={receipt['singling_out']['verdict']} "
+            f"linkability={receipt['linkability']['verdict']} "
+            f"inference={receipt['inference']['verdict']} (see {rpath})")
+
+
 def stage_report(ctx: StageContext) -> None:
     from .report import run_report
 
@@ -164,6 +214,7 @@ def build_default_registry() -> StageRegistry:
     registry = StageRegistry()
     registry.register("ingest", stage_ingest)
     registry.register("profile", stage_profile)
+    registry.register("anonymize", stage_anonymize)
     registry.register("analyze", stage_analyze)
     registry.register("verify", stage_verify)
     registry.register("report", stage_report)

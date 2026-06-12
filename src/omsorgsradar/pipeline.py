@@ -74,6 +74,12 @@ def run_pipeline(
         validate_source(src)
         validate_source_host(src, extra_hosts)
 
+    row_level = [s["id"] for s in cfg.sources if s.get("row_level")]
+    if row_level and "anonymize" not in cfg.stage_list:
+        raise PipelineGateError(
+            f"sources {row_level} are row_level=true but 'anonymize' is not in "
+            f"stages.list — row-level data must be anonymized before analysis")
+
     data_dir, reports_dir = Path(data_dir), Path(reports_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
 

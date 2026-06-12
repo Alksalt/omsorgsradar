@@ -18,6 +18,7 @@ import sys
 BLOCKED_PATTERNS = [
     r"(^|/)data/cache(/|$)",
     r"\.duckdb$",
+    r"(^|/)microdata(/|$)",
 ]
 
 MESSAGE = (

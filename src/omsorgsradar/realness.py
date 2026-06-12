@@ -32,6 +32,8 @@ KNOWN_HOSTS: dict[str, str] = {
     "sotkanet.fi": "Terveyden ja hyvinvoinnin laitos (THL)",
     "sdb.socialstyrelsen.se": "Socialstyrelsen (Sverige)",
     "opne-data-api.helserefusjon.no": "Helsedirektoratet / NAV (helserefusjon, KUHR)",
+    "api.kolada.se": "Kolada / RKA (Socialstyrelsen- og SCB-data per kommun)",
+    "api.scb.se": "Statistiska centralbyrån (SCB)",
 }
 
 # Fallback when a source omits base_url (the adapter supplies its default URL):
@@ -42,6 +44,8 @@ ADAPTER_PROVENANCE: dict[str, dict[str, str]] = {
                         "url": "https://sdb.socialstyrelsen.se/api/v1/sv"},
     "kuhr": {"institution": "Helsedirektoratet / NAV (helserefusjon, KUHR)",
              "url": "https://opne-data-api.helserefusjon.no/v1"},
+    "kolada": {"institution": "Kolada / RKA (Socialstyrelsen- og SCB-data per kommun)",
+               "url": "https://api.kolada.se/v3"},
 }
 
 

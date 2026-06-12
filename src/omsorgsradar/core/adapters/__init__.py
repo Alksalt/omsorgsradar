@@ -14,6 +14,7 @@ import pandas as pd
 
 from ..config import ConfigError
 from .csvfile import CsvAdapter
+from .kolada import KoladaAdapter
 from .kuhr import KuhrAdapter
 from .pxweb import PxWebAdapter
 from .socialstyrelsen import SocialstyrelsenAdapter
@@ -41,6 +42,7 @@ REQUIRED_SOURCE_FIELDS: dict[str, tuple[str, ...]] = {
     "socialstyrelsen": ("amne", "matt"),
     "kuhr": ("fagomraade", "fomar", "tomar"),
     "csv": ("path", "provenance"),
+    "kolada": ("kpi", "years"),
 }
 
 
@@ -73,12 +75,20 @@ def _make_csv(source: Mapping[str, Any], *, cache_dir: Path | None = None, base_
     return CsvAdapter(base_dir=base_dir)
 
 
+def _make_kolada(source: Mapping[str, Any], *, cache_dir: Path | None = None, base_dir: Path | None = None) -> "KoladaAdapter":
+    return KoladaAdapter(
+        base_url=source.get("base_url", KoladaAdapter.DEFAULT_BASE_URL),
+        cache_dir=cache_dir,
+    )
+
+
 ADAPTER_FACTORIES = {
     "pxweb": _make_pxweb,
     "sotkanet": _make_sotkanet,
     "socialstyrelsen": _make_socialstyrelsen,
     "kuhr": _make_kuhr,
     "csv": _make_csv,
+    "kolada": _make_kolada,
 }
 
 

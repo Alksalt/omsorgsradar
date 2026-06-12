@@ -27,6 +27,8 @@ import logging
 from pathlib import Path
 from typing import Any, Mapping
 
+from urllib.parse import urlparse
+
 import pandas as pd
 import requests
 
@@ -94,7 +96,16 @@ class SocialstyrelsenAdapter:
             payload = resp.json()
             rows.extend(payload.get("data", []))
             nxt = payload.get("nasta_sida")
-            page_url = nxt.replace("http://", "https://", 1) if nxt else None
+            if nxt:
+                nxt = nxt.replace("http://", "https://", 1)
+                host = urlparse(nxt).netloc.lower()
+                base_host = urlparse(self.base_url).netloc.lower()
+                if host != base_host:
+                    raise RuntimeError(
+                        f"socialstyrelsen: nasta_sida host {host!r} != base "
+                        f"{base_host!r} — refusing cross-host pagination"
+                    )
+            page_url = nxt or None
         if page_url is not None:
             raise RuntimeError(
                 f"socialstyrelsen: exceeded max_pages={max_pages} at {page_url} — "

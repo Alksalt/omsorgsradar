@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_TIMEOUT = 60  # seconds, shared by all HTTP adapters
 
-_KEY_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+_KEY_RE = re.compile(r"\A[A-Za-z0-9._-]+\Z")  # \Z, not $: reject trailing newline
 
 
 class CacheKeyError(ValueError):

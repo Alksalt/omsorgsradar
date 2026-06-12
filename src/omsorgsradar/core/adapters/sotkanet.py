@@ -115,7 +115,8 @@ class SotkanetAdapter:
         kunta = self.municipalities()
         frames: list[pd.DataFrame] = []
         for ind in source["indicators"]:
-            key = f"sotkanet_{ind}_{years[0]}_{years[-1]}_{gender}"
+            year_part = "-".join(str(y) for y in years)  # full list: no collision
+            key = f"sotkanet_{ind}_{year_part}_{gender}"
             rows = self._get_json(
                 f"{self.base_url}/json",
                 params={"indicator": str(ind),

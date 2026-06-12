@@ -18,7 +18,7 @@ def seeded_adapter(tmp_path: Path) -> SotkanetAdapter:
     shutil.copy(FIXTURE_DIR / "sotkanet_regions_fixture.json",
                 tmp_path / "sotkanet_regions.json")
     shutil.copy(FIXTURE_DIR / "sotkanet_127_fixture.json",
-                tmp_path / "sotkanet_127_2023_2023_total.json")
+                tmp_path / "sotkanet_127_2023_total.json")
     return SotkanetAdapter(base_url="http://127.0.0.1:9/unreachable", cache_dir=tmp_path)
 
 
@@ -45,7 +45,7 @@ class TestFetch:
 
     def test_empty_indicator_gives_empty_tidy_df(self, tmp_path: Path) -> None:
         ad = seeded_adapter(tmp_path)
-        (tmp_path / "sotkanet_999_2023_2023_total.json").write_text("[]")
+        (tmp_path / "sotkanet_999_2023_total.json").write_text("[]")
         df = ad.fetch({"adapter": "sotkanet", "id": "x",
                        "indicators": [999], "years": [2023]})
         assert df.empty and "geo_id" in df.columns

@@ -112,10 +112,13 @@ before analysis, verdict published in the quality profile.
 4. **Run** the remaining stages on green; link report, figures, run journal; narrate findings from
    `findings.json` only (numbers come from artifacts, never from model memory).
 
-Security gate (review flag 2026-06-11): before any machine-authored analysis.toml is
-executed, tighten core/config.py — `base_url` pattern-locked to the known data hosts,
-`id`/cache keys restricted to `^[a-z0-9_]+$`, and pxweb cache writes must reject keys
-containing `/` or `..`.
+Security gate (review flag 2026-06-11, extended by G1 panel 2026-06-12): before any
+machine-authored analysis.toml is executed, tighten core/config.py — `base_url`
+pattern-locked to the known data hosts. Landed in G1 already: cache keys sanitized
+(`core/adapters/cache.py`, rejects `/`, `..`, newlines), source ids locked to
+`^[a-z0-9_]+$`, socialstyrelsen `nasta_sida` pagination host-pinned. Still G3-blocking:
+csv adapter must resolve `path` and reject anything outside the analysis dir
+(absolute/`../` paths are owner-trust-only in G1 — `csvfile.py` docstring).
 
 ### `/add-dataset <api-url>`
 1. Inspect the API (one sample call, schema sniff: JSON-stat2? PxWeb? CKAN? plain JSON/CSV?).

@@ -22,7 +22,7 @@ class TestJsonCache:
         cache.save("k", {"x": 1})  # must not raise
         assert cache.load("k") is None
 
-    @pytest.mark.parametrize("bad", ["a/b", "../etc", "a..b", "a b", "", "nøkkel"])
+    @pytest.mark.parametrize("bad", ["a/b", "../etc", "a..b", "a b", "", "nøkkel", "trailing\n"])
     def test_bad_keys_rejected(self, tmp_path: Path, bad: str) -> None:
         with pytest.raises(CacheKeyError):
             JsonCache(tmp_path).save(bad, {})

@@ -20,7 +20,8 @@ ones.
   only open aggregate statistics — SSB/FHI).
 
 Status: **v1 built + shipped (P0–P5, 2026-06-11) · v2 G0 (engine + config) shipped 2026-06-11 on
-owner's go · next: G1 (Nordic adapters) per `docs/specs/2026-06-11-v2-generalization-design.md`.**
+owner's go · G1 (Nordic adapters + realness gates) shipped 2026-06-12 · next: G2
+(`analyses/nordisk-omsorg` end-to-end) per `docs/specs/2026-06-11-v2-generalization-design.md`.**
 
 ## v2 engine (G0+)
 Config: `workflow.toml` (models/endpoint/defaults) + `analyses/<name>/analysis.toml`

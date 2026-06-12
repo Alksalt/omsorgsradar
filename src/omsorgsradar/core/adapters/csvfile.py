@@ -3,6 +3,11 @@
 The realness provenance gate has no known-host fallback for local files, so
 csv sources MUST carry [sources.provenance] with institution + url — enforced
 by validate_source (registry) and re-checked by the profile-stage gates.
+
+Absolute and ``../`` paths are accepted ONLY because configs are
+owner-authored in G1. Hard G3 prerequisite before any machine-authored
+analysis.toml runs: resolve the path and reject anything outside the
+analysis dir (see spec, security gate).
 """
 
 from __future__ import annotations

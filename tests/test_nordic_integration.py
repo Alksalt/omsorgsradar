@@ -65,7 +65,7 @@ def test_nordic_ingest_profile_offline(tmp_path: Path) -> None:
     shutil.copy(FIXTURE_DIR / "sotkanet_regions_fixture.json",
                 cache / "sotkanet_regions.json")
     shutil.copy(FIXTURE_DIR / "sotkanet_127_fixture.json",
-                cache / "sotkanet_127_2023_2023_total.json")
+                cache / "sotkanet_127_2023_total.json")
     shutil.copy(FIXTURE_DIR / "kuhr_le_1505_fixture.json",
                 cache / "kuhr_LE_2023_2023_t2ad_k1505.json")
 

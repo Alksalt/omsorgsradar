@@ -347,12 +347,24 @@ def stage_verify_nordisk(ctx: StageContext) -> None:
         high = float(((t["growth_pct"] > gro_med) & (t["coverage"] < cov_med)).mean())
         _check(claims, f"{country}.high_squeeze_share", c["high_squeeze_share"],
                round(high, 4), tol=0.0005)
-        top1 = t.sort_values("squeeze", ascending=False).iloc[0]
-        _check(claims, f"{country}.top1_geo_id",
-               c["top_squeeze"][0]["geo_id"], str(top1["geo_id"]))
-        _check(claims, f"{country}.top1_squeeze",
-               c["top_squeeze"][0]["squeeze"], round(float(top1["squeeze"]), 3),
-               tol=0.005)
+        t_sorted = t.sort_values("squeeze", ascending=False).reset_index(drop=True)
+        for row in c["top_squeeze"]:
+            i = int(row["rank"]) - 1
+            if i >= len(t_sorted):
+                _check(claims, f"{country}.top{row['rank']}.exists",
+                       row["geo_id"], "<missing>")
+                continue
+            actual = t_sorted.iloc[i]
+            _check(claims, f"{country}.top{row['rank']}.geo_id",
+                   row["geo_id"], str(actual["geo_id"]))
+            _check(claims, f"{country}.top{row['rank']}.geo_name",
+                   row["geo_name"], str(actual["geo_name"]))
+            _check(claims, f"{country}.top{row['rank']}.squeeze",
+                   row["squeeze"], round(float(actual["squeeze"]), 3), tol=0.005)
+            _check(claims, f"{country}.top{row['rank']}.coverage",
+                   row["coverage"], round(float(actual["coverage"]), 2), tol=0.005)
+            _check(claims, f"{country}.top{row['rank']}.growth_pct",
+                   row["growth_pct"], round(float(actual["growth_pct"]), 2), tol=0.005)
 
     shares = {k: v["high_squeeze_share"] for k, v in findings["countries"].items()}
     _check(claims, "comparison.lowest_high_squeeze_share_country",

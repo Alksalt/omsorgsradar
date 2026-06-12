@@ -171,7 +171,7 @@ class TestNordiskVerify:
         v = _json.loads((tmp_path / "verification.json").read_text(encoding="utf-8"))
         assert v["verdict"] == "PASS"
         assert v["failed"] == 0
-        assert v["total_claims"] >= 12
+        assert v["total_claims"] >= 40  # 3 countries × (5 stats + top_n×5) + comparison
 
     def test_planted_hallucination_caught(self, tmp_path: Path) -> None:
         import json as _json

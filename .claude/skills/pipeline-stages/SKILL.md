@@ -24,7 +24,7 @@ description: How to run, extend, and debug the omsorgsradar analysis pipeline (i
 - New analysis: create `analyses/<name>/analysis.toml` (schema:
   `core/config.py`). Stage list + `[[sources]]` blocks; no code needed for
   existing adapters.
-- Adapters: `pxweb | sotkanet | socialstyrelsen | kuhr | csv` — required fields per
+- Adapters: `pxweb | sotkanet | socialstyrelsen | kuhr | kolada | csv` — required fields per
   adapter in `docs/adapters.md`; validation runs at pipeline startup. New API shape →
   new module in `core/adapters/` + offline fixture + known-value test (never edit an
   existing adapter's behavior for a new dataset).

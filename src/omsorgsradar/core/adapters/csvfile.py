@@ -30,7 +30,12 @@ class CsvAdapter:
         self.base_dir = Path(base_dir) if base_dir is not None else None
 
     def fetch(self, source: Mapping[str, Any]) -> pd.DataFrame:
-        base = (self.base_dir or Path.cwd()).resolve()
+        if self.base_dir is None:
+            raise ConfigError(
+                f"csv source '{source.get('id')}': base_dir is required for path "
+                "containment — construct CsvAdapter with the analysis dir"
+            )
+        base = self.base_dir.resolve()
         raw = Path(str(source["path"]))
         p = (raw if raw.is_absolute() else base / raw).resolve()
         if not p.is_relative_to(base):

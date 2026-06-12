@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from omsorgsradar.core.adapters.csvfile import CsvAdapter
+from omsorgsradar.core.config import ConfigError
 
 
 def write_csv(path: Path, text: str) -> Path:
@@ -37,6 +38,12 @@ class TestFetch:
         with pytest.raises(ValueError, match="escapes the analysis dir"):
             CsvAdapter(base_dir=base).fetch(
                 {"adapter": "csv", "id": "x", "path": str(outside),
+                 "provenance": {"institution": "T", "url": "https://x"}})
+
+    def test_base_dir_required(self) -> None:
+        with pytest.raises(ConfigError, match="base_dir is required"):
+            CsvAdapter().fetch(
+                {"adapter": "csv", "id": "x", "path": "f.csv",
                  "provenance": {"institution": "T", "url": "https://x"}})
 
     def test_parent_escape_rejected(self, tmp_path: Path) -> None:

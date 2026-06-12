@@ -73,7 +73,7 @@ def validate_source_host(
     base = str(source.get("base_url", ""))
     if not base:
         return
-    host = urlparse(base).netloc.lower()
+    host = (urlparse(base).hostname or "").lower()
     allowed = set(ALLOWED_BASE_URL_HOSTS) | set(extra_hosts)
     if host in allowed or any(host.endswith("." + h) for h in allowed):
         return
@@ -165,8 +165,10 @@ def make_adapter(
     *,
     cache_dir: Path | None = None,
     base_dir: Path | None = None,
+    extra_hosts: frozenset[str] | set[str] = frozenset(),
 ) -> DatasetAdapter:
     validate_source(source)
+    validate_source_host(source, extra_hosts)
     return ADAPTER_FACTORIES[source["adapter"]](
         source, cache_dir=cache_dir, base_dir=base_dir
     )

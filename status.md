@@ -89,5 +89,11 @@
   `ALLOWED_BASE_URL_HOSTS`-allowlist håndhevet ved oppstart (+ workflow.toml
   `[security].extra_allowed_hosts`), csv-path-containment, `--validate-only`/`--until`,
   `core/discovery.py` pointer-klassifisering. `docs/dataset-registry.md` (Tier 1
-  verifisert / Tier 2 kandidater). Tests: 219 → 244 offline. **Next: G4 — anonymize
+  verifisert / Tier 2 kandidater). Tests: 219 → 247 offline + 4 live. **Next: G4 — anonymize
   stage (Presidio nb + anonymeter) + BRFSS-demo + planted-PII-test.**
+- **2026-06-12** — **G3 panel close-out.** Correctness/security/integration: 3× PASS
+  (security-vektet — gaten er hele poenget). Bypass-forsøk alle blokkert: host-lookalikes,
+  userinfo/port-smugling, localhost-SSRF, paginerings-omdirigering, csv-symlink/`../`-escape,
+  extra_allowed_hosts kan ikke smugles via analysis.toml. Defense-in-depth-fikser landet:
+  host-sjekk foldet inn i `make_adapter` (ikke bare run_pipeline), `CsvAdapter` krever nå
+  base_dir, port strippet via hostname. Tester: 247 offline + 4 live.

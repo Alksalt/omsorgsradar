@@ -53,6 +53,23 @@ class TestMakeAdapter:
         from omsorgsradar.ingest import _FETCHERS
         assert set(_FETCHERS) == set(LEGACY_SOURCE_IDS)
 
+    def test_make_adapter_enforces_host_allowlist(self, tmp_path: Path) -> None:
+        with pytest.raises(ConfigError, match="not allowlisted"):
+            make_adapter(
+                {"id": "x", "adapter": "pxweb",
+                 "base_url": "https://evil.example.com", "table": "1"},
+                cache_dir=tmp_path,
+            )
+
+    def test_make_adapter_extra_hosts_honored(self, tmp_path: Path) -> None:
+        ad = make_adapter(
+            {"id": "x", "adapter": "pxweb",
+             "base_url": "https://api.statbank.dk/v1", "table": "1"},
+            cache_dir=tmp_path,
+            extra_hosts=frozenset({"api.statbank.dk"}),
+        )
+        assert ad.source_id == "pxweb"
+
 
 class TestConfigSchema:
     def test_source_id_pattern_locked(self, tmp_path: Path) -> None:

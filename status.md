@@ -143,3 +143,17 @@
   avvises nå (ville ellers havne i journal); COSTS.md-prising oppdatert fra utdatert sonnet-4-5 til
   config-drevet fable-5. 4 nye tester. Tester: **294 offline + 5 live**. **G5 levert. Next: G6 — marimo
   + GitHub Pages site + README/LIMITATIONS/COSTS-finpuss + push.**
+- **2026-06-12** — **G6 (rapportnettsted + marimo) bygget + 6-agents review-panel.** `omsorgsradar.site`:
+  frittstående statisk-site-bygger (Jinja2 + ren CSS, ingen JS-rammeverk) som publiserer committede
+  `*_rapport.md` + `figures/*.png` via **allowlist** — rører aldri `data/cache`/`microdata`/`*.duckdb`/rå
+  CSV. Selvstendig marimo-WASM-notebook (interaktiv nordisk skvis-utforsking, aggregat inline, kjører
+  i nettleser). GitHub Pages-workflow (least-privilege, bygger fra committede artefakter — kjører ALDRI
+  pipelinen i CI, ingen nettverk/secrets). brfss-demo-rapport publisert. CI bygger fra committede artefakter.
+  **6 uavhengige review-agenter (eier-ønske 3–8): blast-radius, security, correctness, integration,
+  silent-failure, content/UX-som-kommunehelsesjef.** 2× BLOCK + FIX-FIRST → 16 funn fikset: README/docs
+  `--analysis`-flagg fantes ikke (positional CLI); `jinja2` udeklarert dep (+`nh3` HTML-sanitizer);
+  rapporter delte `reports/figures/` (brfss fikk omsorgsradar-figurer) → per-slug-undermapper + vakt;
+  marimo-eksport lekket repo-rot `CLAUDE.md` → temp-dir-eksport; rå TabPFN-feil + 404-LIMITATIONS-lenke
+  + identisk 36,3%-vekst-kolonne i rapporten ryddet; symlink-herding på figur-kopiering; kort-rekkefølge
+  (norsk først) + teasere. Lekkasje-sjekk: ingen fnr-verdi / 11-sifret tall / token i publiserte sider.
+  Tester: 294 → **303 offline + 5 live**. **Next: push + aktiver Pages + verifiser live-URL.**

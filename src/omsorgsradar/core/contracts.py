@@ -161,6 +161,21 @@ SCHEMAS: dict[str, dict[str, Any]] = {
 }
 
 
+def register_schema(name: str, schema: dict[str, Any]) -> None:
+    """Register an artifact schema (instance extension point).
+
+    ``analyses/<name>/stages.py`` registers schemas for its custom artifacts so
+    they flow through the same ``validate_artifact`` path as core artifacts.
+    Re-registering the identical schema is a no-op (extension modules are
+    re-imported on every pipeline run); a conflicting redefinition raises.
+    """
+    if name in SCHEMAS:
+        if SCHEMAS[name] == schema:
+            return
+        raise ValueError(f"artifact schema '{name}' already registered with a different definition")
+    SCHEMAS[name] = schema
+
+
 def validate_artifact(name: str, payload: dict[str, Any]) -> None:
     """Validate an artifact payload against its registered schema.
 

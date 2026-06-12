@@ -76,3 +76,42 @@ class TestValidateArtifact:
     def test_unknown_artifact_name_fails(self) -> None:
         with pytest.raises(ArtifactValidationError, match="unknown artifact"):
             validate_artifact("blob", {})
+
+
+class TestRegisterSchema:
+    DUMMY = {"type": "object", "required": ["x"],
+             "properties": {"x": {"type": "integer"}}}
+
+    def test_register_validate_roundtrip(self) -> None:
+        from omsorgsradar.core.contracts import (
+            ArtifactValidationError, SCHEMAS, register_schema, validate_artifact,
+        )
+        try:
+            register_schema("g2_dummy", self.DUMMY)
+            validate_artifact("g2_dummy", {"x": 1})
+            with pytest.raises(ArtifactValidationError):
+                validate_artifact("g2_dummy", {"x": "nope"})
+        finally:
+            SCHEMAS.pop("g2_dummy", None)
+
+    def test_identical_reregistration_is_idempotent(self) -> None:
+        from omsorgsradar.core.contracts import SCHEMAS, register_schema
+        try:
+            register_schema("g2_dummy", self.DUMMY)
+            register_schema("g2_dummy", self.DUMMY)  # extension reload — no raise
+        finally:
+            SCHEMAS.pop("g2_dummy", None)
+
+    def test_conflicting_reregistration_raises(self) -> None:
+        from omsorgsradar.core.contracts import SCHEMAS, register_schema
+        try:
+            register_schema("g2_dummy", self.DUMMY)
+            with pytest.raises(ValueError, match="already registered"):
+                register_schema("g2_dummy", {"type": "object"})
+        finally:
+            SCHEMAS.pop("g2_dummy", None)
+
+    def test_core_schema_protected(self) -> None:
+        from omsorgsradar.core.contracts import register_schema
+        with pytest.raises(ValueError, match="already registered"):
+            register_schema("findings", {"type": "object"})

@@ -144,6 +144,16 @@ k-threshold aggregation + **anonymeter** receipts (singling out / linkability / 
 identifiability-assessment artifact. Framing everywhere: «anonymisering med målt restrisiko», never
 "fully anonymous". Demo analysis: CDC BRFSS microdata. Planted-PII test required.
 
+**As built (G4, 2026-06-12):** anonymeter the *package* is uninstallable on this stack (pins
+numpy<1.27; repo is numpy 2.4) and targets synthetic data, not k-anonymized real microdata — so the
+three WP216 criteria it measures are **vendored** with standard SDC math in `core/anonymize/risk.py`
+(singling-out ← k-anonymity / prosecutor risk; linkability ← QI-uniqueness; inference ← l-diversity +
+attacker advantage). Identifiability receipt → `data/identifiability.json` (schema-validated, gate
+aborts on FAIL after the verdict is on disk). spaCy NER is optional/live-only; the offline path uses
+`spacy.blank("nb")` (no 568 MB download). Row-level sources are tagged `row_level = true` (startup
+check forces `anonymize`; realness skips shape-checks; `microdata/` is hook-blocked). See
+`docs/anonymize.md`. Demo: `analyses/brfss-demo/` (synthetic BRFSS-shaped fixture, real fetch documented).
+
 ## Execution modes
 
 The shell inherits harness auth: **subscription OAuth primary** (Claude Code on Anthropic sub;

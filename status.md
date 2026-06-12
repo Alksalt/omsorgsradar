@@ -97,3 +97,19 @@
   extra_allowed_hosts kan ikke smugles via analysis.toml. Defense-in-depth-fikser landet:
   host-sjekk foldet inn i `make_adapter` (ikke bare run_pipeline), `CsvAdapter` krever nå
   base_dir, port strippet via hostname. Tester: 247 offline + 4 live.
+- **2026-06-12** — **G4 (anonymize stage) bygget.** Nytt `core/anonymize/`-pakke: `pii.py`
+  (Presidio + norske recognizers: fødselsnummer/D-nummer mod-11, telefon, kontonummer;
+  offline via `spacy.blank("nb")`, ingen 568 MB-nedlasting), `kanon.py` (config-drevet
+  generalisering + k-undertrykking), `risk.py` (**vendoret** restrisiko-kvittering for de tre
+  EU Art-29-WP216-kriteriene — singling-out/linkability/inference — med SDC-matte: k-anonymitet/
+  l-diversitet/QI-unikhet). `anonymize`-steg i motoren (etter profile, før analyze): redigerer PII,
+  k-anonymiserer, publiserer `data/identifiability.json` (schema-validert), bytter rådata ut av state,
+  aborterer på FAIL etter at verdikten er på disk. **Kritisk dep-funn: `anonymeter`-pakken er
+  uinstallérbar (pinner numpy<1.27; repoet er numpy 2.4) og er laget for syntetiske data — de tre
+  kriteriene er derfor vendoret. Eier-beslutning, DECISIONS.md oppdatert.** Radnivå-vern i tre lag:
+  `row_level=true`-kilder (startup-sjekk krever anonymize; realness hopper over form-sjekker; `microdata/`
+  hook-blokkert fra modell-kontekst). Demo: `analyses/brfss-demo/` (diabetes-prevalens per stratum fra
+  syntetisk BRFSS-formet fixture med plantet fnr; smoke: verdikt PASS, min_class_size=10, 489/600
+  rader sluppet, 35 klasser, verify uavhengig). Planted-PII-test + inference-FAIL-abort + row_level-
+  startup-test grønne. Tester: 247 → **270 offline + 5 live**. **Next: G4 close-out (opus-panel) +
+  push.**

@@ -46,6 +46,13 @@ flowchart TD
 | P2 Verify | `verify.py` | Recomputes every claimed statistic ("tool receipts") |
 | P3 Report | `report.py` | Bokmål markdown + matplotlib figures |
 | P4 ML | `ml.py` | XGBoost walk-forward CV + SHAP + naive baseline |
+| Anonymize (opt.) | `core/anonymize/` | Microdata → PII-redaction + k-anonymity + **measured residual-risk receipt** (EU WP216: singling-out / linkability / inference) |
+
+The optional `anonymize` stage turns row-level microdata into a k-anonymized aggregate plus a
+*measured-residual-risk* receipt — **anonymisering med målt restrisiko**, never "fully anonymous"
+(pseudonymisering ≠ anonymisering; EDPB 01/2025). It is LLM-free engine code; row-level data never
+enters model context. Demo: `analyses/brfss-demo/` (diabetes prevalence by stratum). See
+[`docs/anonymize.md`](docs/anonymize.md).
 
 ---
 

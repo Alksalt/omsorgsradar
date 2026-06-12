@@ -1,6 +1,6 @@
 ---
 name: pipeline-stages
-description: How to run, extend, and debug the omsorgsradar analysis pipeline (ingest → profile → analyze → verify → report → ml). Use when working on any pipeline stage, adding an analysis instance, or investigating a failed run.
+description: How to run, extend, and debug the omsorgsradar analysis pipeline (ingest → profile → [anonymize] → analyze → verify → report → ml). Use when working on any pipeline stage, adding an analysis instance, or investigating a failed run.
 ---
 
 # Pipeline stages
@@ -31,6 +31,15 @@ description: How to run, extend, and debug the omsorgsradar analysis pipeline (i
 - Realness gates run in `profile` on every dataset (verdict in
   `data/quality_profile.json`); a FAIL verdict aborts before analyze. csv sources
   must declare `[sources.provenance]` institution + url.
+- `anonymize` (optional core stage, runs after `profile`, before `analyze`): redacts PII
+  (Presidio + Norwegian recognizers), k-anonymizes the quasi-identifiers, publishes a
+  measured-residual-risk receipt (`data/identifiability.json`, WP216: singling-out/linkability/
+  inference) and aborts on a FAIL verdict. Config in `[params.anonymize]`: `source`,
+  `text_columns`, `quasi_identifiers`, `sensitive`, `k`, `generalize.<col>` (bins+labels or map),
+  `thresholds` (l_min/inference/linkability), optional `spacy_model` (live NER). Sources holding
+  microdata MUST set `row_level = true` — the engine refuses to run them without `anonymize` in the
+  stage list, realness skips its shape-checks, and the raw path must live under `microdata/`
+  (hook-blocked). See `docs/anonymize.md`. Example instance: `analyses/brfss-demo/`.
 - Variant behavior: add `analyses/<name>/stages.py` with
   `register(registry)`; use `registry.register(name, fn, override=True)`.
   Core stages are never edited for a variant.

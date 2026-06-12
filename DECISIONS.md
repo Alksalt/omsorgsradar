@@ -22,8 +22,14 @@ Hard constraints. Workspace-wide rules in `../CLAUDE.md` apply on top.
   config-swappable alternates; v1 ships a working local demo of ≥1 stage.
 - Row-level data never enters model context: the LLM orchestrates code; only schemas/profiles/aggregates
   return. Enforced by hook, not instruction.
-- Anonymize stage framing: «anonymisering med målt restrisiko» (Presidio + anonymeter receipts) — never
-  claim "fully anonymous"; pseudonymisering ≠ anonymisering (EDPB 01/2025, Datatilsynet).
+- Anonymize stage framing: «anonymisering med målt restrisiko» — never claim "fully anonymous";
+  pseudonymisering ≠ anonymisering (EDPB 01/2025, Datatilsynet). Residual-risk receipts cover the three
+  EU Art-29-WP216 criteria (singling-out / linkability / inference), computed by vendored SDC math in
+  `core/anonymize/risk.py` (k-anonymity / l-diversity / QI-uniqueness; refs WP216 + sdcMicro + Giomi 2023).
+  The `anonymeter` package is NOT used — it pins numpy<1.27 (uninstallable on this stack) and targets
+  synthetic data, not k-anonymized real microdata. Row-level sources carry `row_level = true`: the engine
+  refuses to run them without `anonymize` in the stage list, the realness gate skips its shape-dependent
+  checks for them, and their raw path is hook-blocked from model context (`microdata/`).
 - Dataset realness gates (provenance/DOI, duplicate rate, missingness plausibility, distribution sanity,
   named institution) are mandatory in the profile stage before any analysis runs.
 - Deterministic engine + agentic shell: skills (`/magic-analyze`, `/add-dataset`) write config and prose

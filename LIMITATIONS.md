@@ -47,6 +47,27 @@ Indeksen bør brukes som **startpunkt for videre analyse**, ikke som beslutnings
 
 All analyse er på **kommunalt aggregatnivå** over offentlige aggregatstatistikker. Ingen individdata, ingen pasientdata. Ingen REK-godkjenning er nødvendig.
 
+## Anonymisering med målt restrisiko (anonymize-steget)
+
+`anonymize`-steget (demo: `analyses/brfss-demo/`) behandler radnivå-mikrodata og publiserer
+en k-anonymisert aggregat sammen med en **målt** restrisiko-kvittering. Viktige forbehold:
+
+- **Restrisikoen er målt, ikke eliminert.** Kvitteringen rapporterer de tre EU Art-29-WP216-kriteriene
+  (singling-out / linkability / inference) med standard SDC-mål. En PASS betyr at risikoen er under de
+  konfigurerte tersklene — ikke at datasettet er «fullstendig anonymt».
+- **Pseudonymisering ≠ anonymisering** (EDPB 01/2025, Datatilsynet). Fjerning av direkte identifikatorer
+  alene gjør ikke data anonyme; gjenidentifisering via kvasi-identifikatorer er fortsatt mulig uten
+  k-anonymisering.
+- **k-anonymitet ≠ differensiell personvern.** k-anonymitet beskytter mot singling-out, men gir ingen
+  formell garanti mot inferens på tvers av klasser; l-diversitet demper, men løser ikke,
+  homogenitets- og bakgrunnskunnskaps-angrep.
+- **Generaliseringsvalgene er analytiker-beslutninger** (aldersbånd, k, terskler) — de er
+  konfigurasjon, ikke fasit, og påvirker både restrisiko og analytisk nytteverdi (utility/privacy-avveiing).
+- **`anonymeter`-pakken brukes ikke** (uinstallérbar på numpy 2; laget for syntetiske data). De tre
+  kriteriene er vendoret med SDC-matematikk i `core/anonymize/risk.py` — se `docs/anonymize.md`.
+- **BRFSS-demoen bruker et syntetisk, BRFSS-formet fixture** (deterministisk generert). Den ekte
+  CDC BRFSS-mikrodatafilen er dokumentert, men ikke inkludert i repoet.
+
 ## Kartkoplinger (fremtidig arbeid)
 
 Kartverket GeoJSON-grenser for kommuner (WFS/REST) er **ikke** inkludert i v0.1. Et koropletkart ville øke visualiseringsverdien. Ikke ekskludert av tekniske grunner — nedprioritert for framdrift.

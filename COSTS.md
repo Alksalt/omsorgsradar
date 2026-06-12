@@ -33,6 +33,14 @@ TabPFN-2.5 was not run in v0.1 because it requires an interactive license accept
 
 Both SSB PxWebAPI v2 and FHI NOKKEL are **free, no authentication required** (CC BY 4.0 / open government data). The pipeline caches responses to `data/cache/` after the first run — subsequent runs cost zero API calls for ingest.
 
+### Anonymize stage (LLM-free)
+
+The `anonymize` stage runs entirely in engine code (Presidio pattern recognizers + pandas
+k-anonymity + vendored SDC risk math) — **$0.00 marginal cost per run, no API calls**. The offline
+path uses `spacy.blank("nb")` (tokenizer only, bundled with spaCy). The optional Norwegian NER model
+`nb_core_news_lg` is a **one-time ~568 MB download** (`uv run python -m spacy download nb_core_news_lg`)
+and then runs locally on CPU — only needed for free-text name/location detection in live runs.
+
 ## Compute
 
 Full pipeline run time (MacBook, cached ingest): ~45 seconds.

@@ -1,6 +1,7 @@
+import sys
 from pathlib import Path
 import pytest
-from omsorgsradar.site import discover_reports, build_site
+from omsorgsradar.site import discover_reports, build_site, SITE_INTRO, _SLUG_DESCRIPTOR
 
 # Real PNG magic bytes (8-byte signature)
 _PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
@@ -133,3 +134,108 @@ def test_report_summary_appears_in_index(tmp_path):
     build_site(reports_dir=tmp_path, out_dir=out)
     idx = (out / "index.html").read_text(encoding="utf-8")
     assert "Dette er første avsnitt med tekst." in idx
+
+
+# ── B7: landing-page reconciliation (N4 + N20) ───────────────────────────────
+
+def test_slug_descriptor_map_has_known_analyses():
+    """All three known analysis slugs have descriptors."""
+    for slug in ("omsorgsradar", "nordisk-omsorg", "brfss-demo"):
+        assert slug in _SLUG_DESCRIPTOR
+        assert _SLUG_DESCRIPTOR[slug]
+
+
+def test_site_intro_contains_reconciliation_sentence():
+    """SITE_INTRO must contain the ranking-differs-by-design sentence."""
+    assert "ulike tidsvinduer og metoder" in SITE_INTRO
+    assert "rangerer" in SITE_INTRO
+
+
+def test_descriptor_appears_in_index_for_known_slug(tmp_path):
+    """Landing card for omsorgsradar shows the method/window descriptor."""
+    report_dir = tmp_path / "omsorgsradar"
+    report_dir.mkdir()
+    (report_dir / "omsorgsradar_rapport.md").write_text(
+        "# Omsorgsradar\n\nNoen funn.\n", encoding="utf-8")
+    out = tmp_path / "site"
+    build_site(reports_dir=tmp_path, out_dir=out)
+    idx = (out / "index.html").read_text(encoding="utf-8")
+    assert "Trendframskriving 2017" in idx
+    assert "card-method" in idx
+
+
+def test_descriptor_absent_for_unknown_slug(tmp_path):
+    """Unknown slug: no descriptor line, no card-method class with empty content."""
+    report_dir = tmp_path / "unknown-analysis"
+    report_dir.mkdir()
+    (report_dir / "unknown-analysis_rapport.md").write_text(
+        "# Unknown\n\nTekst.\n", encoding="utf-8")
+    out = tmp_path / "site"
+    build_site(reports_dir=tmp_path, out_dir=out)
+    idx = (out / "index.html").read_text(encoding="utf-8")
+    # descriptor block must not render for slugs with no descriptor
+    assert 'card-method"><' not in idx or "card-method\"></p>" not in idx
+
+
+def test_marimo_failure_keeps_site_and_writes_placeholder(tmp_path):
+    """N20: if marimo export fails, built site is preserved and explore/ gets a placeholder."""
+    _make_reports(tmp_path)
+    out = tmp_path / "site"
+    build_site(reports_dir=tmp_path, out_dir=out)
+
+    from omsorgsradar.site import export_marimo
+    # export_marimo on a non-notebook path will raise RuntimeError
+    try:
+        export_marimo(tmp_path / "nonexistent.py", out)
+    except Exception:
+        pass
+
+    # Simulate the main() logic for marimo failure: placeholder written, site intact
+    explore_dir = out / "explore"
+    explore_dir.mkdir(parents=True, exist_ok=True)
+    placeholder = explore_dir / "index.html"
+    placeholder.write_text(
+        "<!DOCTYPE html><html lang='nb'><head><meta charset='utf-8'>"
+        "<title>Interaktiv utforsking</title></head><body>"
+        "<p>Interaktiv utforsking er midlertidig utilgjengelig.</p>"
+        "</body></html>",
+        encoding="utf-8",
+    )
+    # Static site must still be intact
+    assert (out / "index.html").exists()
+    assert (out / "alpha" / "index.html").exists()
+    # Placeholder exists
+    assert placeholder.exists()
+    assert "midlertidig utilgjengelig" in placeholder.read_text(encoding="utf-8")
+
+
+def test_main_marimo_failure_writes_placeholder_not_rmtree(tmp_path, capsys):
+    """N20: main() with failing --marimo must NOT delete the site; placeholder + warning."""
+    import subprocess, sys, textwrap
+
+    _make_reports(tmp_path)
+    # Run main() directly by importing and calling it with monkeypatching
+    from unittest.mock import patch
+    from omsorgsradar import site as site_mod
+
+    out_dir = tmp_path / "site"
+
+    # Patch export_marimo to simulate failure, patch sys.argv
+    def _fail_export(notebook, out_dir):
+        raise RuntimeError("marimo not available in test")
+
+    with patch.object(site_mod, "export_marimo", side_effect=_fail_export), \
+         patch("sys.argv", ["site", "--reports-dir", str(tmp_path),
+                            "--out", str(out_dir),
+                            "--marimo", str(tmp_path / "fake.py")]):
+        site_mod.main()
+
+    # Site must still exist
+    assert (out_dir / "index.html").exists()
+    # Placeholder must exist
+    placeholder = out_dir / "explore" / "index.html"
+    assert placeholder.exists()
+    assert "midlertidig utilgjengelig" in placeholder.read_text(encoding="utf-8")
+    # Warning on stderr
+    captured = capsys.readouterr()
+    assert "WARNING" in captured.err

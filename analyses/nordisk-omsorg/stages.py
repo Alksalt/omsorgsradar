@@ -277,6 +277,16 @@ def stage_analyze_nordisk(ctx: StageContext) -> None:
     params = ctx.config.params
     datasets = ctx.state["datasets"]
     tables = build_country_tables(datasets, params)
+    # B2: per-country non-empty guard — an empty frame means the source failed
+    # silently; raise loudly so a zero-data report is never published.
+    _SOURCE_FOR_COUNTRY = {"NO": "no_kostra/no_befolkning", "SE": "se_hemtjanst/se_befolkning", "FI": "fi_homecare/fi_elderly_share"}
+    for country, t in tables.items():
+        if t.empty:
+            src = _SOURCE_FOR_COUNTRY.get(country, country)
+            raise PipelineGateError(
+                f"nordisk analyze: empty frame for country '{country}' "
+                f"(source: {src}) — ingest may have returned no rows"
+            )
     squeezed = {c: squeeze_table(t) for c, t in tables.items()}
 
     full = pd.concat(
@@ -499,6 +509,16 @@ def stage_report_nordisk(ctx: StageContext) -> None:
         )
     findings = ctx.state["nordic_findings"]
     table = pd.read_csv(ctx.data_dir / "nordic_table.csv")
+    # B2: per-country non-empty guard at report stage
+    _SOURCE_FOR_COUNTRY = {"NO": "no_kostra/no_befolkning", "SE": "se_hemtjanst/se_befolkning", "FI": "fi_homecare/fi_elderly_share"}
+    for country in ("NO", "SE", "FI"):
+        t = table[table["country"] == country]
+        if t.empty:
+            src = _SOURCE_FOR_COUNTRY.get(country, country)
+            raise PipelineGateError(
+                f"nordisk report: empty frame for country '{country}' "
+                f"(source: {src}) — cannot produce a credible report"
+            )
     fig_dir = ctx.reports_dir / "figures"
     fig_dir.mkdir(parents=True, exist_ok=True)
     top_n = int(ctx.config.params.get("top_n", 10))
@@ -511,12 +531,17 @@ def stage_report_nordisk(ctx: StageContext) -> None:
     comp_nb = {"NO": "Norge", "SE": "Sverige", "FI": "Finland"}[comp]
     ctx_block = ""
     if f.get("context", {}).get("kuhr_konsultasjoner_latest"):
-        n_kons = f"{f['context']['kuhr_konsultasjoner_latest']:,}".replace(",", " ")
+        n_kons = f"{f['context']['kuhr_konsultasjoner_latest']:,}".replace(",", " ")
+        chg_pct_raw = f['context']['kuhr_konsultasjoner_change_pct']
+        # nb-NO number formatting: comma decimal, minus sign prefix
+        chg_pct_nb = f"{chg_pct_raw:+.1f}".replace(".", ",").replace("+", "").replace("-", "−")
         ctx_block = (
             f"\nKontekst (KUHR, åpne helserefusjonsdata): {n_kons} "
             f"fastlegekonsultasjoner (takst 2ad) i {years['latest']}, en endring på "
-            f"{f['context']['kuhr_konsultasjoner_change_pct']} % siden "
-            f"{years['base']}.\n"
+            f"{chg_pct_nb} % siden {years['base']}. "
+            f"Fastlegekonsultasjonsvolum brukes her som kontekst-proxy for trykket på "
+            f"kommunal primærhelsetjeneste — nedgang kan reflektere økt kapasitet, men "
+            f"kan også gjenspeile endret behov eller rapporteringsendringer.\n"
         )
 
     sections = "\n".join(
@@ -533,7 +558,8 @@ og (3) en skvis-skår: z-skår for eldrevekst minus z-skår for dekning,
 normalisert **innen hvert land**. Høy skår = sterk aldring kombinert med lav
 dekning. Alle tall er beregnet av kode og kontrollregnet av en uavhengig
 verifiseringsmodul før denne rapporten ble generert
-(verifisering: {ctx.state['nordic_verification']['passed']}/{ctx.state['nordic_verification']['total_claims']} kontroller OK).
+(verifisering: {ctx.state['nordic_verification']['passed']}/{ctx.state['nordic_verification']['total_claims']} kontroller OK —
+én uavhengig omregning per rangert kommune pluss nasjonale aggregater per land).
 
 ## Funn per land
 
@@ -549,7 +575,7 @@ lavest i **{comp_nb}**.
 {ctx_block}
 ## Forbehold
 
-- Analysen er **deskriptivt, ikke kausalt** — rangerer og beskriver; forklarer ikke.
+- Analysen er **deskriptiv, ikke kausal** — rangerer og beskriver; forklarer ikke.
 - Aldersgrenser: NO/SE 80+, FI 75+. Definisjoner av hjemmetjeneste varierer.
 - Utelatte rader er talt opp per land (se tabellene); for Norge omfatter de
   både kommuner med supprimerte verdier og historiske kommunenummer fra

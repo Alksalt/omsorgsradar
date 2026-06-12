@@ -18,8 +18,8 @@ Hard constraints. Workspace-wide rules in `../CLAUDE.md` apply on top.
 - Cross-country comparisons are within-country-normalized patterns only; never compare indicator levels across countries (different age cuts/definitions).
 - Kommune-merger lookup is generated from SSB KLASS (classification 131), never hand-written; splits excluded and documented.
 - Primary execution mode = subscription OAuth harnesses (Claude Code on Anthropic sub; Codex CLI on OpenAI sub).
-  API-key (Anthropic/OpenAI/OpenRouter) and fully-local (LM Studio/Ollama via `ANTHROPIC_BASE_URL`) are
-  config-swappable alternates; v1 ships a working local demo of ≥1 stage.
+  API-key (Anthropic/OpenAI/OpenRouter) and fully-local (LM Studio/Ollama via `[endpoint.local].base_url`
+  in workflow.toml) are config-swappable alternates; v1 ships a working local demo of ≥1 stage.
 - Execution modes (as built, G5): selected by `[endpoint].mode`; resolved in `core/endpoint.py` to a
   provider-agnostic LLM client. `subscription` ⇒ engine makes NO API calls (shell narrates, $0);
   `api` ⇒ anthropic (Messages) / openai+openrouter (Chat Completions); `local` ⇒ Anthropic- or

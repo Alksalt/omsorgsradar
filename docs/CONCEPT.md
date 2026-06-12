@@ -15,7 +15,7 @@ figurer og kart. Universally recognized by kommunehelsesjefer, Helsedir analysts
 |---|---|---|
 | SSB PxWebAPI v2, tabell 12209 + `pleie`-serien | omsorgskapasitet per kommune (institusjonsplasser, hjemmetjenestetimer, brukere 67+/80+), 2007– | GET, CC BY 4.0, JSON-stat2/CSV |
 | SSB befolkningsframskrivinger + befolkning | aldersfordeling nå + framskrevet 2025–2035 per kommune | PxWebAPI v2 |
-| FHI OpenAPI, kilde `NOKKEL` (folkehelsestatistikk) | sosioøkonomisk/levekår-kontekst per kommune | `statistikk-data.fhi.no/api/open/v1/`, no auth, JSON-stat2/Parquet |
+| FHI OpenAPI, kilde `NOKKEL` (folkehelsestatistikk) | sosioøkonomisk/levekår-kontekst per kommune | `statistikk-data.fhi.no/api/open/v1/`, no auth, JSON-stat2/Parquet | ⚠️ API 404 per 2026-06-12; ekskludert (se `docs/api_drift.md`) |
 
 ⚠️ Kommunehelsa/Norgeshelsa ble nedlagt 2025-11-10 — bruk alltid `NOKKEL`-navnet (gamle navn daterer
 prosjektet). ⚠️ Kommunesammenslåinger (2020-bølgen) krever lookup-tabell i ingest — dette er den klassiske

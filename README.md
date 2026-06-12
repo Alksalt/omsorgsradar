@@ -92,24 +92,30 @@ uv sync
 # Run the default (omsorgsradar) analysis — fetches live SSB data, cached after first run
 uv run python -m omsorgsradar.pipeline
 
-# Run a specific analysis by name (config in analyses/<name>/analysis.toml)
-uv run python -m omsorgsradar.pipeline analyses/nordisk-omsorg
+# Run a specific named analysis (config in analyses/<name>/analysis.toml)
+uv run python -m omsorgsradar.pipeline analyses/nordisk-omsorg \
+    --data-dir data/nordisk-omsorg --reports-dir reports/nordisk-omsorg
 
 # Run tests (fully offline, no API key needed)
 uv run pytest
 
 # Build the report site locally (from committed artifacts)
-uv run python -m omsorgsradar.site --reports-dir reports --out site
+# Note: --marimo produces the interactive explore page (same as CI)
+uv run python -m omsorgsradar.site --reports-dir reports --out site \
+    --marimo notebooks/explore_nordisk.py
 
 # Optional: LLM narration (requires Anthropic API key; default mode is key-free)
 ANTHROPIC_API_KEY=sk-... uv run python -m omsorgsradar.pipeline
 ```
 
-Output files (per analysis, under `reports/<name>/`):
-- `*_rapport.md` — bokmål report
-- `figures/` — matplotlib figures
-- `data/findings.json` — structured analysis findings (under `--data-dir`, default `data/`)
-- `data/quality_profile.json` — data quality profile (under `--data-dir`, default `data/`)
+**Note:** the default `uv run python -m omsorgsradar.pipeline` run re-fetches live SSB data and
+regenerates the committed `data/*.json` artifacts. Commit them to update the site.
+
+Output files (per named analysis):
+- `reports/<name>/<name>_rapport.md` — bokmål report
+- `reports/<name>/figures/` — matplotlib figures
+- `data/<name>/findings.json` — structured analysis findings (under `--data-dir`)
+- `data/<name>/quality_profile.json` — data quality profile (under `--data-dir`)
 
 ---
 
@@ -202,6 +208,38 @@ Documented in [`docs/api_drift.md`](docs/api_drift.md). Key findings:
 - FHI NOKKEL indicator endpoint returns 404 (re-checked 2026-06-12; no working replacement
   found — `statistikk.fhi.no` is a frontend without a public REST API). FHI data is excluded
 - KOSTRA 12209 region variable code is `KOKkommuneregion0000` (not `Region`) — discovered at runtime
+
+---
+
+## Creating a new analysis
+
+Each analysis is a folder under `analyses/<name>/` containing at minimum an `analysis.toml`:
+
+```toml
+[analysis]
+name = "my-analysis"
+question = "Hvilken kommune…?"
+
+[stages]
+list = ["ingest", "profile", "analyze", "verify", "report"]
+
+[[sources]]
+id = "my_source"
+adapter = "pxweb"
+base_url = "https://data.ssb.no/api/v0/no/table"
+table = "12209"
+required = true
+
+[params]
+base_year = 2019
+latest_year = 2023
+top_n = 10
+```
+
+Add a `stages.py` in the same folder to override or extend core stages (see
+`analyses/nordisk-omsorg/stages.py` for the pattern). For available adapters and required fields per
+source type, see [`docs/adapters.md`](docs/adapters.md). To wire up a dataset interactively, use the
+[`/add-dataset`](.claude/skills/add-dataset.md) skill.
 
 ---
 

@@ -23,7 +23,9 @@ SITE_TITLE = "Kommunal Omsorgsradar"
 SITE_INTRO = (
     "Agentisk dataanalyse over åpne nordiske helsedata. Hver rapport er generert "
     "av en deterministisk pipeline og kontrollregnet av en uavhengig verifiseringsmodul "
-    "(«tool receipts») før publisering."
+    "(«tool receipts») før publisering. "
+    "De to norske analysene bruker ulike tidsvinduer og metoder, og rangerer derfor "
+    "kommuner ulikt — med vilje."
 )
 
 # Allowed HTML tags and attributes for the nh3 sanitizer
@@ -42,6 +44,14 @@ _SLUG_PRIORITY: dict[str, int] = {
     "omsorgsradar": 0,
     "nordisk-omsorg": 1,
     "brfss-demo": 2,
+}
+
+# One-line method/window descriptor per analysis, shown on the landing card.
+# Bokmål. Drives the landing-page reconciliation sentence (N4).
+_SLUG_DESCRIPTOR: dict[str, str] = {
+    "omsorgsradar": "Trendframskriving 2017→2035 · press-indeks",
+    "nordisk-omsorg": "Historisk 2019–2023 · z-skår innen land — sammenlignbar på tvers av Norden",
+    "brfss-demo": "Anonymiseringsdemo · syntetiske mikrodata",
 }
 
 _MD_HEADING_RE = re.compile(r"^#{1,6}\s+")
@@ -177,7 +187,12 @@ def build_site(reports_dir: Path | str, out_dir: Path | str,
         return (_SLUG_PRIORITY.get(d.slug, 99), d.slug)
 
     analyses = [
-        {"slug": d.slug, "title": d.title, "summary": d.summary}
+        {
+            "slug": d.slug,
+            "title": d.title,
+            "summary": d.summary,
+            "descriptor": _SLUG_DESCRIPTOR.get(d.slug, ""),
+        }
         for d in sorted(docs, key=_sort_key)
     ]
 
@@ -236,7 +251,20 @@ def export_marimo(notebook: Path | str, out_dir: Path | str) -> Path:
 
 
 def main() -> None:
+    """Build the static site from committed report artifacts.
+
+    Marimo export (--marimo flag): if the WASM export fails, the static site is
+    NOT deleted — a placeholder explore/index.html is written instead, a loud
+    stderr warning is printed, and the process exits 0 (static success).
+
+    Design choice: publishing the static reports is the primary goal; losing the
+    interactive explore page is a degraded experience, not a site failure. CI
+    uploads whatever is in `site/`, so a failed marimo build should not block
+    the reports from being deployed.
+    """
     import argparse
+    import sys
+
     p = argparse.ArgumentParser(description="Build the static report site.")
     p.add_argument("--reports-dir", default="reports")
     p.add_argument("--out", default="site")
@@ -248,9 +276,23 @@ def main() -> None:
     if args.marimo:
         try:
             export_marimo(args.marimo, args.out)
-        except Exception:
-            shutil.rmtree(out, ignore_errors=True)
-            raise
+        except Exception as exc:
+            # N20: never rmtree the built site on marimo failure.
+            # Write a placeholder so the explore/ link returns 200, not 404.
+            explore_dir = out / "explore"
+            explore_dir.mkdir(parents=True, exist_ok=True)
+            (explore_dir / "index.html").write_text(
+                "<!DOCTYPE html><html lang='nb'><head><meta charset='utf-8'>"
+                "<title>Interaktiv utforsking</title></head><body>"
+                "<p>Interaktiv utforsking er midlertidig utilgjengelig.</p>"
+                "</body></html>",
+                encoding="utf-8",
+            )
+            print(
+                f"\nWARNING: marimo WASM export failed — static site is intact but "
+                f"explore/ shows a placeholder.\nError: {exc}\n",
+                file=sys.stderr,
+            )
     print(f"site built: {out} ({len(discover_reports(Path(args.reports_dir)))} analyses)")
 
 

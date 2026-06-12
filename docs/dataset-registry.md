@@ -10,7 +10,7 @@ The `/magic-analyze` shell resolves free-text questions against this registry
 
 | Source | Land | Innhold | Adapter | Base URL | Verifisert |
 |---|---|---|---|---|---|
-| SSB PxWebAPI v2 | NO | KOSTRA pleie/omsorg (12209), befolkning (07459), framskrivinger (12880) — kommune | `pxweb` | `https://data.ssb.no/api/v0/no/table` | 2026-06-11/12 |
+| SSB PxWebAPI v2 | NO | KOSTRA pleie/omsorg (12209), befolkning (07459), nasjonal framskriving (13599, MMM 80+) — kommune | `pxweb` | `https://data.ssb.no/api/v0/no/table` | 2026-06-11/12 |
 | SCB PxWeb | SE | Befolkning per kommun/ålder (BefolkningNy) m.fl. | `pxweb` (+`cache_key`, `use_codes`) | `https://api.scb.se/OV0104/v1/doris/sv/ssd/...` | 2026-06-12 |
 | THL Sotkanet | FI | ~3 700 indikatorer per kunta; kotihoito 75+ = **5513** (3216 er død), 75+-andel = 171, befolkning = 127, prognoser 745/757. CC BY 4.0 | `sotkanet` | `https://sotkanet.fi/rest/1.1` (krever User-Agent) | 2026-06-12 |
 | Kolada (RKA) | SE | Kommunale KPI-er; hemtjänst 80+ = **N21704** (Socialstyrelsen/SCB-data republisert) | `kolada` | `https://api.kolada.se/v3` | 2026-06-12 |

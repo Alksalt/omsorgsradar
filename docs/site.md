@@ -20,28 +20,16 @@ bundle** (`site/explore/index.html`) via `marimo export html-wasm`. It runs enti
 browser — no server, no backend. Aggregate data is inlined into the bundle; no row-level or
 individual data is present.
 
-## One owner step required: enable GitHub Pages
-
-The GitHub Actions workflow (`.github/workflows/pages.yml`) deploys the site automatically on
-every push to `main`. However, **GitHub Actions cannot enable Pages on a repository by itself**
-— that is a one-time manual step:
-
-1. Go to **Settings → Pages** in the repository on GitHub.
-2. Under **Source**, select **GitHub Actions** (not "Deploy from a branch").
-3. Save. The next push to `main` (or a manual `workflow_dispatch`) will deploy the site.
-
-Until Pages is enabled the workflow will fail at the deploy job with a permissions error — this
-is expected.
-
 ## Publishing a new or updated analysis
 
 1. Run the analysis pipeline locally:
    ```bash
-   uv run python -m omsorgsradar.pipeline analyses/<name>
+   uv run python -m omsorgsradar.pipeline analyses/<name> \
+       --data-dir data/<name> --reports-dir reports/<name>
    ```
 2. Commit the output artifacts:
    ```bash
-   git add reports/<name>_rapport.md reports/<name>/figures/
+   git add reports/<name>/
    git commit -m "chore: publish <name> report vX"
    git push
    ```

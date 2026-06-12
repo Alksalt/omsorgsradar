@@ -19,19 +19,16 @@ ones.
   owner is «utdannet lege (master i medisin)», never bare «lege»; no real patient data (this project uses
   only open aggregate statistics — SSB/FHI).
 
-Status: **v1 built + shipped (P0–P5, 2026-06-11) · v2 G0 (engine + config) shipped 2026-06-11 ·
-G1 (Nordic adapters + realness gates) shipped 2026-06-12 · G2 (nordisk-omsorg, first cross-country
-instance) shipped 2026-06-12 · G3 (/magic-analyze + /add-dataset skills + security gate) shipped
-2026-06-12 · next: G4 (anonymize stage) per
-`docs/specs/2026-06-11-v2-generalization-design.md`.**
+Status: **v1 P0–P5 · v2 G0–G8 shipped 2026-06-11/12 · 382+ tests · Pages live**
 
 ## v2 engine (G0+)
 Config: `workflow.toml` (models/endpoint/defaults) + `analyses/<name>/analysis.toml`
 (stages/sources/params); precedence analysis > workflow > code. Engine:
-`src/omsorgsradar/core/` (config, contracts, journal, registry, adapters) +
-`src/omsorgsradar/stages.py` (default stages). Adapters: pxweb, sotkanet (FI),
-socialstyrelsen (SE), kolada/RKA (SE elder-care — sdb has no äldreomsorg topic), kuhr (NO), csv —
-`docs/adapters.md`; realness gates mandatory in profile. Variants = new instance
-folder, never core edits. Shell: /magic-analyze + /add-dataset skills; sources gated by host
-allowlist + path containment at startup. Run/extend/debug: see skill `pipeline-stages`.
-Spec: `docs/specs/2026-06-11-v2-generalization-design.md`.
+`src/omsorgsradar/core/` (config, contracts, journal, registry, adapters, endpoint, geo,
+discovery, anonymize) + `src/omsorgsradar/stages.py` (default stages incl. anonymize + ml) +
+`src/omsorgsradar/site.py` + `src/omsorgsradar/maps.py` + `src/omsorgsradar/fmt.py`.
+Adapters: pxweb, sotkanet (FI), socialstyrelsen (SE), kolada/RKA (SE elder-care — sdb has no
+äldreomsorg topic), kuhr (NO), csv — `docs/adapters.md`; realness gates mandatory in profile.
+Variants = new instance folder, never core edits. Shell: /magic-analyze + /add-dataset skills;
+sources gated by host allowlist + path containment at startup. Run/extend/debug: see skill
+`pipeline-stages`. Spec: `docs/specs/2026-06-11-v2-generalization-design.md`.

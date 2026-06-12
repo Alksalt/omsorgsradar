@@ -201,7 +201,7 @@ class TestNordiskReport:
             encoding="utf-8"
         )
         f = ctx.state["nordic_findings"]
-        assert "deskriptivt, ikke kausalt" in report
+        assert "deskriptiv, ikke kausal" in report
         assert "75+" in report and "80+" in report
         for country in ("NO", "SE", "FI"):
             assert f["countries"][country]["top_squeeze"][0]["geo_name"] in report
@@ -277,3 +277,111 @@ class TestNordiskE2E:
         assert len(run_files) == 1
         run = _json.loads(run_files[0].read_text(encoding="utf-8"))
         assert run["status"] == "ok"
+
+
+class TestNordiskPerCountryGuard:
+    """B2: empty country frame raises PipelineGateError naming country + source."""
+
+    def _make_ctx(self, tmp_path: Path, doctored_datasets: dict):
+        from omsorgsradar.core.config import load_run_config
+        from omsorgsradar.core.journal import RunJournal
+        from omsorgsradar.core.registry import StageContext
+
+        cfg = load_run_config(REPO / "analyses" / "nordisk-omsorg",
+                              REPO / "workflow.toml")
+        journal = RunJournal.start(tmp_path / "runs", analysis="nordisk-omsorg",
+                                   config_snapshot={})
+        ctx = StageContext(config=cfg, data_dir=tmp_path,
+                           reports_dir=tmp_path / "reports", journal=journal)
+        ctx.state["datasets"] = doctored_datasets
+        return ctx
+
+    def _base_datasets(self):
+        return _fixture_datasets()
+
+    def test_empty_fi_table_raises_gate_error(self, tmp_path: Path) -> None:
+        """Doctoring fi_homecare to be empty causes stage_analyze to raise."""
+        from omsorgsradar.core.registry import PipelineGateError
+
+        mod = load_instance()
+        datasets = self._base_datasets()
+        # Doctor FI homecare dataset to be empty
+        datasets["fi_homecare"] = datasets["fi_homecare"].iloc[0:0]
+        ctx = self._make_ctx(tmp_path, datasets)
+
+        with pytest.raises(PipelineGateError, match="FI"):
+            mod.stage_analyze_nordisk(ctx)
+
+    def test_empty_se_table_raises_gate_error(self, tmp_path: Path) -> None:
+        """Doctoring se_hemtjanst to be empty causes stage_analyze to raise."""
+        from omsorgsradar.core.registry import PipelineGateError
+
+        mod = load_instance()
+        datasets = self._base_datasets()
+        datasets["se_hemtjanst"] = datasets["se_hemtjanst"].iloc[0:0]
+        ctx = self._make_ctx(tmp_path, datasets)
+
+        with pytest.raises(PipelineGateError, match="SE"):
+            mod.stage_analyze_nordisk(ctx)
+
+    def test_gate_error_names_country_and_source(self, tmp_path: Path) -> None:
+        """The error message includes the country code and source identifiers."""
+        from omsorgsradar.core.registry import PipelineGateError
+
+        mod = load_instance()
+        datasets = self._base_datasets()
+        datasets["no_kostra"] = datasets["no_kostra"].iloc[0:0]
+        ctx = self._make_ctx(tmp_path, datasets)
+
+        with pytest.raises(PipelineGateError) as exc_info:
+            mod.stage_analyze_nordisk(ctx)
+        msg = str(exc_info.value)
+        assert "NO" in msg
+        assert "no_kostra" in msg
+
+    def test_report_stage_rejects_empty_country_frame(self, tmp_path: Path) -> None:
+        """stage_report_nordisk raises when a country frame is empty in the CSV."""
+        import json as _json
+        import shutil
+
+        from omsorgsradar.core.config import load_run_config
+        from omsorgsradar.core.journal import RunJournal
+        from omsorgsradar.core.registry import PipelineGateError, StageContext
+
+        mod = load_instance()
+        # Run analyze successfully first
+        m, ctx = TestNordiskVerify()._run_analyze(tmp_path)
+        m.stage_verify_nordisk(ctx)
+
+        # Now overwrite nordic_table.csv with SE rows removed
+        table_path = tmp_path / "nordic_table.csv"
+        table = pd.read_csv(table_path)
+        table = table[table["country"] != "SE"]
+        table.to_csv(table_path, index=False)
+
+        with pytest.raises(PipelineGateError, match="SE"):
+            m.stage_report_nordisk(ctx)
+
+
+class TestNordiskTextFixes:
+    """B1: verify nb-style formatting and corrected grammar in the report."""
+
+    def test_report_uses_deskriptiv_ikke_kausal(self, tmp_path: Path) -> None:
+        m, ctx = TestNordiskVerify()._run_analyze(tmp_path)
+        m.stage_verify_nordisk(ctx)
+        m.stage_report_nordisk(ctx)
+        report = (tmp_path / "reports" / "nordisk-omsorg_rapport.md").read_text(
+            encoding="utf-8"
+        )
+        assert "deskriptiv, ikke kausal" in report
+        assert "deskriptivt, ikke kausalt" not in report
+
+    def test_report_gloss_kontroller(self, tmp_path: Path) -> None:
+        m, ctx = TestNordiskVerify()._run_analyze(tmp_path)
+        m.stage_verify_nordisk(ctx)
+        m.stage_report_nordisk(ctx)
+        report = (tmp_path / "reports" / "nordisk-omsorg_rapport.md").read_text(
+            encoding="utf-8"
+        )
+        # The gloss clause should appear after "kontroller OK"
+        assert "én uavhengig omregning per rangert kommune" in report

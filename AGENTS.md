@@ -27,8 +27,9 @@ Architecture: deterministic engine (config-driven, LLM-free computation) + agent
   profile; NO/SE/FI geo harmonization.
 - **G2 — Nordic analysis.** `analyses/nordisk-omsorg/` end-to-end, bokmål report, planted-hallucination test.
 - **G3 — Agentic shell.** `/magic-analyze` (any dataset pointer) + `/add-dataset` skills + dataset registry.
-- **G4 — Anonymize stage.** Presidio (nb) + anonymeter receipts + identifiability artifact; BRFSS demo;
-  planted-PII test.
-- **G5 — Execution modes.** Subscription OAuth primary, API-key, local (LM Studio `ANTHROPIC_BASE_URL`)
-  + working local demo; Normen mapping.
+- **G4 — Anonymize stage.** Presidio (nb) + vendored WP216 SDC math (anonymeter rejected: pins
+  numpy<1.27, uninstallable on this stack; targets synthetic data, not k-anonymized microdata)
+  + identifiability artifact; BRFSS demo; planted-PII test.
+- **G5 — Execution modes.** Subscription OAuth primary, API-key, local (LM Studio via
+  `[endpoint.local].base_url` in workflow.toml) + working local demo; Normen mapping.
 - **G6 — marimo + Pages + package.** marimo artifacts, GitHub Pages report site, README/LIMITATIONS/COSTS, push.

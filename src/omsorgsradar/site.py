@@ -204,8 +204,12 @@ def export_marimo(notebook: Path | str, out_dir: Path | str) -> Path:
     import tempfile
     import shutil as _sh
 
-    notebook = Path(notebook)
-    target = Path(out_dir) / "explore"
+    # Resolve to ABSOLUTE paths: the subprocess runs with cwd=td, so a relative
+    # -o target (e.g. "site/explore") would be written INSIDE the temp dir and
+    # vanish. (This was the CI failure: passed locally with an absolute --out,
+    # failed with the workflow's relative `--out site`.)
+    notebook = Path(notebook).resolve()
+    target = (Path(out_dir) / "explore").resolve()
     target.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory() as td:

@@ -50,5 +50,8 @@
   pattern-locked). Realness gates (5 Kaggle-triage checks) mandatory in profile —
   verdict published, FAIL aborts (fabricated-dataset gate test green at unit AND
   pipeline level). ⚠ Socialstyrelsen API has no äldreomsorg topic (verified live) —
-  G2 Swedish elder-care via open-data CSV. Tests: 114 → 182 (offline) + 3 live.
+  G2 Swedish elder-care via open-data CSV. Review panel (correctness/security/
+  integration): 3× PASS → fixes applied (\Z cache-key anchor, nasta_sida host
+  pinning + cross-host test, sotkanet full-year cache keys, csv-path containment
+  carried into spec G3 gate). Tests: 114 → 184 (offline) + 3 live.
   **Next: G2 — `analyses/nordisk-omsorg` end-to-end.**

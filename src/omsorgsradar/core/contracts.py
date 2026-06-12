@@ -109,7 +109,37 @@ FINDINGS_SCHEMA: dict[str, Any] = {
 QUALITY_PROFILE_SCHEMA: dict[str, Any] = {
     "type": "object",
     "required": ["datasets"],
-    "properties": {"datasets": {"type": "object"}},
+    "properties": {
+        "datasets": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "realness": {
+                        "type": "object",
+                        "required": ["verdict", "checks"],
+                        "properties": {
+                            "verdict": {"enum": ["PASS", "WARN", "FAIL", "SKIP"]},
+                            "checks": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": ["name", "status"],
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "status": {
+                                            "enum": ["PASS", "WARN", "FAIL", "SKIP"]
+                                        },
+                                        "detail": {"type": "string"},
+                                    },
+                                },
+                            },
+                        },
+                    }
+                },
+            },
+        }
+    },
 }
 
 VERIFICATION_SCHEMA: dict[str, Any] = {

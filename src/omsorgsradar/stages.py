@@ -44,13 +44,25 @@ def stage_ingest(ctx: StageContext) -> None:
 def stage_profile(ctx: StageContext) -> None:
     from .profile import profile_all, save_quality_report
 
-    quality = profile_all(ctx.state["datasets"])
+    quality = profile_all(ctx.state["datasets"], sources=ctx.config.sources)
     path = ctx.data_dir / "quality_profile.json"
     save_quality_report(quality, path=path)
     validate_artifact("quality_profile", quality)
     write_manifest(path, artifact="quality_profile", producer="profile")
     ctx.state["quality_report"] = quality
     ctx.artifacts["quality_profile"] = path
+    # Realness gate (DECISIONS.md): FAIL aborts — but only after the verdict
+    # is on disk so the failure is inspectable.
+    failed = [
+        name
+        for name, ds in quality["datasets"].items()
+        if isinstance(ds, dict) and ds.get("realness", {}).get("verdict") == "FAIL"
+    ]
+    if failed:
+        raise PipelineGateError(
+            f"realness gate FAIL for dataset(s): {', '.join(sorted(failed))} — "
+            f"see {path}"
+        )
 
 
 def stage_analyze(ctx: StageContext) -> None:

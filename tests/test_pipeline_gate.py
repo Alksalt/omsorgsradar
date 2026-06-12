@@ -84,3 +84,43 @@ class TestVerifyGate:
         assert not (tmp_path / "reports").exists() or not list(
             (tmp_path / "reports").glob("*.md")
         )
+
+
+class TestRealnessGate:
+    def _analysis_dir(self, tmp_path):
+        adir = tmp_path / "analyses" / "fabricated"
+        adir.mkdir(parents=True)
+        rows = "\n".join("NO-0301,2020,7.0" for _ in range(200))
+        (adir / "fake.csv").write_text("geo_id,aar,value\n" + rows + "\n")
+        (adir / "analysis.toml").write_text(
+            '[analysis]\nname = "fabricated"\n'
+            '[stages]\nlist = ["ingest", "profile"]\n'
+            '[[sources]]\nadapter = "csv"\nid = "fake"\npath = "fake.csv"\n'
+            '[sources.provenance]\ninstitution = "Test"\nurl = "https://example.org"\n',
+            encoding="utf-8",
+        )
+        return adir
+
+    def test_fabricated_csv_aborts_after_publishing_verdict(self, tmp_path) -> None:
+        import json
+        import pytest
+        from omsorgsradar.core.registry import PipelineGateError
+        from omsorgsradar.pipeline import run_pipeline
+
+        adir = self._analysis_dir(tmp_path)
+        data_dir = tmp_path / "data"
+        with pytest.raises(PipelineGateError, match="realness"):
+            run_pipeline(
+                adir,
+                data_dir=data_dir,
+                reports_dir=tmp_path / "reports",
+                runs_dir=tmp_path / "runs",
+            )
+        # Verdict was published before the abort (spec: verdict in the profile)
+        quality = json.loads((data_dir / "quality_profile.json").read_text())
+        assert quality["datasets"]["fake"]["realness"]["verdict"] == "FAIL"
+        # 200 identical duplicated rows + zero variance triggered it
+        statuses = {c["name"]: c["status"]
+                    for c in quality["datasets"]["fake"]["realness"]["checks"]}
+        assert statuses["duplicates"] == "FAIL"
+        assert statuses["distribution"] == "FAIL"

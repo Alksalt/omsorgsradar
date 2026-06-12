@@ -141,18 +141,54 @@ def profile_population(df: pd.DataFrame) -> dict[str, Any]:
     return report
 
 
+def profile_generic(df: pd.DataFrame) -> dict[str, Any]:
+    """Profile any adapter-produced tidy dataset (Nordic adapters, csv)."""
+    report: dict[str, Any] = {
+        "source": "generic",
+        "n_rows": len(df),
+        "missing_rates": {},
+        "year_range": None,
+        "n_geo": None,
+        "outliers": {},
+    }
+    for col in df.columns:
+        report["missing_rates"][col] = round(_missing_rate(df[col]), 4)
+    if "aar" in df.columns:
+        years = pd.to_numeric(df["aar"], errors="coerce").dropna()
+        if not years.empty:
+            report["year_range"] = [int(years.min()), int(years.max())]
+    if "geo_id" in df.columns:
+        report["n_geo"] = int(df["geo_id"].nunique())
+    if "value" in df.columns:
+        report["outliers"]["value"] = _outlier_iqr(
+            pd.to_numeric(df["value"], errors="coerce")
+        )
+    return report
+
+
 def profile_all(
     datasets: dict[str, pd.DataFrame],
+    sources: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Run profiling on all datasets and return combined quality report.
 
+    When *sources* is provided, each dataset that has a matching source id
+    receives a ``realness`` sub-report (see :mod:`omsorgsradar.realness`).
+    Datasets not listed in *sources* are profiled with the generic profiler.
+
     Args:
         datasets: Dict mapping table name → DataFrame (from :func:`ingest.run_ingest`).
+        sources: Optional list of source dicts from analysis config. When given,
+            realness gates are run per dataset and the verdict is included.
 
     Returns:
         Combined quality report dict.
     """
+    from .realness import run_realness
+
     report: dict[str, Any] = {"datasets": {}}
+
+    specialized = {"kostra_pleie", "befolkning", "framskrivinger", "fhi_nokkel"}
 
     if "kostra_pleie" in datasets:
         report["datasets"]["kostra_pleie"] = profile_kostra(datasets["kostra_pleie"])
@@ -186,6 +222,16 @@ def profile_all(
             ),
             "missing_value_rate": round(_missing_rate(df_fhi.get("value", pd.Series(dtype=float))), 4),
         }
+
+    for name, df in datasets.items():
+        if name not in specialized:
+            report["datasets"][name] = profile_generic(df)
+
+    if sources is not None:
+        by_id = {s["id"]: s for s in sources}
+        for name, df in datasets.items():
+            if name in by_id and name in report["datasets"]:
+                report["datasets"][name]["realness"] = run_realness(df, by_id[name])
 
     return report
 

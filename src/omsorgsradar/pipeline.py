@@ -91,8 +91,10 @@ def run_pipeline(
     ctx.state["skip_ingest"] = skip_ingest
     ctx.state["use_llm"] = use_llm
 
+    current_stage = "<startup>"
     try:
         for name in stages:
+            current_stage = name
             before = dict(ctx.artifacts)
             t0 = time.monotonic()
             logger.info("Stage: %s", name)
@@ -105,7 +107,7 @@ def run_pipeline(
                 duration_s=round(time.monotonic() - t0, 3),
             )
     except PipelineGateError as exc:
-        journal.record_stage("verify", meta={"error": str(exc)})
+        journal.record_stage(current_stage, meta={"error": str(exc)})
         journal.finalize("gate_failed")
         raise
     except Exception:

@@ -122,3 +122,44 @@ class TestQualityReportSummaryMd:
         md = quality_report_summary_md(report)
         assert isinstance(md, str)
         assert "kostra_pleie" in md
+
+
+class TestRealnessWiring:
+    SOURCES = [
+        {"id": "kostra_pleie", "adapter": "pxweb",
+         "base_url": "https://data.ssb.no/api/v0/no/table", "table": "12209"},
+        {"id": "befolkning", "adapter": "pxweb",
+         "base_url": "https://data.ssb.no/api/v0/no/table", "table": "07459"},
+        {"id": "framskrivinger", "adapter": "pxweb",
+         "base_url": "https://data.ssb.no/api/v0/no/table", "table": "12880"},
+        {"id": "fhi_nokkel", "adapter": "fhi",
+         "base_url": "https://statistikk-data.fhi.no/api/open/v1", "source": "nokkel"},
+    ]
+
+    def test_realness_attached_per_dataset(self, fixture_datasets) -> None:
+        from omsorgsradar.profile import profile_all
+
+        report = profile_all(fixture_datasets, sources=self.SOURCES)
+        for name in fixture_datasets:
+            assert "realness" in report["datasets"][name], name
+            assert report["datasets"][name]["realness"]["verdict"] in (
+                "PASS", "WARN", "SKIP"
+            )
+
+    def test_no_sources_keeps_v1_shape(self, fixture_datasets) -> None:
+        from omsorgsradar.profile import profile_all
+
+        report = profile_all(fixture_datasets)
+        for name in fixture_datasets:
+            assert "realness" not in report["datasets"][name]
+
+    def test_generic_dataset_profiled(self) -> None:
+        import pandas as pd
+        from omsorgsradar.profile import profile_all
+
+        df = pd.DataFrame({"geo_id": ["FI-091"], "aar": [2023], "value": [1.0]})
+        report = profile_all({"fi_test": df})
+        generic = report["datasets"]["fi_test"]
+        assert generic["n_rows"] == 1
+        assert generic["year_range"] == [2023, 2023]
+        assert generic["n_geo"] == 1

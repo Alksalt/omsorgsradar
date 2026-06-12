@@ -416,6 +416,15 @@ def run_tabpfn_on_folds(
     results = MLResults()
 
     if _tabpfn_cls is None:
+        # Check for missing token BEFORE any fold iteration (A7).
+        # One INFO line is emitted; no per-fold WARNINGs.
+        import os as _os
+        if not _os.environ.get(TABPFN_TOKEN_ENV_VAR):
+            logger.info(
+                "TabPFN hoppes over — sett %s (se COSTS.md)", TABPFN_TOKEN_ENV_VAR
+            )
+            results.notes.append(_TABPFN_UNAVAILABLE_MSG)
+            return results
         try:
             from tabpfn import TabPFNRegressor  # type: ignore[import]
             _tabpfn_cls = TabPFNRegressor
@@ -454,7 +463,7 @@ def run_tabpfn_on_folds(
             # Catch TabPFNLicenseError, TabPFNHuggingFaceGatedRepoError, and
             # any other runtime error.  Log the raw exception; surface only a
             # clean bokmål string to artifacts.
-            logger.warning("TabPFN fold %d failed: %s", i + 1, exc)
+            logger.info("TabPFN hoppes over — sett %s (se COSTS.md)", TABPFN_TOKEN_ENV_VAR)
             results.notes.append(_TABPFN_UNAVAILABLE_MSG)
             return results
 

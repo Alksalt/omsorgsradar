@@ -33,12 +33,30 @@ import pandas as pd
 
 from .analyze import AnalysisResult, KommuneMetrics
 from .verify import Verifier, build_standard_claims, VerificationReport
+from .fmt import nb, nb_pct, nb_index
+from .core.endpoint import MODEL_PRICING
 
 logger = logging.getLogger(__name__)
 
 REPORT_DIR = Path(__file__).parent.parent.parent / "reports"
 FIGURES_DIR = REPORT_DIR / "figures"
 REPORT_MD_PATH = REPORT_DIR / "omsorgsradar_rapport.md"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Default model resolution (A6)
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def _resolve_default_model() -> str:
+    """Pick the default LLM model for report narration.
+
+    Prefers ``claude-fable-5`` if present in MODEL_PRICING; otherwise falls
+    back to the first key in MODEL_PRICING. Never a bare string literal.
+    """
+    if "claude-fable-5" in MODEL_PRICING:
+        return "claude-fable-5"
+    return next(iter(MODEL_PRICING))
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -72,6 +90,9 @@ def plot_press_index_bar(
 ) -> Path:
     """Plot top-*n* kommuner by normalised press index as a horizontal bar chart.
 
+    Colormap: sequential Reds-family (dark = highest press / worst).
+    Value labels use nb_index formatting (same precision as the table).
+
     Args:
         result: Analysis result.
         n: Number of top kommuner to show.
@@ -91,7 +112,16 @@ def plot_press_index_bar(
 
     labels = [_safe_name(km.navn, km.knr) for km in top_n]
     values = [km.press_index_norm for km in top_n]
-    colors = plt.cm.RdYlGn_r(np.linspace(0.1, 0.9, len(top_n)))  # type: ignore[arg-type]
+
+    # Sequential Reds: dark = high press (worst). linspace 0.3→0.95 so the top
+    # bar is near-black-red and bottom is pale pink. Invert: first bar (rank 1,
+    # highest press) gets the darkest shade.
+    cmap = plt.cm.Reds  # type: ignore[attr-defined]
+    # We want rank-1 (highest value) → darkest → linspace descending from 0.95 to 0.3
+    n_bars = len(top_n)
+    # values are already sorted descending (highest press first)
+    color_intensities = np.linspace(0.95, 0.3, n_bars)
+    colors = [cmap(v) for v in color_intensities]
 
     fig, ax = plt.subplots(figsize=(10, max(6, n * 0.4)))
     bars = ax.barh(range(len(top_n)), values, color=colors)
@@ -106,9 +136,9 @@ def plot_press_index_bar(
     ax.set_xlim(0, 1.05)
     ax.grid(axis="x", alpha=0.3)
 
-    # Add value labels
+    # Value labels: nb_index (two-decimal, Norwegian format — same precision as table)
     for i, (bar, val) in enumerate(zip(bars, values)):
-        ax.text(val + 0.01, i, f"{val:.2f}", va="center", fontsize=8)
+        ax.text(val + 0.01, i, nb_index(val), va="center", fontsize=8)
 
     fig.tight_layout()
     fig.savefig(out_path, dpi=150, bbox_inches="tight")
@@ -122,6 +152,9 @@ def plot_coverage_scatter(
     out_dir: Path = FIGURES_DIR,
 ) -> Path:
     """Scatter plot: coverage rate vs projected 80+ growth rate.
+
+    Colormap: sequential Reds-family (dark = highest press / worst).
+    y-label: «Andel innbyggere 80+ som mottar hjemmetjenester (%)».
 
     Args:
         result: Analysis result.
@@ -150,7 +183,9 @@ def plot_coverage_scatter(
     sizes = [40 + km.press_index_norm * 120 for km in kommuner]
 
     fig, ax = plt.subplots(figsize=(10, 7))
-    sc = ax.scatter(x, y, c=colors, s=sizes, cmap="RdYlGn_r", alpha=0.7, edgecolors="gray", linewidths=0.3)
+    # Reds colormap: high press_index_norm → dark red (worst). vmin/vmax anchor semantics.
+    sc = ax.scatter(x, y, c=colors, s=sizes, cmap="Reds", alpha=0.7,
+                    edgecolors="gray", linewidths=0.3, vmin=0.0, vmax=1.0)
     cbar = fig.colorbar(sc, ax=ax)
     cbar.set_label("Press-indeks (normalisert)", fontsize=10)
 
@@ -166,7 +201,7 @@ def plot_coverage_scatter(
         )
 
     ax.set_xlabel("Forventet vekst i 80+-befolkning mot 2035 (%)", fontsize=11)
-    ax.set_ylabel("Hjemmetjeneste-brukere per 1000 innbygger 80+ (siste år)", fontsize=11)
+    ax.set_ylabel("Andel innbyggere 80+ som mottar hjemmetjenester (%)", fontsize=11)
     ax.set_title(
         "Omsorgskapasitet vs demografisk press — norske kommuner",
         fontsize=13, fontweight="bold",
@@ -183,7 +218,11 @@ def plot_national_trend(
     result: AnalysisResult,
     out_dir: Path = FIGURES_DIR,
 ) -> Path:
-    """Bar chart showing national 80+ population baseline vs 2035 projection.
+    """Bar chart: national 80+ population baseline vs 2035 trendframskriving.
+
+    Title uses nb-NO formatting for growth rate and SSB MMM rate.
+    Right bar labeled «2035 (trendframskriving)».
+    Horizontal reference line at SSB-MMM 2035 absolute level (if available).
 
     Args:
         result: Analysis result.
@@ -204,8 +243,24 @@ def plot_national_trend(
         logger.warning("No national trend data for plot")
         return out_path
 
+    ssb = result.ssb_projection_growth_2035
+    ssb_available = not np.isnan(ssb)
+
+    # Build title with nb-NO formatting
+    growth_str = nb_pct(growth)
+    if ssb_available:
+        title = (
+            f"Nasjonal 80+-befolkning — trendframskriving til 2035\n"
+            f"(+{growth_str}; SSBs MMM-bane: +{nb_pct(ssb)})"
+        )
+    else:
+        title = (
+            f"Nasjonal 80+-befolkning — trendframskriving til 2035\n"
+            f"(+{growth_str})"
+        )
+
     fig, ax = plt.subplots(figsize=(7, 5))
-    years = ["Siste år (data)", "2035 (projeksjon)"]
+    years = ["Siste år (data)", "2035 (trendframskriving)"]
     values = [baseline / 1000, projected / 1000]
     colors = ["#4C9BE8", "#E85C5C"]
     bars = ax.bar(years, values, color=colors, width=0.5, edgecolor="white")
@@ -214,16 +269,24 @@ def plot_national_trend(
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + 0.5,
-            f"{val:,.0f}k",
+            f"{nb(val, decimals=0)}k",
             ha="center", va="bottom", fontsize=12, fontweight="bold",
         )
 
-    ax.set_ylabel("Antall innbygger 80+ (tusen)", fontsize=11)
-    ax.set_title(
-        f"Nasjonal 80+-befolkning — vekst til 2035\n(+{growth:.1f}% om SSB-bane opprettholdes)",
-        fontsize=12, fontweight="bold",
-    )
-    ax.set_ylim(0, max(values) * 1.2)
+    # SSB MMM reference line at the absolute 2035 level
+    if ssb_available:
+        ssb_level = baseline / 1000 * (1 + ssb / 100)
+        ax.axhline(y=ssb_level, color="#333333", linewidth=1.5, linestyle="--", alpha=0.7)
+        ax.text(
+            1.02, ssb_level,
+            "SSB MMM",
+            va="center", ha="left", fontsize=9, color="#333333",
+            transform=ax.get_yaxis_transform(),
+        )
+
+    ax.set_ylabel("Antall innbyggere 80+ (tusen)", fontsize=11)
+    ax.set_title(title, fontsize=12, fontweight="bold")
+    ax.set_ylim(0, max(values) * 1.25)
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     fig.savefig(out_path, dpi=150, bbox_inches="tight")
@@ -235,6 +298,7 @@ def plot_national_trend(
 def plot_press_index_choropleth(
     result: AnalysisResult,
     out_dir: Path = FIGURES_DIR,
+    map_anchor_knrs: list[str] | None = None,
 ) -> Path | None:
     """Choropleth map of normalised press index per kommune (figure 4).
 
@@ -242,14 +306,20 @@ def plot_press_index_choropleth(
     If the asset is missing, logs a warning and returns None so the report
     still builds without the map figure.
 
+    Colormap: Reds (dark = high press / worst). Top-10 ranked kommuner and
+    any codes in *map_anchor_knrs* are labeled at polygon centroids.
+
     Args:
         result: Analysis result containing per-kommune press_index_norm values.
         out_dir: Output directory for the figure.
+        map_anchor_knrs: Optional list of 4-digit kommunenummer strings to label
+            as anchor points (e.g. city anchors ["0301","4601","5001","1103"]).
+            Defaults to [] when None.
 
     Returns:
         Path to the saved PNG, or None if the asset is unavailable.
     """
-    from .maps import render_choropleth, DEFAULT_GEO_PATH
+    from .maps import render_choropleth, render_choropleth_with_labels, DEFAULT_GEO_PATH
 
     if not DEFAULT_GEO_PATH.exists():
         logger.warning(
@@ -257,13 +327,14 @@ def plot_press_index_choropleth(
         )
         return None
 
+    if map_anchor_knrs is None:
+        map_anchor_knrs = []
+
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "press_index_choropleth.png"
 
     # Build values dict: 4-digit zero-padded knr → press_index_norm
-    # knr in findings is already a 4-digit string; zfill guards against edge cases
-    # Use try/except for isnan to handle int/None from deserialized JSON as well
     def _is_valid(v: Any) -> bool:
         try:
             return not np.isnan(float(v))
@@ -276,14 +347,34 @@ def plot_press_index_choropleth(
         if _is_valid(km.press_index_norm)
     }
 
+    # Collect top-10 knrs by press index
+    ranked_with_values = [
+        (km.knr.zfill(4), km.rank)
+        for km in result.kommuner
+        if km.rank and km.rank >= 1 and _is_valid(km.press_index_norm)
+    ]
+    top10_knrs = {knr for knr, rank in ranked_with_values if rank <= 10}
+
+    # Combine anchor knrs (cities) and top-10 into label set
+    label_knrs: set[str] = set(map_anchor_knrs) | top10_knrs
+
+    # Build knr → name map for labels
+    knr_to_name: dict[str, str] = {
+        km.knr.zfill(4): _safe_name(km.navn, km.knr)
+        for km in result.kommuner
+    }
+
     attribution = "Kartgrunnlag: Kartverket via robhop/fylker-og-kommuner (CC BY 4.0)"
-    choropleth_result = render_choropleth(
+    choropleth_result = render_choropleth_with_labels(
         DEFAULT_GEO_PATH,
         values,
         out_path,
         title="Press-indeks per kommune mot 2035",
         value_label="Press-indeks (normalisert 0–1)",
         attribution=attribution,
+        cmap_name="Reds",
+        label_knrs=label_knrs,
+        knr_to_name=knr_to_name,
     )
 
     n_missing = choropleth_result["missing"]
@@ -305,14 +396,18 @@ def render_template(
     quality_report: dict[str, Any] | None = None,
     verification: VerificationReport | None = None,
     n_top: int = 20,
+    choropleth_available: bool = True,
 ) -> str:
     """Render a bokmål markdown report from structured findings (no LLM).
 
     Args:
         result: Analysis result.
         quality_report: Optional data quality profile dict.
-        verification: Optional verification report.
+        verification: Optional verification report (gate's report when provided;
+            rebuilt from result when None).
         n_top: Number of top kommuner to include in the ranking table.
+        choropleth_available: If False, the choropleth img link is omitted
+            (prevents dead links when the geo asset is absent).
 
     Returns:
         Markdown report string.
@@ -326,7 +421,7 @@ def render_template(
     projected = result.national_80plus_2035
 
     rank1 = next((km for km in ranked if km.rank == 1), None)
-    rank1_name = _safe_name(rank1.navn, rank1.knr) if rank1 else "N/A"
+    rank1_name = _safe_name(rank1.navn, rank1.knr) if rank1 else "—"
 
     n_high = sum(
         1 for km in ranked
@@ -359,7 +454,7 @@ def render_template(
             ssb_clause = (
                 f"Dette er en trendframskriving, ikke SSBs offisielle "
                 f"befolkningsframskriving: SSBs hovedalternativ (tabell 13599, "
-                f"alternativ MMM) gir til sammenligning **~{proj:.0f}%** vekst for "
+                f"alternativ MMM) gir til sammenligning **~{nb_pct(proj, decimals=0)}** vekst for "
                 f"80+ fra {proj_base} til 2035 — vesentlig raskere (se Begrensninger)."
             )
         else:
@@ -367,9 +462,11 @@ def render_template(
                 "Dette er en trendframskriving, ikke SSBs offisielle "
                 "befolkningsframskriving (se Begrensninger)."
             )
+        baseline_k = nb(baseline / 1000, decimals=0)
+        projected_k = nb(projected / 1000, decimals=0)
         lines.append(
-            f"På nasjonalt nivå vokser 80+-befolkningen med anslagsvis **{growth:.1f}%** "
-            f"fra {baseline/1000:,.0f} 000 (siste datapunkt) til {projected/1000:,.0f} 000 i 2035 "
+            f"På nasjonalt nivå vokser 80+-befolkningen med anslagsvis **{nb_pct(growth)} **"
+            f"fra {baseline_k} 000 (siste datapunkt) til {projected_k} 000 i 2035 "
             f"dersom hver kommunes historiske trend (2017–2026) fortsetter. {ssb_clause}"
         )
         lines.append("")
@@ -378,7 +475,7 @@ def render_template(
     )
     if not np.isnan(mean_rate):
         lines.append(
-            f"Gjennomsnittlig dekningsgrad er **{mean_rate:.0f} %** "
+            f"Gjennomsnittlig dekningsgrad er **{nb(mean_rate, decimals=0)} %** "
             f"(andel innbyggere 80+ som mottar hjemmetjenester)."
         )
     lines.append("")
@@ -408,10 +505,10 @@ def render_template(
     lines.append("| Rang | Kommune | Press-indeks | Dekningsrate | Vekst 80+ mot 2035 |")
     lines.append("|------|---------|-------------|-------------|-------------------|")
     for km in top:
-        cov = f"{km.coverage_rate:.0f}" if not np.isnan(km.coverage_rate) else "—"
-        growth_str = f"{km.pop_80plus_growth_pct:.1f}%" if not np.isnan(km.pop_80plus_growth_pct) else "—"
+        cov = nb(km.coverage_rate, decimals=0) if not np.isnan(km.coverage_rate) else "—"
+        growth_str = nb_pct(km.pop_80plus_growth_pct) if not np.isnan(km.pop_80plus_growth_pct) else "—"
         lines.append(
-            f"| {km.rank} | {_safe_name(km.navn, km.knr)} | {km.press_index_norm:.3f} "
+            f"| {km.rank} | {_safe_name(km.navn, km.knr)} | {nb_index(km.press_index_norm)} "
             f"| {cov} | {growth_str} |"
         )
     lines.append("")
@@ -425,22 +522,20 @@ def render_template(
     lines.append("")
     lines.append("![Nasjonal trend](figures/national_trend.png)")
     lines.append("")
-    lines.append("![Press-indeks koropleth](figures/press_index_choropleth.png)")
-    lines.append("")
-    lines.append(
-        "*Kartgrunnlag: Kartverket via robhop/fylker-og-kommuner (CC BY 4.0). "
-        "Kommuner uten data er vist i grått.*"
-    )
-    lines.append("")
+    if choropleth_available:
+        lines.append("![Press-indeks koropleth](figures/press_index_choropleth.png)")
+        lines.append("")
+        lines.append(
+            "*Kartgrunnlag: Kartverket via robhop/fylker-og-kommuner (CC BY 4.0). "
+            "Kommuner uten data er vist i grått.*"
+        )
+        lines.append("")
     lines.append("---")
     lines.append("")
     lines.append("## Datakvalitet")
     lines.append("")
     if quality_report:
-        for ds_name, ds_info in quality_report.get("datasets", {}).items():
-            lines.append(f"**{ds_name}**: {ds_info.get('n_rows', 'N/A')} rader "
-                         f"· {ds_info.get('n_kommuner', 'N/A')} kommuner "
-                         f"· kilde: {ds_info.get('source', 'N/A')}")
+        _render_quality_block(lines, quality_report)
     else:
         lines.append("*Datakvalitetsprofil ikke tilgjengelig.*")
     lines.append("")
@@ -448,15 +543,7 @@ def render_template(
     lines.append("")
     lines.append("## Verifisering av tall (verktøykvitteringer)")
     lines.append("")
-    if verification:
-        lines.append(f"**Resultat: {verification.verdict}** — "
-                     f"{verification.passed}/{verification.total_claims} påstander verifisert.")
-        lines.append("")
-        for r in verification.results:
-            status = "✓" if r.passes else "✗"
-            lines.append(f"- {status} `{r.claim.claim_type}` → {r.message}")
-    else:
-        lines.append("*Verifisering ikke kjørt.*")
+    _render_verification_block(lines, verification)
     lines.append("")
     lines.append("---")
     lines.append("")
@@ -479,6 +566,94 @@ def render_template(
     return "\n".join(lines)
 
 
+def _render_quality_block(lines: list[str], quality_report: dict[str, Any]) -> None:
+    """Render the Datakvalitet section into *lines* in-place.
+
+    Rules (A4):
+    - Zero-row sources are suppressed from the table and replaced by a
+      one-sentence bokmål note per suppressed source.
+    - «—» instead of «N/A» for missing counts.
+    - The «befolkning» row is annotated with koderader and active kommuner counts
+      derived from the quality report data.
+    """
+    datasets = quality_report.get("datasets", {})
+    suppressed: list[str] = []
+    shown: list[tuple[str, dict[str, Any]]] = []
+
+    for ds_name, ds_info in datasets.items():
+        n_rows = ds_info.get("n_rows")
+        try:
+            rows_val = int(n_rows)
+        except (TypeError, ValueError):
+            rows_val = -1  # unknown → show
+
+        if rows_val == 0:
+            suppressed.append(ds_name)
+        else:
+            shown.append((ds_name, ds_info))
+
+    # Render the table for non-zero sources
+    for ds_name, ds_info in shown:
+        n_rows = ds_info.get("n_rows")
+        n_kommuner = ds_info.get("n_kommuner")
+        source = ds_info.get("source", "—")
+
+        # Format with «—» for None/unknown
+        rows_str = str(n_rows) if n_rows is not None else "—"
+        kom_str = str(n_kommuner) if n_kommuner is not None else "—"
+
+        # Special annotation for befolkning: show koderader breakdown
+        if ds_name == "befolkning" and n_rows is not None and n_kommuner is not None:
+            try:
+                nr = int(n_rows)
+                nk = int(n_kommuner)
+                historical = nr - nk
+                annotation = f" ({nr} koderader — {nk} aktive kommuner + {historical} historiske koder)"
+            except (TypeError, ValueError):
+                annotation = ""
+            lines.append(
+                f"**{ds_name}**: {rows_str} rader{annotation} · kilde: {source}"
+            )
+        else:
+            lines.append(
+                f"**{ds_name}**: {rows_str} rader · {kom_str} kommuner · kilde: {source}"
+            )
+
+    # One sentence per suppressed source
+    for ds_name in suppressed:
+        # Map known source names to a bokmål explanation
+        if "fhi" in ds_name.lower() or "nokkel" in ds_name.lower():
+            lines.append(
+                f"FHI NOKKEL er ekskludert — API-et er utilgjengelig."
+            )
+        else:
+            lines.append(
+                f"*{ds_name}* er ekskludert — ingen rader mottatt."
+            )
+
+
+def _render_verification_block(lines: list[str], verification: VerificationReport | None) -> None:
+    """Render the verification section into *lines* in-place.
+
+    When *verification* is the gate's own report (A8), it renders the full
+    passed/total count with a one-clause gloss of what a «kontroll» is.
+    When None, shows a «not run» notice.
+    """
+    if verification is None:
+        lines.append("*Verifisering ikke kjørt.*")
+        return
+
+    lines.append(
+        f"**Resultat: {verification.verdict}** — "
+        f"{verification.passed}/{verification.total_claims} kontroller bestått "
+        f"(narrasjonssjekker + uavhengige DB-kvitteringer)."
+    )
+    lines.append("")
+    for r in verification.results:
+        status = "✓" if r.passes else "✗"
+        lines.append(f"- {status} `{r.claim.claim_type}` → {r.message}")
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # LLM renderer (optional)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -489,7 +664,7 @@ def render_llm(
     quality_report: dict[str, Any] | None = None,
     verification: VerificationReport | None = None,
     client: Any = None,
-    model: str = "claude-sonnet-4-5",
+    model: str | None = None,
     n_top: int = 20,
 ) -> tuple[str, dict[str, Any]]:
     """Narrate findings using a pre-built LLM client.
@@ -499,12 +674,17 @@ def render_llm(
         quality_report: Optional quality report dict.
         verification: Optional verification report.
         client: LLMClient instance (from core.endpoint.build_client).
-        model: Model ID to pass to the client.
+        model: Model ID to pass to the client. When None, resolved to a key
+            that exists in MODEL_PRICING (prefers «claude-fable-5»).
         n_top: Number of top kommuner to include.
 
     Returns:
         ``(report_markdown, cost_info)`` tuple.
     """
+    # A6: resolve default model — never a bare string literal outside MODEL_PRICING
+    if model is None:
+        model = _resolve_default_model()
+
     from .analyze import result_to_dict
 
     findings_dict = result_to_dict(result)
@@ -544,6 +724,7 @@ Rapporten skal:
 3. Kommentere topp-10 kommuner (ikke liste alle 20 — rapporten inneholder allerede tabellen)
 4. Avslutte med et kort avsnitt om planleggingsimplikasjoner for kommuner og Helsedirektoratet
 5. Bruke presist fagspråk, unngå klisjeer, holde seg strengt til tallene i JSON-en
+6. Bruke norsk tallformat: komma som desimaltegn, mellomrom som tusenskilletegn (f.eks. «31,1 %»)
 
 Ikke repeter tabellen. Ikke hallusiner nye tall. All tekst på bokmål."""
 
@@ -558,8 +739,18 @@ Ikke repeter tabellen. Ikke hallusiner nye tall. All tekst på bokmål."""
     }
 
     # Combine: LLM intro + template table + verification block
-    template_report = render_template(result, quality_report, verification, n_top)
-    # Replace the summary section with LLM narration
+    # Build table rows with nb-NO formatting
+    table_rows = ""
+    for km in result.kommuner[:n_top]:
+        if np.isnan(km.press_index_norm):
+            continue
+        cov = nb(km.coverage_rate, decimals=0) if not np.isnan(km.coverage_rate) else "—"
+        growth_str = nb_pct(km.pop_80plus_growth_pct) if not np.isnan(km.pop_80plus_growth_pct) else "—"
+        table_rows += (
+            f"| {km.rank} | {_safe_name(km.navn, km.knr)} | {nb_index(km.press_index_norm)} "
+            f"| {cov} | {growth_str} |\n"
+        )
+
     report = f"""# Kommunal Omsorgsradar — rapport
 
 {_report_header_line()}
@@ -574,18 +765,7 @@ Ikke repeter tabellen. Ikke hallusiner nye tall. All tekst på bokmål."""
 
 | Rang | Kommune | Press-indeks | Dekningsrate | Vekst 80+ mot 2035 |
 |------|---------|-------------|-------------|-------------------|
-"""
-    for km in result.kommuner[:n_top]:
-        if np.isnan(km.press_index_norm):
-            continue
-        cov = f"{km.coverage_rate:.0f}" if not np.isnan(km.coverage_rate) else "—"
-        growth_str = f"{km.pop_80plus_growth_pct:.1f}%" if not np.isnan(km.pop_80plus_growth_pct) else "—"
-        report += (
-            f"| {km.rank} | {_safe_name(km.navn, km.knr)} | {km.press_index_norm:.3f} "
-            f"| {cov} | {growth_str} |\n"
-        )
-
-    report += """
+{table_rows}
 ---
 
 ## Figurer
@@ -598,7 +778,7 @@ Ikke repeter tabellen. Ikke hallusiner nye tall. All tekst på bokmål."""
 
 ---
 
-*Rapporten er generert av omsorgsradar-pipeline v0.1.0 med LLM-narrasjon.*
+*Rapporten er generert av omsorgsradar-pipeline v{_package_version()} med LLM-narrasjon.*
 *Utdannet lege (master i medisin) — Oleksandr Altukhov.*
 """
 
@@ -616,6 +796,8 @@ def run_report(
     report_dir: Path = REPORT_DIR,
     use_llm: bool | None = None,
     workflow: dict[str, Any] | None = None,
+    verification: VerificationReport | None = None,
+    params: dict[str, Any] | None = None,
 ) -> tuple[Path, dict[str, Any]]:
     """Generate the full report: figures + markdown.
 
@@ -625,26 +807,81 @@ def run_report(
         report_dir: Output directory for the report.
         use_llm: If False, force template path. If None, defer to workflow config.
         workflow: Workflow config dict (from workflow.toml). If None, use template path.
+        verification: Optional gate VerificationReport. When provided, the report's
+            verification block renders this report (A8). When None, rebuilds from result.
+        params: Optional params dict (e.g. from analysis.toml). Used to extract
+            report.map_anchor_knrs for the choropleth.
 
     Returns:
         ``(report_path, cost_info)`` tuple.
+
+    Raises:
+        RuntimeError: If any required figure fails to render or its PNG is missing
+            after the call (A5). The choropleth is exempted — it may be skipped when
+            the geo asset is absent, but the template then omits its img link.
     """
     report_dir = Path(report_dir)
     figures_dir = report_dir / "figures"
     report_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    # Generate figures
-    plot_press_index_bar(result, out_dir=figures_dir)
-    plot_coverage_scatter(result, out_dir=figures_dir)
-    plot_national_trend(result, out_dir=figures_dir)
-    plot_press_index_choropleth(result, out_dir=figures_dir)
+    # Extract map_anchor_knrs from params (A3)
+    map_anchor_knrs: list[str] = []
+    if params:
+        map_anchor_knrs = list(params.get("report", {}).get("map_anchor_knrs", []))
 
-    # Verify findings
-    verifier = Verifier(result)
-    claims = build_standard_claims(result)
-    verification = verifier.verify_all(claims)
+    # ── Figure generation with guards (A5) ──────────────────────────────────
+    # Required figures: bar, scatter, trend. Choropleth is optional (skip-if-no-asset).
+    missing_figures: list[str] = []
 
+    def _guarded_plot(fn_name: str, plot_fn, *args, **kwargs) -> Path | None:
+        """Call plot_fn(*args, **kwargs). Collect name if PNG absent after call."""
+        try:
+            out = plot_fn(*args, **kwargs)
+        except Exception as exc:
+            logger.error("Figure %s raised: %s", fn_name, exc)
+            missing_figures.append(fn_name)
+            return None
+        if out is not None and not Path(out).exists():
+            logger.error("Figure %s did not write PNG: %s", fn_name, out)
+            missing_figures.append(fn_name)
+            return None
+        return out
+
+    _guarded_plot("press_index_bar", plot_press_index_bar, result, out_dir=figures_dir)
+    _guarded_plot("coverage_scatter", plot_coverage_scatter, result, out_dir=figures_dir)
+    _guarded_plot("national_trend", plot_national_trend, result, out_dir=figures_dir)
+
+    # Choropleth: allowed to be skipped (geo asset may be absent). Only raise if
+    # the function returned a path but the file is missing (internal failure).
+    choropleth_available = False
+    try:
+        ch_out = plot_press_index_choropleth(
+            result, out_dir=figures_dir, map_anchor_knrs=map_anchor_knrs
+        )
+        if ch_out is not None and Path(ch_out).exists():
+            choropleth_available = True
+        elif ch_out is not None and not Path(ch_out).exists():
+            # Returned a path but didn't write it — treat as internal failure
+            missing_figures.append("press_index_choropleth")
+    except Exception as exc:
+        logger.error("Choropleth raised: %s", exc)
+        missing_figures.append("press_index_choropleth")
+
+    if missing_figures:
+        raise RuntimeError(
+            f"report aborted: figures missing: {', '.join(missing_figures)}"
+        )
+
+    # ── Verification (A8) ───────────────────────────────────────────────────
+    # When verification is None, rebuild from result (current behavior).
+    # When provided (gate's report), pass it through to the template.
+    if verification is None:
+        verifier = Verifier(result)
+        claims = build_standard_claims(result)
+        verification = verifier.verify_all(claims)
+
+    # ── Report rendering ─────────────────────────────────────────────────────
     from .core.endpoint import build_client
     cost_info: dict[str, Any] = {"path": "key-free template renderer", "renderer": "template"}
 
@@ -659,10 +896,12 @@ def run_report(
             cost_info["renderer"] = "llm"
         except Exception as exc:
             logger.warning("LLM renderer failed (%s); falling back to template", exc)
-            report_md = render_template(result, quality_report, verification)
+            report_md = render_template(result, quality_report, verification,
+                                        choropleth_available=choropleth_available)
             cost_info = {"renderer": "template_fallback", "error": str(exc)}
     else:
-        report_md = render_template(result, quality_report, verification)
+        report_md = render_template(result, quality_report, verification,
+                                    choropleth_available=choropleth_available)
 
     report_path = report_dir / "omsorgsradar_rapport.md"
     report_path.write_text(report_md, encoding="utf-8")

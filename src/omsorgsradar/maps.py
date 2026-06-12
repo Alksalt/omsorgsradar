@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import matplotlib.collections as mcollections
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
+import matplotlib.ticker
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -201,6 +202,8 @@ def render_choropleth(
         sm.set_array([])  # required for ScalarMappable without a plot object
         cbar = fig.colorbar(sm, ax=ax, fraction=0.025, pad=0.02)
         cbar.set_label(value_label, fontsize=10)
+        cbar.ax.yaxis.set_major_formatter(
+            matplotlib.ticker.FuncFormatter(lambda v, _pos: f"{v:.1f}".replace(".", ",")))
 
     # Autoscale axes to fit all polygons
     ax.autoscale_view()
@@ -386,6 +389,8 @@ def render_choropleth_with_labels(
         sm.set_array([])
         cbar = fig.colorbar(sm, ax=ax, fraction=0.025, pad=0.02)
         cbar.set_label(value_label, fontsize=10)
+        cbar.ax.yaxis.set_major_formatter(
+            matplotlib.ticker.FuncFormatter(lambda v, _pos: f"{v:.1f}".replace(".", ",")))
 
     ax.autoscale_view()
 

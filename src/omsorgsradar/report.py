@@ -28,6 +28,7 @@ import matplotlib
 matplotlib.use("Agg")  # non-interactive backend for server-side rendering
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.ticker
 import numpy as np
 import pandas as pd
 
@@ -135,6 +136,8 @@ def plot_press_index_bar(
     )
     ax.set_xlim(0, 1.05)
     ax.grid(axis="x", alpha=0.3)
+    ax.xaxis.set_major_formatter(
+        matplotlib.ticker.FuncFormatter(lambda v, _pos: nb(v, decimals=1)))
 
     # Value labels: nb_index (two-decimal, Norwegian format — same precision as table)
     for i, (bar, val) in enumerate(zip(bars, values)):
@@ -188,6 +191,8 @@ def plot_coverage_scatter(
                     edgecolors="gray", linewidths=0.3, vmin=0.0, vmax=1.0)
     cbar = fig.colorbar(sc, ax=ax)
     cbar.set_label("Press-indeks (normalisert)", fontsize=10)
+    cbar.ax.yaxis.set_major_formatter(
+        matplotlib.ticker.FuncFormatter(lambda v, _pos: nb(v, decimals=1)))
 
     # Annotate top-10 by press index
     top10 = sorted(kommuner, key=lambda k: k.press_index_norm, reverse=True)[:10]
@@ -269,7 +274,7 @@ def plot_national_trend(
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + 0.5,
-            f"{nb(val, decimals=0)}k",
+            f"{nb(val * 1000, decimals=0)}",
             ha="center", va="bottom", fontsize=12, fontweight="bold",
         )
 
@@ -465,7 +470,7 @@ def render_template(
         baseline_k = nb(baseline / 1000, decimals=0)
         projected_k = nb(projected / 1000, decimals=0)
         lines.append(
-            f"På nasjonalt nivå vokser 80+-befolkningen med anslagsvis **{nb_pct(growth)} **"
+            f"På nasjonalt nivå vokser 80+-befolkningen med anslagsvis **{nb_pct(growth)}** "
             f"fra {baseline_k} 000 (siste datapunkt) til {projected_k} 000 i 2035 "
             f"dersom hver kommunes historiske trend (2017–2026) fortsetter. {ssb_clause}"
         )

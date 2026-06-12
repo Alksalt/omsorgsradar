@@ -136,3 +136,8 @@ oppløsning, splittelser ekskludert) og veksten beregnes per kommune. **Alle pub
 regenerert 2026-06-12 med den korrigerte metoden** — v1-toppen (Hasvik/Bjerkreim/Tydal) var i
 hovedsak et artefakt av uniform vekst kombinert med lav dekning; den korrigerte analysen peker
 på Oslo-belte-kommunene (Frogn, Vestby, Lørenskog) der 80+-veksten faktisk er raskest.
+
+nordisk-omsorg-analysen ble regenerert samme dato med den terminale KLASS-tabellen: topp-10
+geo_id-er bruker nå gjeldende kommunenummer (f.eks. NO-3216 Vestby, ikke utgått NO-3019), og
+NO `n_dropped` gikk fra 157 til 25 (tomme 2024-plassholderrader absorberes nå i forgjengernes
+sammenhengende serier).

@@ -280,6 +280,8 @@ def stage_report(ctx: StageContext) -> None:
         report_dir=ctx.reports_dir,
         use_llm=ctx.state.get("use_llm"),
         workflow=ctx.config.workflow,
+        verification=vreport,
+        params=ctx.config.params,
     )
     ctx.state["cost_info"] = cost_info
     ctx.artifacts["report"] = report_path

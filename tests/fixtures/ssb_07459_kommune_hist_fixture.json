@@ -1,0 +1,553 @@
+{
+  "version": "2.0",
+  "class": "dataset",
+  "label": "07459: Befolkning, etter region, kjønn, alder, statistikkvariabel og år",
+  "source": "Statistisk sentralbyrå",
+  "updated": "2026-02-25T07:00:00Z",
+  "note": [
+    "Utgåtte kommuner i perioden 1986-2013 er ikke inkludert i tabellen som fordeler personer i Politidistrikt 2016. Tallene for flere av disse grupperingene av politidistriktene er derfor ikke utfyllende i denne perioden."
+  ],
+  "role": {
+    "time": [
+      "Tid"
+    ],
+    "geo": [
+      "Region"
+    ],
+    "metric": [
+      "ContentsCode"
+    ]
+  },
+  "id": [
+    "Region",
+    "Kjonn",
+    "Alder",
+    "ContentsCode",
+    "Tid"
+  ],
+  "size": [
+    3,
+    2,
+    25,
+    1,
+    2
+  ],
+  "dimension": {
+    "Region": {
+      "label": "region",
+      "note": [
+        "[Se liste over endringer i de regionale inndelingene](https://www.ssb.no/offentlig-sektor/kommunekatalog/endringer-i-de-regionale-inndelingene)."
+      ],
+      "category": {
+        "index": {
+          "0301": 0,
+          "1103": 1,
+          "1804": 2
+        },
+        "label": {
+          "0301": "Oslo - Oslove",
+          "1103": "Stavanger",
+          "1804": "Bodø"
+        }
+      },
+      "extension": {
+        "elimination": false,
+        "show": "code_value"
+      },
+      "link": {
+        "describedby": [
+          {
+            "extension": {
+              "Region": "urn:ssb:classification:klass:104 urn:ssb:classification:klass:131"
+            }
+          }
+        ]
+      }
+    },
+    "Kjonn": {
+      "label": "kjønn",
+      "category": {
+        "index": {
+          "2": 0,
+          "1": 1
+        },
+        "label": {
+          "2": "Kvinner",
+          "1": "Menn"
+        }
+      },
+      "extension": {
+        "elimination": true,
+        "show": "value"
+      },
+      "link": {
+        "describedby": [
+          {
+            "extension": {
+              "Kjonn": "urn:ssb:classification:klass:2"
+            }
+          }
+        ]
+      }
+    },
+    "Alder": {
+      "label": "alder",
+      "category": {
+        "index": {
+          "080": 0,
+          "081": 1,
+          "082": 2,
+          "083": 3,
+          "084": 4,
+          "085": 5,
+          "086": 6,
+          "087": 7,
+          "088": 8,
+          "089": 9,
+          "090": 10,
+          "091": 11,
+          "092": 12,
+          "093": 13,
+          "094": 14,
+          "095": 15,
+          "096": 16,
+          "097": 17,
+          "098": 18,
+          "099": 19,
+          "100": 20,
+          "101": 21,
+          "102": 22,
+          "103": 23,
+          "104": 24
+        },
+        "label": {
+          "080": "80 år",
+          "081": "81 år",
+          "082": "82 år",
+          "083": "83 år",
+          "084": "84 år",
+          "085": "85 år",
+          "086": "86 år",
+          "087": "87 år",
+          "088": "88 år",
+          "089": "89 år",
+          "090": "90 år",
+          "091": "91 år",
+          "092": "92 år",
+          "093": "93 år",
+          "094": "94 år",
+          "095": "95 år",
+          "096": "96 år",
+          "097": "97 år",
+          "098": "98 år",
+          "099": "99 år",
+          "100": "100 år",
+          "101": "101 år",
+          "102": "102 år",
+          "103": "103 år",
+          "104": "104 år"
+        }
+      },
+      "extension": {
+        "elimination": false,
+        "show": "value"
+      },
+      "link": {
+        "describedby": [
+          {
+            "extension": {
+              "Alder": "urn:ssb:classification:klass:282"
+            }
+          }
+        ]
+      }
+    },
+    "ContentsCode": {
+      "label": "statistikkvariabel",
+      "category": {
+        "index": {
+          "Personer1": 0
+        },
+        "label": {
+          "Personer1": "Personer"
+        },
+        "unit": {
+          "Personer1": {
+            "base": "antall",
+            "decimals": 0
+          }
+        }
+      },
+      "extension": {
+        "elimination": false,
+        "refperiod": {
+          "Personer1": "1.1."
+        },
+        "show": "value",
+        "measuringType": {
+          "Personer1": "Stock"
+        },
+        "priceType": {
+          "Personer1": "NotApplicable"
+        },
+        "adjustment": {
+          "Personer1": "None"
+        }
+      }
+    },
+    "Tid": {
+      "label": "år",
+      "category": {
+        "index": {
+          "2017": 0,
+          "2024": 1
+        },
+        "label": {
+          "2017": "2017",
+          "2024": "2024"
+        }
+      },
+      "extension": {
+        "elimination": false,
+        "show": "code"
+      }
+    }
+  },
+  "extension": {
+    "px": {
+      "infofile": "None",
+      "tableid": "07459",
+      "decimals": 0,
+      "official-statistics": true,
+      "aggregallowed": true,
+      "copyright": false,
+      "language": "no",
+      "contents": "07459: Befolkning,",
+      "descriptiondefault": false,
+      "heading": [
+        "ContentsCode",
+        "Tid"
+      ],
+      "stub": [
+        "Region",
+        "Kjonn",
+        "Alder"
+      ],
+      "matrix": "Personer1",
+      "subject-code": "be",
+      "subject-area": "Befolkning"
+    },
+    "discontinued": null,
+    "contact": [
+      {
+        "name": "Magnus Haug",
+        "organization": "Statistisk sentralbyrå",
+        "phone": "40 81 14 91",
+        "mail": "mgh@ssb.no",
+        "raw": "Magnus Haug, Statistisk sentralbyrå# +47 40 81 14 91#mgh@ssb.no"
+      }
+    ]
+  },
+  "value": [
+    1195,
+    1672,
+    1201,
+    1487,
+    1049,
+    1160,
+    1043,
+    1200,
+    1084,
+    1177,
+    1060,
+    1013,
+    1095,
+    897,
+    880,
+    789,
+    812,
+    754,
+    702,
+    612,
+    696,
+    601,
+    582,
+    538,
+    600,
+    507,
+    429,
+    431,
+    380,
+    323,
+    309,
+    246,
+    260,
+    195,
+    154,
+    140,
+    94,
+    118,
+    80,
+    87,
+    55,
+    55,
+    29,
+    36,
+    14,
+    17,
+    13,
+    19,
+    10,
+    10,
+    855,
+    1433,
+    733,
+    1108,
+    671,
+    883,
+    671,
+    939,
+    648,
+    817,
+    632,
+    681,
+    510,
+    560,
+    442,
+    477,
+    392,
+    360,
+    326,
+    325,
+    303,
+    290,
+    249,
+    240,
+    199,
+    199,
+    144,
+    161,
+    118,
+    115,
+    83,
+    97,
+    63,
+    62,
+    24,
+    41,
+    14,
+    47,
+    17,
+    23,
+    11,
+    17,
+    7,
+    10,
+    6,
+    5,
+    2,
+    8,
+    3,
+    6,
+    268,
+    396,
+    240,
+    333,
+    241,
+    311,
+    223,
+    302,
+    220,
+    242,
+    228,
+    246,
+    239,
+    206,
+    240,
+    190,
+    159,
+    171,
+    136,
+    143,
+    145,
+    114,
+    131,
+    116,
+    101,
+    119,
+    80,
+    96,
+    78,
+    87,
+    62,
+    41,
+    46,
+    43,
+    27,
+    34,
+    23,
+    24,
+    15,
+    9,
+    8,
+    10,
+    5,
+    4,
+    0,
+    1,
+    3,
+    2,
+    0,
+    3,
+    207,
+    326,
+    180,
+    301,
+    186,
+    222,
+    149,
+    203,
+    153,
+    218,
+    131,
+    168,
+    106,
+    117,
+    103,
+    127,
+    88,
+    104,
+    67,
+    93,
+    62,
+    73,
+    45,
+    61,
+    31,
+    45,
+    23,
+    24,
+    24,
+    33,
+    16,
+    20,
+    11,
+    12,
+    7,
+    9,
+    6,
+    5,
+    3,
+    0,
+    3,
+    1,
+    1,
+    0,
+    2,
+    1,
+    1,
+    2,
+    0,
+    0,
+    130,
+    153,
+    110,
+    174,
+    110,
+    131,
+    90,
+    114,
+    111,
+    111,
+    80,
+    98,
+    72,
+    80,
+    78,
+    88,
+    71,
+    65,
+    51,
+    80,
+    54,
+    58,
+    36,
+    59,
+    32,
+    38,
+    15,
+    32,
+    21,
+    25,
+    15,
+    15,
+    8,
+    15,
+    5,
+    9,
+    9,
+    9,
+    6,
+    3,
+    5,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    97,
+    164,
+    80,
+    152,
+    82,
+    126,
+    60,
+    113,
+    69,
+    91,
+    47,
+    74,
+    60,
+    81,
+    32,
+    61,
+    32,
+    43,
+    28,
+    41,
+    27,
+    31,
+    22,
+    19,
+    14,
+    19,
+    9,
+    18,
+    10,
+    13,
+    4,
+    6,
+    2,
+    5,
+    3,
+    2,
+    1,
+    4,
+    1,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

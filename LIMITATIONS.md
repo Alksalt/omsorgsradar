@@ -26,14 +26,13 @@ Indeksen bør brukes som **startpunkt for videre analyse**, ikke som beslutnings
 - Pre-2020 historiske koder fra KOSTRA-serien håndteres korrekt; eldre data kan ha gjenværende mismatches for kommuner som ble slått sammen i 2017–2019.
 
 ### Befolkningsframskrivinger
-- Analysen bruker SSB-tabell 12880 (nasjonale framskrivinger) i mangel av offentlig tilgjengelige kommunevise projections via PxWebAPI v2.
-- SSB kommune-nivå projections (tabell 13873) returnerte 400-feil fra den offentlige API-en under innhentingen — dokumentert i `docs/api_drift.md`.
-- Den valgte veksttakten (3,5% p.a.) er basert på nasjonal SSB-trend for 80+-kohorten 2010–2024. Kommunevis vekst vil avvike — bykommuner kan ha lavere vekst, distriktskommuner høyere.
+- SSB tabell 13873 (kommunevise framskrivinger 2023–2050) er ikke tilgjengelig via det offentlige PxWebAPI (HTTP 400, bekreftet re-sjekk 2026-06-12) — dokumentert i `docs/api_drift.md`.
+- Analysen bruker i stedet **historisk CAGR per kommune** beregnet fra SSB tabell 07459 (folkemengde etter alder og år). For kommuner med tilstrekkelig historikk (≥ 2 år med positive 80+-tall) beregnes en kommunespesifikk vekstrate; manglende kommuner faller tilbake på nasjonal rate (fra 12880) eller standardverdi 3,5% p.a.
+- En `growth_source`-kolonne i resultatene angir for hver kommune om raten er «kommune»-, «national»- eller «default»-basert.
 - Fremskrivinger er usikre utover 5 år. 2035-tallene bør leses som planleggingshorisonter, ikke presise prediksjoner.
 
 ### FHI NOKKEL
-- FHI NOKKEL-endepunktet (`/api/open/v1/datakilder/nokkel/indikatorer`) returnerte 404 under innhenting (2026-06-11). Socioøkonomisk kontekst (levekårsindeks, sosial ulikhet) er **ikke** inkludert i denne versjonen.
-- Planlagt: integrering av FHI NOKKEL-data når API-endepunktet er tilgjengelig igjen.
+- FHI NOKKEL-endepunktet ble re-sjekket 2026-06-12: `statistikk-data.fhi.no/api/open/v1` returnerer fortsatt 404 for alle stier; det finnes ingen kjent offentlig REST-API som erstatter det. FHI-data er ekskludert fra analysen.
 
 ## ML-begrensninger
 

@@ -18,6 +18,7 @@ Claim types supported:
   - ``coverage_rate_mean``: mean coverage_rate across all kommuner
   - ``top_kommune_name``: name of rank-1 kommune (string equality)
   - ``top_n_press_index``: press_index_norm of rank-n kommune
+  - ``kommune_growth_pct``: pop_80plus_growth_pct for a specific kommune (by knr)
 """
 
 from __future__ import annotations
@@ -296,6 +297,41 @@ class Verifier:
                     "OK"
                     if passes
                     else f"FAIL: claimed '{claim.claimed_value}', recomputed '{recomputed}'"
+                ),
+            )
+
+        elif ct == "kommune_growth_pct":
+            # Independently recompute from raw findings by knr
+            knr = str(claim.parameters.get("knr", ""))
+            km_match = next(
+                (km for km in self._result.kommuner if km.knr == knr), None
+            )
+            if km_match is None:
+                return ClaimResult(
+                    claim=claim,
+                    recomputed_value=None,
+                    passes=False,
+                    message=f"No kommune with knr='{knr}' found in findings",
+                )
+            recomputed = km_match.pop_80plus_growth_pct
+            if np.isnan(recomputed):
+                return ClaimResult(
+                    claim=claim,
+                    recomputed_value=None,
+                    passes=False,
+                    message=f"pop_80plus_growth_pct is NaN for knr='{knr}'",
+                )
+            passes, rel_err = self._numeric_close(float(claim.claimed_value), recomputed)
+            return ClaimResult(
+                claim=claim,
+                recomputed_value=round(recomputed, 2),
+                passes=passes,
+                relative_error=rel_err,
+                message=(
+                    "OK"
+                    if passes
+                    else f"FAIL knr={knr}: claimed {claim.claimed_value:.2f}%, "
+                         f"recomputed {recomputed:.2f}% (rel err {rel_err:.1%})"
                 ),
             )
 

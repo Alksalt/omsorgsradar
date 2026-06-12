@@ -63,6 +63,8 @@ class KommuneMetrics:
     rank: int = 0
     latest_kostra_year: int = 0
     latest_pop_year: int = 0
+    # Growth source provenance: "kommune" | "national" | "default"
+    growth_source: str = "default"
 
 
 @dataclass
@@ -75,6 +77,8 @@ class AnalysisResult:
     national_growth_rate_2035: float = float("nan")
     analysis_year_range: tuple[int, int] = (0, 0)
     notes: list[str] = field(default_factory=list)
+    # Description of which growth-rate path dominated for this run
+    growth_method: str = "default"
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -137,45 +141,143 @@ def _extract_80plus_by_kommune(df_pop: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
+def _extract_80plus_all_years(df_pop: pd.DataFrame) -> pd.DataFrame:
+    """Extract population aged 80+ per kommune for ALL available years.
+
+    Used to compute per-kommune historical growth rates (CAGR) in
+    :func:`_compute_kommune_growth_rates`.
+
+    Args:
+        df_pop: Output of :func:`ingest.fetch_population_current`.
+
+    Returns:
+        DataFrame with columns ``knr``, ``aar``, ``pop_80plus`` — one row
+        per (knr, year) combination.
+    """
+    if df_pop.empty:
+        return pd.DataFrame(columns=["knr", "aar", "pop_80plus"])
+
+    df = df_pop.copy()
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+
+    age_col = "alder" if "alder" in df.columns else None
+    if age_col is None:
+        return pd.DataFrame(columns=["knr", "aar", "pop_80plus"])
+
+    def parse_age(label: str) -> int | None:
+        label = str(label).strip()
+        digits = "".join(c for c in label.split()[0] if c.isdigit())
+        return int(digits) if digits else None
+
+    df["age_int"] = df[age_col].map(parse_age)
+    df_80 = df[df["age_int"].fillna(0) >= 80].copy()
+
+    if df_80.empty:
+        return pd.DataFrame(columns=["knr", "aar", "pop_80plus"])
+
+    result = (
+        df_80.groupby(["knr", "aar"])["value"]
+        .sum()
+        .reset_index()
+        .rename(columns={"value": "pop_80plus"})
+    )
+    result = result[result["pop_80plus"] > 0]  # drop zero-count years (merged codes)
+    return result
+
+
+def _compute_kommune_growth_rates(df_pop: pd.DataFrame) -> pd.DataFrame:
+    """Compute per-kommune historical 80+ CAGR from multi-year population data.
+
+    Uses the earliest and latest year with positive 80+ count per kommune to
+    compute a compound annual growth rate.  Requires at least 2 years with
+    positive count; otherwise the rate is NaN (will trigger national fallback).
+
+    Args:
+        df_pop: Raw population DataFrame (output of
+            :func:`ingest.fetch_population_current`) with all available years.
+
+    Returns:
+        DataFrame with columns ``knr``, ``kommune_cagr`` (as a fraction,
+        e.g. 0.0134 for 1.34% p.a.).  One row per kommune.
+    """
+    df_all = _extract_80plus_all_years(df_pop)
+    if df_all.empty:
+        return pd.DataFrame(columns=["knr", "kommune_cagr"])
+
+    records: list[dict] = []
+    for knr, grp in df_all.groupby("knr"):
+        grp_sorted = grp.sort_values("aar")
+        # Need at least 2 data points with positive population
+        valid = grp_sorted[grp_sorted["pop_80plus"] > 0]
+        if len(valid) < 2:
+            records.append({"knr": knr, "kommune_cagr": float("nan")})
+            continue
+        pop_start = float(valid.iloc[0]["pop_80plus"])
+        pop_end = float(valid.iloc[-1]["pop_80plus"])
+        years = int(valid.iloc[-1]["aar"]) - int(valid.iloc[0]["aar"])
+        if pop_start <= 0 or years <= 0:
+            records.append({"knr": knr, "kommune_cagr": float("nan")})
+            continue
+        cagr = (pop_end / pop_start) ** (1.0 / years) - 1.0
+        records.append({"knr": knr, "kommune_cagr": cagr})
+
+    return pd.DataFrame(records)
+
+
 def _project_80plus(
     df_80: pd.DataFrame,
     target_year: int = 2035,
     df_proj: pd.DataFrame | None = None,
+    df_pop_all_years: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Project 80+ population to *target_year* per kommune.
 
-    Method: uses the national growth rate from SSB projections if available;
-    otherwise applies the observed national compound annual growth rate over
-    the last 10 years of population data.
+    Growth-rate fallback chain (best available wins):
+      1. **Kommune-level historical CAGR** — computed from ``df_pop_all_years``
+         (the full multi-year population DataFrame).  Requires ≥2 years of
+         positive 80+ count per kommune.
+      2. **National-level CAGR from SSB projections** — derived from
+         ``df_proj`` if supplied.
+      3. **Default 3.5% p.a.** — Norwegian 80+ trend 2010–2024 (SSB 2024).
+
+    Emits a ``growth_source`` column: ``"kommune"`` | ``"national"`` |
+    ``"default"`` indicating which path was used per row.
 
     Args:
-        df_80: DataFrame from :func:`_extract_80plus_by_kommune`.
+        df_80: DataFrame from :func:`_extract_80plus_by_kommune` (one row per
+            kommune, latest year only).
         target_year: Projection horizon year.
         df_proj: Optional national projection DataFrame.
+        df_pop_all_years: Optional full population DataFrame with all years
+            (used to compute per-kommune historical CAGR).
 
     Returns:
-        *df_80* with additional column ``pop_80plus_2035``.
+        *df_80* with additional columns ``pop_80plus_2035``,
+        ``pop_80plus_growth_pct``, and ``growth_source``.
     """
     if df_80.empty:
+        df_80 = df_80.copy()
         df_80["pop_80plus_2035"] = pd.Series(dtype=float)
+        df_80["pop_80plus_growth_pct"] = pd.Series(dtype=float)
+        df_80["growth_source"] = pd.Series(dtype=str)
         return df_80
 
     baseline_year = int(df_80["aar"].max())
     years_ahead = target_year - baseline_year
 
-    # Attempt to derive growth rate from national projection
+    # ── Step 1: Attempt to derive national growth rate from SSB projections ──
     national_growth_rate: float | None = None
     if df_proj is not None and not df_proj.empty and "value" in df_proj.columns:
         try:
             df_proj_num = df_proj.copy()
             df_proj_num["value"] = pd.to_numeric(df_proj_num["value"], errors="coerce")
-            # Use total population as proxy (projections may not split by age)
             total_now = df_proj_num[df_proj_num["aar"] == baseline_year]["value"].sum()
             total_2035 = df_proj_num[df_proj_num["aar"] == target_year]["value"].sum()
             if total_now > 0 and total_2035 > 0 and years_ahead > 0:
                 national_growth_rate = (total_2035 / total_now) ** (1 / years_ahead) - 1
                 logger.info(
-                    "National growth rate from projections: %.3f%% p.a.", national_growth_rate * 100
+                    "National growth rate from projections: %.3f%% p.a.",
+                    national_growth_rate * 100,
                 )
         except Exception as exc:
             logger.warning("Could not derive growth rate from projections: %s", exc)
@@ -183,13 +285,48 @@ def _project_80plus(
     if national_growth_rate is None:
         # Default: Norwegian 80+ cohort grew ~3.5% p.a. over 2010–2024 (SSB 2024 report)
         national_growth_rate = 0.035
-        logger.info("Using default national 80+ growth rate: %.1f%% p.a.", national_growth_rate * 100)
 
+    # ── Step 2: Compute per-kommune CAGR from historical data ─────────────────
+    kommune_rates: pd.DataFrame = pd.DataFrame(columns=["knr", "kommune_cagr"])
+    if df_pop_all_years is not None and not df_pop_all_years.empty:
+        kommune_rates = _compute_kommune_growth_rates(df_pop_all_years)
+
+    # ── Step 3: Build per-row growth rate with fallback chain ─────────────────
     df_out = df_80.copy()
-    df_out["pop_80plus_2035"] = df_out["pop_80plus"] * (1 + national_growth_rate) ** years_ahead
+    if not kommune_rates.empty:
+        df_out = df_out.merge(kommune_rates, on="knr", how="left")
+    else:
+        df_out["kommune_cagr"] = float("nan")
+
+    rates: list[float] = []
+    sources: list[str] = []
+    for _, row in df_out.iterrows():
+        k_cagr = row.get("kommune_cagr", float("nan"))
+        if pd.notna(k_cagr) and k_cagr > 0:
+            rates.append(float(k_cagr))
+            sources.append("kommune")
+        elif national_growth_rate is not None:
+            rates.append(float(national_growth_rate))
+            sources.append("national" if df_proj is not None and not df_proj.empty else "default")
+        else:
+            rates.append(0.035)
+            sources.append("default")
+
+    df_out["_rate"] = rates
+    df_out["growth_source"] = sources
+    df_out["pop_80plus_2035"] = df_out["pop_80plus"] * (1 + df_out["_rate"]) ** years_ahead
     df_out["pop_80plus_growth_pct"] = (
-        (df_out["pop_80plus_2035"] - df_out["pop_80plus"]) / df_out["pop_80plus"].replace(0, float("nan")) * 100
+        (df_out["pop_80plus_2035"] - df_out["pop_80plus"])
+        / df_out["pop_80plus"].replace(0, float("nan"))
+        * 100
     )
+    df_out = df_out.drop(columns=["_rate"])
+    if "kommune_cagr" in df_out.columns:
+        df_out = df_out.drop(columns=["kommune_cagr"])
+
+    # Log distribution
+    source_counts = pd.Series(sources).value_counts().to_dict()
+    logger.info("Growth-rate sources: %s", source_counts)
     return df_out
 
 
@@ -408,8 +545,22 @@ def run_analysis(
     logger.info("80+ population extracted for %d kommuner", len(df_80))
     result.analysis_year_range = (int(df_80["aar"].min()), int(df_80["aar"].max()))
 
-    # Step 2: Project 80+ to target year
-    df_80 = _project_80plus(df_80, target_year=target_year, df_proj=df_proj)
+    # Step 2: Project 80+ to target year — using per-kommune historical CAGR where available
+    df_80 = _project_80plus(
+        df_80,
+        target_year=target_year,
+        df_proj=df_proj,
+        df_pop_all_years=df_pop if not df_pop.empty else None,
+    )
+
+    # Derive growth_method summary
+    if "growth_source" in df_80.columns:
+        source_counts = df_80["growth_source"].value_counts().to_dict()
+        total = len(df_80)
+        parts = [f"{src} for {cnt} of {total}" for src, cnt in sorted(source_counts.items())]
+        result.growth_method = "; ".join(parts)
+    else:
+        result.growth_method = "default"
 
     # National aggregates
     result.national_80plus_latest = float(df_80["pop_80plus"].sum())
@@ -455,6 +606,7 @@ def run_analysis(
             rank=int(row.get("rank", 0)),
             latest_kostra_year=int(row.get("latest_year", 0)) if pd.notna(row.get("latest_year")) else 0,
             latest_pop_year=int(row.get("aar", 0)) if pd.notna(row.get("aar")) else 0,
+            growth_source=str(row.get("growth_source", "default")),
         )
         kommuner.append(km)
 
@@ -462,9 +614,10 @@ def run_analysis(
     result.notes = notes
 
     logger.info(
-        "Analysis complete: %d kommuner ranked; national 80+ growth to 2035: %.1f%%",
+        "Analysis complete: %d kommuner ranked; national 80+ growth to 2035: %.1f%%; growth_method: %s",
         len(kommuner),
         result.national_growth_rate_2035,
+        result.growth_method,
     )
     return result
 

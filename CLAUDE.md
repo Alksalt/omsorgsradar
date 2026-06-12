@@ -26,6 +26,7 @@ owner's go · next: G1 (Nordic adapters) per `docs/specs/2026-06-11-v2-generaliz
 Config: `workflow.toml` (models/endpoint/defaults) + `analyses/<name>/analysis.toml`
 (stages/sources/params); precedence analysis > workflow > code. Engine:
 `src/omsorgsradar/core/` (config, contracts, journal, registry, adapters) +
-`src/omsorgsradar/stages.py` (default stages). Variants = new instance folder,
-never core edits. Run/extend/debug: see skill `pipeline-stages`.
+`src/omsorgsradar/stages.py` (default stages). Adapters: pxweb, sotkanet (FI), socialstyrelsen (SE), kuhr (NO), csv —
+`docs/adapters.md`; realness gates mandatory in profile. Variants = new instance
+folder, never core edits. Run/extend/debug: see skill `pipeline-stages`.
 Spec: `docs/specs/2026-06-11-v2-generalization-design.md`.

@@ -39,3 +39,16 @@
   report site. Canonical spec: `docs/specs/2026-06-11-v2-generalization-design.md` (G0–G6, ~7–8d).
   Parked: planted-fault suite beyond gate tests, API drift watchdog. **Spec awaits owner review →
   then detailed G0 implementation plan → build on explicit go.**
+- **2026-06-12** — **G1 (Nordic adapters + realness gates) shipped.** Adapters:
+  sotkanet (THL FI; API needs User-Agent), socialstyrelsen (SE statistikdatabas —
+  live API deviates from its docs: no server-side filtering, string regionId,
+  period-string ar, Swedish decimal commas; adapter built against reality), kuhr
+  (helserefusjon NO, merger-normalized, known values live-verified), csv (local open
+  data) — each with offline fixture + known-value test from captured API responses;
+  shared sanitized JSON cache; NO/SE/FI geo harmonization (`core/geo.py`,
+  `NO-1505`-style ids); adapter registry + startup source validation (id
+  pattern-locked). Realness gates (5 Kaggle-triage checks) mandatory in profile —
+  verdict published, FAIL aborts (fabricated-dataset gate test green at unit AND
+  pipeline level). ⚠ Socialstyrelsen API has no äldreomsorg topic (verified live) —
+  G2 Swedish elder-care via open-data CSV. Tests: 114 → 182 (offline) + 3 live.
+  **Next: G2 — `analyses/nordisk-omsorg` end-to-end.**

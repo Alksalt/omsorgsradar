@@ -22,6 +22,13 @@ description: How to run, extend, and debug the omsorgsradar analysis pipeline (i
 - New analysis: create `analyses/<name>/analysis.toml` (schema:
   `core/config.py`). Stage list + `[[sources]]` blocks; no code needed for
   existing adapters.
+- Adapters: `pxweb | sotkanet | socialstyrelsen | kuhr | csv` — required fields per
+  adapter in `docs/adapters.md`; validation runs at pipeline startup. New API shape →
+  new module in `core/adapters/` + offline fixture + known-value test (never edit an
+  existing adapter's behavior for a new dataset).
+- Realness gates run in `profile` on every dataset (verdict in
+  `data/quality_profile.json`); a FAIL verdict aborts before analyze. csv sources
+  must declare `[sources.provenance]` institution + url.
 - Variant behavior: add `analyses/<name>/stages.py` with
   `register(registry)`; use `registry.register(name, fn, override=True)`.
   Core stages are never edited for a variant.

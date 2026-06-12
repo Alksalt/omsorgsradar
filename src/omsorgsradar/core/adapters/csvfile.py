@@ -4,10 +4,10 @@ The realness provenance gate has no known-host fallback for local files, so
 csv sources MUST carry [sources.provenance] with institution + url — enforced
 by validate_source (registry) and re-checked by the profile-stage gates.
 
-Absolute and ``../`` paths are accepted ONLY because configs are
-owner-authored in G1. Hard G3 prerequisite before any machine-authored
-analysis.toml runs: resolve the path and reject anything outside the
-analysis dir (see spec, security gate).
+Paths are contained: relative paths resolve inside the analysis dir, and any
+path (absolute or ``../``) that resolves outside it is rejected — the G3
+security gate for machine-authored configs. ``resolve()`` also neutralizes
+symlink escapes.
 """
 
 from __future__ import annotations
@@ -17,6 +17,8 @@ from pathlib import Path
 from typing import Any, Mapping
 
 import pandas as pd
+
+from ..config import ConfigError
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +30,14 @@ class CsvAdapter:
         self.base_dir = Path(base_dir) if base_dir is not None else None
 
     def fetch(self, source: Mapping[str, Any]) -> pd.DataFrame:
-        p = Path(str(source["path"]))
-        if not p.is_absolute():
-            p = (self.base_dir or Path.cwd()) / p
+        base = (self.base_dir or Path.cwd()).resolve()
+        raw = Path(str(source["path"]))
+        p = (raw if raw.is_absolute() else base / raw).resolve()
+        if not p.is_relative_to(base):
+            raise ConfigError(
+                f"csv source '{source.get('id')}': path escapes the analysis dir: "
+                f"{p} (base: {base})"
+            )
         if not p.exists():
             raise FileNotFoundError(
                 f"csv source '{source.get('id')}': file not found: {p}"

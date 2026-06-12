@@ -23,12 +23,30 @@ class TestFetch:
         assert list(df.columns) == ["geo_code", "aar", "value"]
         assert df["value"].tolist() == [12.5, 9.0]
 
-    def test_absolute_path_wins(self, tmp_path: Path) -> None:
+    def test_absolute_path_inside_base_ok(self, tmp_path: Path) -> None:
         p = write_csv(tmp_path / "abs.csv", "a,b\n1,2\n")
-        df = CsvAdapter(base_dir=tmp_path / "elsewhere").fetch(
+        df = CsvAdapter(base_dir=tmp_path).fetch(
             {"adapter": "csv", "id": "x", "path": str(p),
              "provenance": {"institution": "T", "url": "https://x"}})
         assert df["a"].tolist() == [1]
+
+    def test_absolute_path_outside_base_rejected(self, tmp_path: Path) -> None:
+        outside = write_csv(tmp_path / "outside.csv", "a\n1\n")
+        base = tmp_path / "analysis"
+        base.mkdir()
+        with pytest.raises(ValueError, match="escapes the analysis dir"):
+            CsvAdapter(base_dir=base).fetch(
+                {"adapter": "csv", "id": "x", "path": str(outside),
+                 "provenance": {"institution": "T", "url": "https://x"}})
+
+    def test_parent_escape_rejected(self, tmp_path: Path) -> None:
+        write_csv(tmp_path / "secret.csv", "a\n1\n")
+        base = tmp_path / "analysis"
+        base.mkdir()
+        with pytest.raises(ValueError, match="escapes the analysis dir"):
+            CsvAdapter(base_dir=base).fetch(
+                {"adapter": "csv", "id": "x", "path": "../secret.csv",
+                 "provenance": {"institution": "T", "url": "https://x"}})
 
     def test_missing_file_raises_with_path(self, tmp_path: Path) -> None:
         with pytest.raises(FileNotFoundError, match="nope.csv"):

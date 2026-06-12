@@ -11,6 +11,8 @@ adapter = "pxweb"
 id = "kostra_pleie"
 base_url = "https://data.ssb.no/api/v0/no/table"
 table = "12209"
+# Required: an SSB outage fails loudly rather than silently shipping a weaker report.
+required = true
 
 [sources.var_map]
 hjemmetjeneste_andel = "KOShjtj80aarover0001"
@@ -23,6 +25,8 @@ adapter = "pxweb"
 id = "befolkning"
 base_url = "https://data.ssb.no/api/v0/no/table"
 table = "07459"
+# Required: an SSB outage fails loudly rather than silently shipping a weaker report.
+required = true
 
 [[sources]]
 adapter = "pxweb"
@@ -35,6 +39,10 @@ base_url = "https://data.ssb.no/api/v0/no/table"
 # was the macroeconomic-accounts table — no age dimension, ends 2029 — so the
 # projection rate was never derivable (Finding 3 / docs/api_drift.md).
 table = "13599"
+# Required: an SSB projection outage fails loudly rather than silently shipping
+# a weaker report that omits the SSB MMM comparison — the honesty move of this
+# analysis depends on citing the SSB number alongside the trend extrapolation.
+required = true
 
 [[sources]]
 adapter = "fhi"
@@ -66,3 +74,9 @@ min_growth_window_years = 5
 #          short-window/merger artifacts that drove the Hvaler explosion.
 kommune_rate_min_pa = -0.05
 kommune_rate_max_pa = 0.10
+
+# C6 interface for Task A's choropleth map (A3): anchor kommune codes for the
+# four main cities (Oslo, Bergen, Trondheim, Stavanger). Task A reads
+# params["report"]["map_anchor_knrs"] with a safe default of [].
+[params.report]
+map_anchor_knrs = ["0301", "4601", "5001", "1103"]

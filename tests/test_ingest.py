@@ -171,7 +171,10 @@ class TestRunIngestOffline:
     """Offline tests for run_ingest orchestration and _FETCHERS dispatch."""
 
     def test_unknown_source_id_raises(self, tmp_path: Path) -> None:
-        sources = [{"id": "nonexistent_source", "base_url": "http://x", "table": "0"}]
+        # C1: run_ingest now validates host first (defense-in-depth), so use an
+        # allowlisted base_url to reach the "unknown adapter" check.
+        sources = [{"id": "nonexistent_source",
+                    "base_url": "https://data.ssb.no/api/v0/no/table", "table": "0"}]
         with pytest.raises(ValueError, match="unknown adapter"):
             run_ingest(sources, db_path=tmp_path / "test.duckdb")
 

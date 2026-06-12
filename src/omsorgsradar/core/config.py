@@ -106,10 +106,17 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
                     # id becomes a DuckDB table name + cache-key fragment —
                     # pattern-locked so config can never inject SQL/paths.
                     "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+                    # C5 (N17): optional required flag — an empty frame for a
+                    # required source aborts the pipeline at the profile stage.
+                    "required": {"type": "boolean"},
                 },
             },
         },
-        "params": {"type": "object"},
+        "params": {
+            "type": "object",
+            # Allow any nested structure for params blocks (report, anonymize, etc.)
+            "additionalProperties": True,
+        },
     },
 }
 

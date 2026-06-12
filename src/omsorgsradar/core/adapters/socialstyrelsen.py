@@ -34,6 +34,7 @@ import requests
 
 from ..geo import make_geo_id
 from .cache import DEFAULT_TIMEOUT, JsonCache
+from .http import safe_request
 
 logger = logging.getLogger(__name__)
 
@@ -70,9 +71,15 @@ class SocialstyrelsenAdapter:
         self.base_url = base_url.rstrip("/")
         self.cache = JsonCache(cache_dir)
         self.timeout = timeout
+        from urllib.parse import urlparse as _up
+        host = (_up(base_url).hostname or "").lower()
+        self._allowed_hosts: frozenset[str] = frozenset({host} if host else set())
 
     def _fetch_all_pages(self, url: str, *, max_pages: int) -> list[dict[str, Any]]:
         """Accumulate ``data`` rows following ``nasta_sida`` (rewritten to https).
+
+        Each ``nasta_sida`` URL is validated via ``safe_request`` which enforces
+        host-pinning; cross-host pagination raises ``ConfigError``.
 
         Args:
             url: Initial request URL.
@@ -91,19 +98,26 @@ class SocialstyrelsenAdapter:
             if page_url is None:
                 return rows
             logger.info("GET %s", page_url)
-            resp = requests.get(page_url, params=None, timeout=self.timeout)
+            resp = safe_request(
+                "GET", page_url,
+                allowed_hosts=self._allowed_hosts,
+                timeout=self.timeout,
+            )
             resp.raise_for_status()
             payload = resp.json()
             rows.extend(payload.get("data", []))
             nxt = payload.get("nasta_sida")
             if nxt:
                 nxt = nxt.replace("http://", "https://", 1)
-                host = urlparse(nxt).netloc.lower()
-                base_host = urlparse(self.base_url).netloc.lower()
-                if host != base_host:
+                # Validate the nasta_sida host before following — this is a JSON-level
+                # pagination link, not an HTTP redirect, so safe_request's hop check
+                # does not cover it. Use the same dot-bounded suffix logic.
+                from .http import _host_allowed
+                nxt_host = (urlparse(nxt).hostname or "").lower()
+                if not _host_allowed(nxt_host, self._allowed_hosts):
                     raise RuntimeError(
-                        f"socialstyrelsen: nasta_sida host {host!r} != base "
-                        f"{base_host!r} — refusing cross-host pagination"
+                        f"socialstyrelsen: nasta_sida host {nxt_host!r} != allowed "
+                        f"{sorted(self._allowed_hosts)} — refusing cross-host pagination"
                     )
             page_url = nxt or None
         if page_url is not None:
@@ -125,8 +139,10 @@ class SocialstyrelsenAdapter:
         key = f"sst_{amne}_regions"
         regions = self.cache.load(key)
         if regions is None:
-            resp = requests.get(
-                f"{self.base_url}/{amne}/region", timeout=self.timeout
+            resp = safe_request(
+                "GET", f"{self.base_url}/{amne}/region",
+                allowed_hosts=self._allowed_hosts,
+                timeout=self.timeout,
             )
             resp.raise_for_status()
             regions = resp.json()

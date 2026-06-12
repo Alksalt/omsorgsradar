@@ -434,7 +434,7 @@ def build_standard_claims(result: AnalysisResult) -> list[Claim]:
         claims.append(Claim(
             claim_type="coverage_rate_mean",
             claimed_value=round(mean_rate, 1),
-            source_text=f"Mean coverage rate: {mean_rate:.1f} brukere per 1000 80+",
+            source_text=f"Mean coverage rate: {mean_rate:.1f} andel innbyggere 80+ som mottar hjemmetjenester (%, KOSTRA KOShjtj80aarover0001)",
         ))
 
     return claims

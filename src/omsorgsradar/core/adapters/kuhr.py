@@ -26,6 +26,7 @@ import requests
 from ...kommune_mergers import normalize_knr_series
 from ..geo import make_geo_id
 from .cache import DEFAULT_TIMEOUT, JsonCache
+from .http import safe_request
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,9 @@ class KuhrAdapter:
         self.base_url = base_url.rstrip("/")
         self.cache = JsonCache(cache_dir)
         self.timeout = timeout
+        from urllib.parse import urlparse as _up
+        host = (_up(base_url).hostname or "").lower()
+        self._allowed_hosts: frozenset[str] = frozenset({host} if host else set())
 
     @staticmethod
     def _cache_key(source: Mapping[str, Any]) -> str:
@@ -119,9 +123,13 @@ class KuhrAdapter:
                     params[field] = ",".join(str(v) for v in vals)
             url = f"{self.base_url}/takstbruk/agtakst/kommune/ar"
             logger.info("GET %s %s", url, params)
-            resp = requests.get(url, params=params,
-                                headers={"Accept": "application/json"},
-                                timeout=self.timeout)
+            resp = safe_request(
+                "GET", url,
+                allowed_hosts=self._allowed_hosts,
+                params=params,
+                headers={"Accept": "application/json"},
+                timeout=self.timeout,
+            )
             resp.raise_for_status()
             payload = resp.json()
             self.cache.save(key, payload)

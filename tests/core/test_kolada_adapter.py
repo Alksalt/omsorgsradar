@@ -82,9 +82,16 @@ class TestRegistry:
 
 class TestPagination:
     def test_cross_host_next_url_refused(self, tmp_path, monkeypatch) -> None:
-        """A next_url pointing at a foreign host is never followed."""
+        """A next_url pointing at a foreign host is never followed.
+
+        Patched at the http module level (safe_request → requests.request)
+        since C2 routes all adapter HTTP calls through safe_request.
+        """
+        import requests as _requests
 
         class FakeResp:
+            status_code = 200
+
             def raise_for_status(self) -> None:
                 pass
 
@@ -92,8 +99,8 @@ class TestPagination:
                 return {"values": [], "next_url": "https://attacker.example/x"}
 
         monkeypatch.setattr(
-            "omsorgsradar.core.adapters.kolada.requests.get",
-            lambda url, headers=None, timeout=None: FakeResp(),
+            "omsorgsradar.core.adapters.http.requests.request",
+            lambda method, url, **kw: FakeResp(),
         )
         ad = KoladaAdapter(cache_dir=None)
         with pytest.raises(RuntimeError, match="cross-host"):

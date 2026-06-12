@@ -8,8 +8,9 @@ Pipeline:
    (extrapolating from current population age structure using national
    growth-rate adjustment because municipality-level SSB projections are
    not available via the public PxWebAPI).
-2. Compute current coverage rate: ``brukere_per_1000_80plus``
-   (KOSTRA BrukerHjem / population 80+) for latest available year.
+2. Compute current coverage rate: ``coverage_rate``
+   (andel innbyggere 80+ som mottar hjemmetjenester, %, KOSTRA KOShjtj80aarover0001 —
+   used directly as a percentage, no per-1000 division is performed).
 3. Compute pressure index:
      ``press_index = projected_80plus_2035 / current_80plus  *
                      (1 / (coverage_rate + epsilon))``
@@ -67,7 +68,7 @@ class KommuneMetrics:
     pop_80plus_projected_2035: float = float("nan")
     pop_80plus_growth_pct: float = float("nan")
     # KOSTRA
-    coverage_rate: float = float("nan")  # brukere_hjem per 1000 80+
+    coverage_rate: float = float("nan")  # andel innbyggere 80+ som mottar hjemmetjenester (%, KOSTRA KOShjtj80aarover0001)
     inst_places_per_1000_80plus: float = float("nan")
     # Derived
     press_index_raw: float = float("nan")
@@ -767,6 +768,14 @@ def run_analysis(
     result.ssb_projection_growth_2035 = proj_growth
     result.ssb_projection_baseline_year = proj_base
 
+    # C6 (N16): if the projection frame was unavailable (empty sentinel from
+    # fetch_population_projections), surface it in result.notes so report templates
+    # and callers can distinguish the fallback case from a real projection.
+    if df_proj is None or (hasattr(df_proj, 'empty') and df_proj.empty):
+        notes.append(
+            "SSB-framskriving utilgjengelig — kun trendtall siteres"
+        )
+
     # Step 3: Coverage rates from KOSTRA
     df_coverage = _extract_coverage_rate(df_kostra, df_80)
 
@@ -931,16 +940,22 @@ def load_findings(path: Path = FINDINGS_PATH) -> AnalysisResult:
         KommuneMetrics(**{k: v for k, v in km.items() if k in valid_fields})
         for km in raw.get("kommuner", [])
     ]
+    # C7/P5: replace every raw.get(k) or default with explicit None-checks.
+    # Using "x or nan" collapses legitimate 0.0 values to NaN.
+    def _float_or_nan(v):
+        return float(v) if v is not None else float("nan")
+
+    def _int_or_zero(v):
+        return int(v) if v is not None else 0
+
     return AnalysisResult(
         kommuner=kommuner,
-        national_80plus_latest=raw.get("national_80plus_latest") or float("nan"),
-        national_80plus_2035=raw.get("national_80plus_2035") or float("nan"),
-        national_growth_rate_2035=raw.get("national_growth_rate_2035") or float("nan"),
+        national_80plus_latest=_float_or_nan(raw.get("national_80plus_latest")),
+        national_80plus_2035=_float_or_nan(raw.get("national_80plus_2035")),
+        national_growth_rate_2035=_float_or_nan(raw.get("national_growth_rate_2035")),
         analysis_year_range=tuple(raw.get("analysis_year_range", (0, 0))),
         notes=raw.get("notes", []),
         growth_method=raw.get("growth_method", "default"),
-        ssb_projection_growth_2035=(
-            raw.get("ssb_projection_growth_2035") or float("nan")
-        ),
-        ssb_projection_baseline_year=raw.get("ssb_projection_baseline_year", 0) or 0,
+        ssb_projection_growth_2035=_float_or_nan(raw.get("ssb_projection_growth_2035")),
+        ssb_projection_baseline_year=_int_or_zero(raw.get("ssb_projection_baseline_year")),
     )

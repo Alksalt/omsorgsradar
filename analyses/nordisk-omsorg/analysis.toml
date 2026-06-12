@@ -20,6 +20,8 @@ table = "12209"
 cache_key = "nordisk_no_kostra_12209"
 use_codes = true
 label_columns = true
+# Required: core NO coverage data — missing means no Norwegian rankings.
+required = true
 
 [sources.query]
 response = { format = "json-stat2" }
@@ -49,6 +51,8 @@ table = "07459"
 cache_key = "nordisk_no_befolkning_07459"
 use_codes = true
 label_columns = true
+# Required: core NO population data — missing means no Norwegian rankings.
+required = true
 
 [sources.query]
 response = { format = "json-stat2" }
@@ -92,6 +96,8 @@ adapter = "kolada"
 id = "se_hemtjanst"
 kpi = "N21704"
 years = [2023]
+# Required: core SE elder-care coverage data.
+required = true
 
 # ── Sverige: 80+ befolkning (SCB BefolkningNy) ───────────────────────────────
 [[sources]]
@@ -102,6 +108,8 @@ table = "BefolkningNy"
 cache_key = "nordisk_se_befolkning"
 use_codes = true
 label_columns = true
+# Required: core SE population data.
+required = true
 
 [sources.query]
 response = { format = "json-stat2" }
@@ -131,15 +139,21 @@ adapter = "sotkanet"
 id = "fi_homecare"
 indicators = [5513]
 years = [2023]
+# Required: core FI elder-care coverage data.
+required = true
 
 [[sources]]
 adapter = "sotkanet"
 id = "fi_elderly_share"
 indicators = [171]
 years = [2019, 2023]
+# Required: core FI elderly share data.
+required = true
 
 [[sources]]
 adapter = "sotkanet"
 id = "fi_population"
 indicators = [127]
 years = [2019, 2023]
+# Required: core FI population data.
+required = true

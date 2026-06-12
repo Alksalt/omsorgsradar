@@ -7,6 +7,7 @@ tidy DataFrame. Adapters never analyze; they fetch, cache, and normalize.
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any, Mapping, Protocol, runtime_checkable
 from urllib.parse import urlparse
@@ -15,11 +16,14 @@ import pandas as pd
 
 from ..config import ConfigError
 from .csvfile import CsvAdapter
+from .http import safe_request  # noqa: F401  (re-exported public API)
 from .kolada import KoladaAdapter
 from .kuhr import KuhrAdapter
 from .pxweb import PxWebAdapter
 from .socialstyrelsen import SocialstyrelsenAdapter
 from .sotkanet import SotkanetAdapter
+
+logger = logging.getLogger(__name__)
 
 
 @runtime_checkable

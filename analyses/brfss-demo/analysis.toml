@@ -11,6 +11,8 @@ adapter = "csv"
 id = "brfss"
 path = "microdata/brfss_sample.csv"
 row_level = true
+# Required: the microdata is the entire analysis — missing means no output.
+required = true
 [sources.dtype]
 state = "str"
 [sources.provenance]

@@ -466,12 +466,18 @@ def fetch_population_projections(
         return df
 
     except Exception as exc:
-        logger.warning(
-            "Projection table %s failed (%s); national rate falls back to default",
+        # C6 (N16): log at ERROR so the outage is visible in the run log;
+        # an empty return is distinguishable from a real frame (no rows).
+        logger.error(
+            "Projection table %s unavailable (%s); national rate falls back to default. "
+            "If framskrivinger is required in analysis.toml the pipeline will abort at "
+            "the profile stage — set required=false to allow silent fallback.",
             table_id, exc,
         )
         time.sleep(REQUEST_PAUSE)
 
+    # Sentinel: empty DataFrame with the expected schema — distinguishable from a
+    # real frame because it has zero rows. run_analysis appends a note when empty.
     return pd.DataFrame(columns=["knr", "alder", "aar", "value"])
 
 
@@ -644,16 +650,23 @@ def run_ingest(
     db_path: Path,
     cache_dir: Path | None = None,
     base_dir: Path | None = None,
+    extra_hosts: frozenset[str] | set[str] = frozenset(),
 ) -> dict[str, pd.DataFrame]:
     """Fetch every configured source, persist to DuckDB, return DataFrames.
 
     Legacy v1 source ids dispatch to their bespoke fetchers; anything else
     goes through the adapter registry (core.adapters.make_adapter).
+
+    Defense-in-depth: validates each source's host against the allowlist
+    inside this function, independent of the pipeline-level preamble check.
+    This ensures ``run_ingest`` callers bypass no host gate.
     """
-    from .core.adapters import make_adapter
+    from .core.adapters import make_adapter, validate_source_host
 
     datasets: dict[str, pd.DataFrame] = {}
     for src in sources:
+        # Defense-in-depth: validate host for every source before any HTTP call.
+        validate_source_host(src, extra_hosts)
         sid = src["id"]
         fetcher = _FETCHERS.get(sid)
         if fetcher is not None:

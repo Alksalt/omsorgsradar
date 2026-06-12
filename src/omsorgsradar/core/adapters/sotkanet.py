@@ -20,6 +20,7 @@ import requests
 
 from ..geo import make_geo_id
 from .cache import DEFAULT_TIMEOUT, JsonCache
+from .http import safe_request
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,9 @@ class SotkanetAdapter:
         self.base_url = base_url.rstrip("/")
         self.cache = JsonCache(cache_dir)
         self.timeout = timeout
+        from urllib.parse import urlparse as _up
+        host = (_up(base_url).hostname or "").lower()
+        self._allowed_hosts: frozenset[str] = frozenset({host} if host else set())
 
     def _get_json(self, url: str, params: dict | None, cache_key: str) -> Any:
         """GET JSON with disk-cache short-circuit.
@@ -70,8 +74,13 @@ class SotkanetAdapter:
         if cached is not None:
             return cached
         logger.info("GET %s", url)
-        resp = requests.get(url, params=params, timeout=self.timeout,
-                            headers=DEFAULT_HEADERS)
+        resp = safe_request(
+            "GET", url,
+            allowed_hosts=self._allowed_hosts,
+            params=params,
+            timeout=self.timeout,
+            headers=DEFAULT_HEADERS,
+        )
         resp.raise_for_status()
         data = resp.json()
         self.cache.save(cache_key, data)

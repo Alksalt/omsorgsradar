@@ -80,6 +80,23 @@ def run_pipeline(
             f"sources {row_level} are row_level=true but 'anonymize' is not in "
             f"stages.list — row-level data must be anonymized before analysis")
 
+    # C3 (N13): anonymize must appear BEFORE every downstream consumer.
+    # A machine-authored stage list like [ingest, profile, analyze, anonymize, …]
+    # passes the presence check above but runs analyze on raw rows — refused here.
+    if row_level and "anonymize" in cfg.stage_list:
+        _DOWNSTREAM = ("analyze", "ml", "report")
+        stages_list = list(cfg.stage_list)
+        anon_idx = stages_list.index("anonymize")
+        for consumer in _DOWNSTREAM:
+            if consumer in stages_list:
+                consumer_idx = stages_list.index(consumer)
+                if consumer_idx < anon_idx:
+                    raise PipelineGateError(
+                        f"row_level source(s) {row_level}: 'anonymize' (position "
+                        f"{anon_idx}) must come before '{consumer}' (position "
+                        f"{consumer_idx}) — current stage list: {stages_list}"
+                    )
+
     data_dir, reports_dir = Path(data_dir), Path(reports_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
 

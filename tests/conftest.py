@@ -35,6 +35,11 @@ def fixture_datasets() -> dict[str, pd.DataFrame]:
     return {
         "kostra_pleie": _prep(kostra, has_alder=False),
         "befolkning": _prep(pop, has_alder=True),
-        "framskrivinger": pd.DataFrame(),
+        "framskrivinger": pd.DataFrame({
+            "knr": ["NATIONAL", "NATIONAL"],
+            "alder": ["80+", "80+"],
+            "aar": [2024, 2035],
+            "value": [100000.0, 146500.0],
+        }),
         "fhi_nokkel": pd.DataFrame(),
     }

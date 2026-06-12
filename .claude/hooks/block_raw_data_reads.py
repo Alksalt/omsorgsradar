@@ -19,6 +19,9 @@ BLOCKED_PATTERNS = [
     r"(^|/)data/cache(/|$)",
     r"\.duckdb$",
     r"(^|/)microdata(/|$)",
+    # C4 (N14): anonymized CSVs are row-derived — model reads the identifiability
+    # receipt JSON, not the table itself. Blocks even a PASS-verdict anonymized CSV.
+    r"(^|/)data/[^/]+_anonymized\.csv$",
 ]
 
 MESSAGE = (

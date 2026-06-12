@@ -27,6 +27,7 @@ import requests
 
 from ..geo import make_geo_id
 from .cache import DEFAULT_TIMEOUT, JsonCache
+from .http import safe_request
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,9 @@ class KoladaAdapter:
         self.base_url = base_url.rstrip("/")
         self.cache = JsonCache(cache_dir)
         self.timeout = timeout
+        from urllib.parse import urlparse as _up
+        host = (_up(base_url).hostname or "").lower()
+        self._allowed_hosts: frozenset[str] = frozenset({host} if host else set())
 
     def _get_json(self, url: str, cache_key: str | None) -> Any:
         if cache_key is not None:
@@ -55,8 +59,12 @@ class KoladaAdapter:
             if cached is not None:
                 return cached
         logger.info("GET %s", url)
-        resp = requests.get(url, headers={"Accept": "application/json"},
-                            timeout=self.timeout)
+        resp = safe_request(
+            "GET", url,
+            allowed_hosts=self._allowed_hosts,
+            headers={"Accept": "application/json"},
+            timeout=self.timeout,
+        )
         resp.raise_for_status()
         data = resp.json()
         if cache_key is not None:

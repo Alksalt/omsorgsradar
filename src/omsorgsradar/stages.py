@@ -23,19 +23,27 @@ def stage_ingest(ctx: StageContext) -> None:
 
     db_path = ctx.data_dir / f"{ctx.config.name}.duckdb"
     if ctx.state.get("skip_ingest"):
+        import duckdb
+
         datasets: dict[str, pd.DataFrame] = {}
         for src in ctx.config.sources:
             try:
                 datasets[src["id"]] = load_from_duckdb(src["id"], db_path=db_path)
-            except Exception as exc:  # missing table → empty df, same as v1
-                logger.warning("Could not load %s: %s", src["id"], exc)
+            except duckdb.CatalogException as exc:
+                # Table not yet in DB (e.g. source added after last ingest run)
+                logger.warning("Table not in DuckDB for %s: %s", src["id"], exc)
                 datasets[src["id"]] = pd.DataFrame()
+            # Any other exception (IO error, corrupt DB, etc.) re-raises.
     else:
+        extra_hosts: frozenset[str] = frozenset(
+            ctx.config.workflow.get("security", {}).get("extra_allowed_hosts", [])
+        )
         datasets = run_ingest(
             ctx.config.sources,
             db_path=db_path,
             cache_dir=ctx.data_dir / "cache",
             base_dir=ctx.config.analysis_dir,
+            extra_hosts=extra_hosts,
         )
     ctx.state["datasets"] = datasets
     ctx.artifacts["duckdb"] = db_path
@@ -62,6 +70,22 @@ def stage_profile(ctx: StageContext) -> None:
         raise PipelineGateError(
             f"realness gate FAIL for dataset(s): {', '.join(sorted(failed))} — "
             f"see {path}"
+        )
+
+    # C5 (N17): mandatory-source gate — a required source with an empty frame
+    # means we cannot produce a meaningful report; fail loudly before continuing.
+    datasets = ctx.state["datasets"]
+    missing_required = [
+        src["id"]
+        for src in ctx.config.sources
+        if src.get("required") and (
+            src["id"] not in datasets or datasets[src["id"]].empty
+        )
+    ]
+    if missing_required:
+        raise PipelineGateError(
+            f"mandatory source(s) returned empty data: {missing_required} — "
+            f"pipeline aborted (mark source required=false to allow fallback)"
         )
 
 
@@ -164,6 +188,15 @@ def stage_verify(ctx: StageContext) -> None:
     )
     ctx.state["verification"] = vreport
     ctx.artifacts["verification"] = path
+
+    # C5 (N17): zero-ranked guard — if no kommune has rank ≥ 1, the result set is
+    # empty and a published report would be a zero-data artifact. Block loudly.
+    if not any(km.rank >= 1 for km in result.kommuner):
+        raise PipelineGateError(
+            "zero ranked kommuner in verification — empty-data report blocked "
+            "(all kommuner have rank=0; check that the required sources contain data)"
+        )
+
     if vreport.verdict != "PASS":
         msg = vreport.summary()
         if structural:
@@ -224,6 +257,11 @@ def stage_anonymize(ctx: StageContext) -> None:
     ctx.artifacts["anonymized_table"] = anon_path
     ctx.artifacts["identifiability"] = rpath
     if receipt["verdict"] == "FAIL":
+        # C4 (N14): remove the insufficiently-anonymized CSV before raising —
+        # it must not linger on disk in model-readable data/. The identifiability
+        # receipt JSON stays as evidence. unlink(missing_ok=True) is safe here:
+        # if the write failed earlier the file may already be absent.
+        anon_path.unlink(missing_ok=True)
         raise PipelineGateError(
             f"identifiability gate FAIL — singling_out={receipt['singling_out']['verdict']} "
             f"linkability={receipt['linkability']['verdict']} "

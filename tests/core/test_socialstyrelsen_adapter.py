@@ -151,6 +151,8 @@ class TestPagination:
         calls: list[str] = []
 
         class FakeResp:
+            status_code = 200
+
             def __init__(self, payload: dict) -> None:
                 self._p = payload
 
@@ -160,12 +162,12 @@ class TestPagination:
             def json(self) -> dict:
                 return self._p
 
-        def fake_get(url: str, params: object = None, timeout: object = None) -> FakeResp:
+        def fake_request(method: str, url: str, **kw) -> FakeResp:
             calls.append(url)
             return FakeResp(pages[url])
 
         monkeypatch.setattr(
-            "omsorgsradar.core.adapters.socialstyrelsen.requests.get", fake_get
+            "omsorgsradar.core.adapters.http.requests.request", fake_request
         )
         ad = SocialstyrelsenAdapter(cache_dir=None)
         rows = ad._fetch_all_pages(
@@ -183,6 +185,8 @@ class TestPagination:
         """A nasta_sida pointing at a foreign host is never followed."""
 
         class FakeResp:
+            status_code = 200
+
             def raise_for_status(self) -> None:
                 pass
 
@@ -190,8 +194,8 @@ class TestPagination:
                 return {"data": [], "nasta_sida": "http://attacker.example/x"}
 
         monkeypatch.setattr(
-            "omsorgsradar.core.adapters.socialstyrelsen.requests.get",
-            lambda url, params=None, timeout=None: FakeResp(),
+            "omsorgsradar.core.adapters.http.requests.request",
+            lambda method, url, **kw: FakeResp(),
         )
         ad = SocialstyrelsenAdapter(cache_dir=None)
         with pytest.raises(RuntimeError, match="cross-host"):
@@ -203,6 +207,8 @@ class TestPagination:
         """RuntimeError is raised when max_pages is reached with pagination active."""
 
         class FakeResp:
+            status_code = 200
+
             def raise_for_status(self) -> None:
                 pass
 
@@ -213,8 +219,8 @@ class TestPagination:
                 }
 
         monkeypatch.setattr(
-            "omsorgsradar.core.adapters.socialstyrelsen.requests.get",
-            lambda url, params=None, timeout=None: FakeResp(),
+            "omsorgsradar.core.adapters.http.requests.request",
+            lambda method, url, **kw: FakeResp(),
         )
         ad = SocialstyrelsenAdapter(cache_dir=None)
         with pytest.raises(RuntimeError, match="max_pages"):

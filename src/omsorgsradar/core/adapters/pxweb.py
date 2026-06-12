@@ -14,6 +14,7 @@ import pandas as pd
 import requests
 
 from .cache import JsonCache
+from .http import safe_request
 
 logger = logging.getLogger(__name__)
 
@@ -90,10 +91,18 @@ class PxWebAdapter:
         base_url: str,
         cache_dir: Path | None = None,
         timeout: int = REQUEST_TIMEOUT,
+        allowed_hosts: frozenset[str] | set[str] | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.cache = JsonCache(cache_dir)
         self.timeout = timeout
+        # Pin redirect validation to the adapter's own base host by default.
+        from urllib.parse import urlparse as _urlparse
+        if allowed_hosts is not None:
+            self._allowed_hosts: frozenset[str] = frozenset(allowed_hosts)
+        else:
+            host = (_urlparse(base_url).hostname or "").lower()
+            self._allowed_hosts = frozenset({host} if host else set())
 
     # ── cache ────────────────────────────────────────────────────────────────
     def _cache_load(self, key: str) -> Any | None:
@@ -113,7 +122,12 @@ class PxWebAdapter:
             return cached
         url = f"{self.base_url}/{table_id}"
         logger.info("POST %s", url)
-        resp = requests.post(url, json=query, timeout=self.timeout)
+        resp = safe_request(
+            "POST", url,
+            allowed_hosts=self._allowed_hosts,
+            json=query,
+            timeout=self.timeout,
+        )
         resp.raise_for_status()
         data = resp.json()
         self._cache_save(key, data)
@@ -131,7 +145,12 @@ class PxWebAdapter:
             if cached is not None:
                 return cached
         logger.info("GET %s", url)
-        resp = requests.get(url, params=params, timeout=self.timeout)
+        resp = safe_request(
+            "GET", url,
+            allowed_hosts=self._allowed_hosts,
+            params=params,
+            timeout=self.timeout,
+        )
         resp.raise_for_status()
         data = resp.json()
         if cache_key is not None:

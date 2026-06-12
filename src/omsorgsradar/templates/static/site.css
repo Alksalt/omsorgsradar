@@ -1,0 +1,296 @@
+/* Kommunal Omsorgsradar — static site CSS
+   Plain, professional, public-sector health palette. No framework. */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --color-bg: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-primary: #1a5276;
+  --color-accent: #2874a6;
+  --color-text: #212529;
+  --color-muted: #6c757d;
+  --color-border: #dee2e6;
+  --color-zebra: #f0f4f8;
+  --color-link: #1a5276;
+  --color-link-hover: #154360;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  line-height: 1.7;
+  color: var(--color-text);
+  background: var(--color-bg);
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout */
+
+header, main, footer {
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem;
+}
+
+header {
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 1.25rem;
+  margin-bottom: 0;
+}
+
+footer {
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+/* Typography */
+
+h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h2 a:hover {
+  text-decoration: underline;
+  color: var(--color-link-hover);
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.4rem 0;
+}
+
+p {
+  margin: 0.75rem 0;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+}
+
+.intro {
+  color: var(--color-muted);
+  font-size: 0.97rem;
+  margin: 0.5rem 0 0 0;
+  max-width: 44rem;
+}
+
+/* Back link (report pages) */
+
+.report-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+}
+
+.back-link {
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* Card grid (index page) */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* Marimo explore button */
+
+.marimo-link {
+  margin-top: 1rem;
+}
+
+.btn-explore {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.btn-explore:hover {
+  background: var(--color-link-hover);
+  color: #fff;
+}
+
+/* Empty state */
+
+.empty {
+  color: var(--color-muted);
+  font-style: italic;
+  margin-top: 2rem;
+}
+
+/* Tables (ranking tables in reports) */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.93rem;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+thead {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+thead th {
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+  background: var(--color-zebra);
+}
+
+tbody tr:hover {
+  background: #dbeafe;
+}
+
+tbody td {
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Images */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius);
+  margin: 1rem 0;
+}
+
+/* Code */
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.88em;
+  background: var(--color-zebra);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: #1e2a38;
+  color: #d4e1f0;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 1.25rem 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Blockquote */
+
+blockquote {
+  border-left: 4px solid var(--color-accent);
+  margin: 1.25rem 0;
+  padding: 0.5rem 1rem;
+  background: var(--color-zebra);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--color-muted);
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  table {
+    font-size: 0.82rem;
+  }
+
+  thead th,
+  tbody td {
+    padding: 0.4rem 0.6rem;
+  }
+}

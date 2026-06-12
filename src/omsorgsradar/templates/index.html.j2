@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ site_title }}</title>
+  <link rel="stylesheet" href="static/site.css">
+</head>
+<body>
+  <header>
+    <h1>{{ site_title }}</h1>
+    <p class="intro">{{ intro }}</p>
+    {% if marimo_embedded %}
+    <p class="marimo-link">
+      <a href="explore/" class="btn-explore">Utforsk dataene interaktivt</a>
+    </p>
+    {% endif %}
+  </header>
+  <main>
+    {% if analyses %}
+    <section class="card-grid">
+      {% for a in analyses %}
+      <article class="card">
+        <h2><a href="{{ a.slug }}/">{{ a.title }}</a></h2>
+      </article>
+      {% endfor %}
+    </section>
+    {% else %}
+    <p class="empty">Ingen rapporter publisert ennå.</p>
+    {% endif %}
+  </main>
+  <footer>
+    <p>Utdannet lege (master i medisin) — Oleksandr Altukhov</p>
+  </footer>
+</body>
+</html>

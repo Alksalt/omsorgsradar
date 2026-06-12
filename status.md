@@ -55,3 +55,24 @@
   pinning + cross-host test, sotkanet full-year cache keys, csv-path containment
   carried into spec G3 gate). Tests: 114 → 184 (offline) + 3 live.
   **Next: G2 — `analyses/nordisk-omsorg` end-to-end.**
+- **2026-06-12** — **G2 Tasks 5–8 shipped.** `analyses/nordisk-omsorg/stages.py` complete:
+  `squeeze_table` (within-country z-normalize + rank), `findings_from_tables` (nordic_findings schema),
+  country table builders for NO/SE/FI (`_no_table` filters pre-merger NaN rows, `_se_table` merges
+  SCB population with Kolada hemtjanst, `_fi_table` reconstructs 75+ elderly from sotkanet share×pop),
+  `kuhr_context` (KUHR sidecar for verify), `stage_analyze_nordisk` (artifacts + manifests),
+  `stage_verify_nordisk` (independent inline recompute — does NOT call `findings_from_tables`; planted-
+  hallucination test green: coverage_median+7.7 AND geo_id spoof both caught in one run),
+  `stage_report_nordisk` (bokmål markdown + 3 matplotlib figures; refuses without green verification),
+  `register()` (shadows analyze/verify/report). Tests: 197 → **208 green**. Commit: 0459b02.
+  **Next: G2 mid-review (opus panel, Task 11) + G2 Phase 4 (Tasks 9–10: offline e2e + live run + docs).**
+- **2026-06-12** — **G2 (nordisk-omsorg) shipped.** First cross-country instance:
+  `analyses/nordisk-omsorg/` (NO/SE/FI aldring vs. hjemmetjenestedekning per kommune,
+  within-country z-skvis; verify = 168 uavhengige kontroller, planted-hallucination-test
+  grønn). Core gains: pxweb `use_codes`/`label_columns`, kolada-adapter (SE — sdb-API-et
+  mangler äldreomsorg), `contracts.register_schema`, pipeline `--data-dir`/`--reports-dir`.
+  **Kritisk funn fra review-panelet: håndskrevet kommune-merger-tabell hadde 1504→1506-feil
+  (gamle Ålesund → Molde) som blåste opp NO-vekst til 246 % — tabellen er regenerert fra
+  SSB KLASS (358 entries, splitter ekskludert), maks 80+-vekst nå 43,5 % (Bykle).** Bokmål
+  rapport + 3 figurer publisert fra live-kjøring (`reports/nordisk-omsorg/`). Tests: 184 → 218
+  offline + 3 live. **Next: G3 — /magic-analyze + /add-dataset skills (security gate:
+  base_url-allowlist + csv-path-containment er harde forutsetninger — se spec).**

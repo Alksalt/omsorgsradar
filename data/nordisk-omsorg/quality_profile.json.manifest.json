@@ -1,0 +1,9 @@
+{
+  "artifact": "quality_profile",
+  "path": "data/nordisk-omsorg/quality_profile.json",
+  "sha256": "3ded2f0a1cb98d34e7fe843ea238e7da59b3f7f054529e67aaf93af5c792bb87",
+  "schema_version": "1",
+  "created_at": "2026-06-12T07:39:58.195230+00:00",
+  "producer": "profile",
+  "inputs": []
+}

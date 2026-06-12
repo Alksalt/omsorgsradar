@@ -19,15 +19,17 @@ ones.
   owner is «utdannet lege (master i medisin)», never bare «lege»; no real patient data (this project uses
   only open aggregate statistics — SSB/FHI).
 
-Status: **v1 built + shipped (P0–P5, 2026-06-11) · v2 G0 (engine + config) shipped 2026-06-11 on
-owner's go · G1 (Nordic adapters + realness gates) shipped 2026-06-12 · next: G2
-(`analyses/nordisk-omsorg` end-to-end) per `docs/specs/2026-06-11-v2-generalization-design.md`.**
+Status: **v1 built + shipped (P0–P5, 2026-06-11) · v2 G0 (engine + config) shipped 2026-06-11 ·
+G1 (Nordic adapters + realness gates) shipped 2026-06-12 · G2 (nordisk-omsorg, first cross-country
+instance) shipped 2026-06-12 · next: G3 (/magic-analyze + /add-dataset skills) per
+`docs/specs/2026-06-11-v2-generalization-design.md`.**
 
 ## v2 engine (G0+)
 Config: `workflow.toml` (models/endpoint/defaults) + `analyses/<name>/analysis.toml`
 (stages/sources/params); precedence analysis > workflow > code. Engine:
 `src/omsorgsradar/core/` (config, contracts, journal, registry, adapters) +
-`src/omsorgsradar/stages.py` (default stages). Adapters: pxweb, sotkanet (FI), socialstyrelsen (SE), kuhr (NO), csv —
+`src/omsorgsradar/stages.py` (default stages). Adapters: pxweb, sotkanet (FI),
+socialstyrelsen (SE), kolada/RKA (SE elder-care — sdb has no äldreomsorg topic), kuhr (NO), csv —
 `docs/adapters.md`; realness gates mandatory in profile. Variants = new instance
 folder, never core edits. Run/extend/debug: see skill `pipeline-stages`.
 Spec: `docs/specs/2026-06-11-v2-generalization-design.md`.

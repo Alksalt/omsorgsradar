@@ -1,0 +1,285 @@
+{
+  "analysis_years": {
+    "base": 2019,
+    "latest": 2023
+  },
+  "countries": {
+    "FI": {
+      "n_municipalities": 299,
+      "n_dropped": 0,
+      "coverage_median": 15.2,
+      "growth_median": 15.22,
+      "high_squeeze_share": 0.3144,
+      "age_cut": "75+",
+      "top_squeeze": [
+        {
+          "geo_id": "FI-170",
+          "geo_name": "Jomala",
+          "squeeze": 4.912,
+          "coverage": 10.0,
+          "growth_pct": 47.89,
+          "rank": 1
+        },
+        {
+          "geo_id": "FI-755",
+          "geo_name": "Siuntio",
+          "squeeze": 4.488,
+          "coverage": 12.0,
+          "growth_pct": 48.0,
+          "rank": 2
+        },
+        {
+          "geo_id": "FI-186",
+          "geo_name": "Järvenpää",
+          "squeeze": 4.007,
+          "coverage": 9.9,
+          "growth_pct": 39.69,
+          "rank": 3
+        },
+        {
+          "geo_id": "FI-858",
+          "geo_name": "Tuusula",
+          "squeeze": 3.588,
+          "coverage": 8.8,
+          "growth_pct": 33.87,
+          "rank": 4
+        },
+        {
+          "geo_id": "FI-245",
+          "geo_name": "Kerava",
+          "squeeze": 3.476,
+          "coverage": 8.9,
+          "growth_pct": 33.07,
+          "rank": 5
+        },
+        {
+          "geo_id": "FI-417",
+          "geo_name": "Lemland",
+          "squeeze": 3.442,
+          "coverage": 8.7,
+          "growth_pct": 32.38,
+          "rank": 6
+        },
+        {
+          "geo_id": "FI-276",
+          "geo_name": "Kontiolahti",
+          "squeeze": 3.153,
+          "coverage": 7.8,
+          "growth_pct": 28.09,
+          "rank": 7
+        },
+        {
+          "geo_id": "FI-604",
+          "geo_name": "Pirkkala",
+          "squeeze": 3.121,
+          "coverage": 9.0,
+          "growth_pct": 30.12,
+          "rank": 8
+        },
+        {
+          "geo_id": "FI-500",
+          "geo_name": "Muurame",
+          "squeeze": 3.034,
+          "coverage": 10.0,
+          "growth_pct": 31.29,
+          "rank": 9
+        },
+        {
+          "geo_id": "FI-529",
+          "geo_name": "Naantali",
+          "squeeze": 2.925,
+          "coverage": 11.0,
+          "growth_pct": 32.25,
+          "rank": 10
+        }
+      ]
+    },
+    "NO": {
+      "n_municipalities": 344,
+      "n_dropped": 157,
+      "coverage_median": 29.75,
+      "growth_median": 7.22,
+      "high_squeeze_share": 0.3081,
+      "age_cut": "80+",
+      "top_squeeze": [
+        {
+          "geo_id": "NO-3019",
+          "geo_name": "Vestby",
+          "squeeze": 4.338,
+          "coverage": 23.0,
+          "growth_pct": 38.18,
+          "rank": 1
+        },
+        {
+          "geo_id": "NO-4632",
+          "geo_name": "Austrheim",
+          "squeeze": 3.951,
+          "coverage": 20.9,
+          "growth_pct": 31.34,
+          "rank": 2
+        },
+        {
+          "geo_id": "NO-3022",
+          "geo_name": "Frogn",
+          "squeeze": 3.824,
+          "coverage": 19.8,
+          "growth_pct": 28.48,
+          "rank": 3
+        },
+        {
+          "geo_id": "NO-5026",
+          "geo_name": "Holtålen",
+          "squeeze": 3.808,
+          "coverage": 22.6,
+          "growth_pct": 32.48,
+          "rank": 4
+        },
+        {
+          "geo_id": "NO-4216",
+          "geo_name": "Birkenes",
+          "squeeze": 3.706,
+          "coverage": 27.5,
+          "growth_pct": 38.75,
+          "rank": 5
+        },
+        {
+          "geo_id": "NO-3028",
+          "geo_name": "Enebakk",
+          "squeeze": 3.428,
+          "coverage": 20.2,
+          "growth_pct": 25.26,
+          "rank": 6
+        },
+        {
+          "geo_id": "NO-1127",
+          "geo_name": "Randaberg",
+          "squeeze": 3.162,
+          "coverage": 25.6,
+          "growth_pct": 30.69,
+          "rank": 7
+        },
+        {
+          "geo_id": "NO-5417",
+          "geo_name": "Salangen",
+          "squeeze": 3.158,
+          "coverage": 22.6,
+          "growth_pct": 26.21,
+          "rank": 8
+        },
+        {
+          "geo_id": "NO-1114",
+          "geo_name": "Bjerkreim",
+          "squeeze": 3.045,
+          "coverage": 16.5,
+          "growth_pct": 16.09,
+          "rank": 9
+        },
+        {
+          "geo_id": "NO-3031",
+          "geo_name": "Nittedal",
+          "squeeze": 2.889,
+          "coverage": 23.0,
+          "growth_pct": 24.21,
+          "rank": 10
+        }
+      ]
+    },
+    "SE": {
+      "n_municipalities": 290,
+      "n_dropped": 0,
+      "coverage_median": 16.5,
+      "growth_median": 12.83,
+      "high_squeeze_share": 0.3138,
+      "age_cut": "80+",
+      "top_squeeze": [
+        {
+          "geo_id": "SE-0140",
+          "geo_name": "Nykvarn",
+          "squeeze": 5.356,
+          "coverage": 13.85,
+          "growth_pct": 52.57,
+          "rank": 1
+        },
+        {
+          "geo_id": "SE-0305",
+          "geo_name": "Håbo",
+          "squeeze": 4.969,
+          "coverage": 13.99,
+          "growth_pct": 49.53,
+          "rank": 2
+        },
+        {
+          "geo_id": "SE-0120",
+          "geo_name": "Värmdö",
+          "squeeze": 4.401,
+          "coverage": 13.47,
+          "growth_pct": 43.17,
+          "rank": 3
+        },
+        {
+          "geo_id": "SE-0187",
+          "geo_name": "Vaxholm",
+          "squeeze": 4.275,
+          "coverage": 14.78,
+          "growth_pct": 45.51,
+          "rank": 4
+        },
+        {
+          "geo_id": "SE-0488",
+          "geo_name": "Trosa",
+          "squeeze": 4.024,
+          "coverage": 14.81,
+          "growth_pct": 43.38,
+          "rank": 5
+        },
+        {
+          "geo_id": "SE-1230",
+          "geo_name": "Staffanstorp",
+          "squeeze": 3.583,
+          "coverage": 10.05,
+          "growth_pct": 26.98,
+          "rank": 6
+        },
+        {
+          "geo_id": "SE-1261",
+          "geo_name": "Kävlinge",
+          "squeeze": 3.17,
+          "coverage": 11.54,
+          "growth_pct": 27.28,
+          "rank": 7
+        },
+        {
+          "geo_id": "SE-1284",
+          "geo_name": "Höganäs",
+          "squeeze": 3.165,
+          "coverage": 11.1,
+          "growth_pct": 26.07,
+          "rank": 8
+        },
+        {
+          "geo_id": "SE-1489",
+          "geo_name": "Alingsås",
+          "squeeze": 3.009,
+          "coverage": 8.14,
+          "growth_pct": 16.92,
+          "rank": 9
+        },
+        {
+          "geo_id": "SE-0580",
+          "geo_name": "Linköping",
+          "squeeze": 2.953,
+          "coverage": 6.07,
+          "growth_pct": 10.97,
+          "rank": 10
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "lowest_high_squeeze_share_country": "NO"
+  },
+  "context": {
+    "kuhr_konsultasjoner_latest": 13431401,
+    "kuhr_konsultasjoner_change_pct": -7.0
+  }
+}

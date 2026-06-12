@@ -15,12 +15,18 @@ Some adapters add extra columns beyond the contract (noted below).
 ## pxweb (SSB; FOHM/DST share the shape)
 
 Required source fields: `base_url`, `table`. Optional: `query` (JSON-stat2 POST body),
-`cache_key` (overrides the default table-id key).
+`cache_key` (overrides the default table-id key), `use_codes` (bool, default false —
+emit dimension codes instead of labels), `label_columns` (bool, default false — when
+`use_codes` is true, also add `<dim>_label` columns alongside code columns).
 
 The adapter POSTs a JSON-stat2 query to `{base_url}/{table}` and parses the
 response into a DataFrame. Used for legacy v1 SSB sources (KOSTRA, population,
 projections). Does not emit the Nordic tidy contract — column names match the
 SSB dimension names from the raw response.
+
+**Note on `cache_key`:** tables with `/` in the path (SCB-style) and all
+explicit-query sources MUST set `cache_key` — slashes are rejected by the
+cache-key sanitizer.
 
 ---
 
@@ -142,6 +148,16 @@ varde = "value"
 institution = "Socialstyrelsen (Sverige)"
 url = "https://www.socialstyrelsen.se/statistik-och-data/oppna-data/"
 ```
+
+---
+
+## kolada — RKA, Sweden (municipal KPIs)
+
+Required: `kpi` (e.g. "N21704"), `years` (list). Optional: `gender` ("T"), `base_url`.
+API: `api.kolada.se/v3` — `/data/kpi/{kpi}/year/{year}` + `/municipality` (type K only;
+riket "0000" and regions excluded). Data origin: Socialstyrelsen/SCB official statistics
+republished per kommun by RKA. Used for SE elder-care because the sdb API has no
+äldreomsorg topic.
 
 ---
 

@@ -14,7 +14,9 @@ Hard constraints. Workspace-wide rules in `../CLAUDE.md` apply on top.
 - Ship `LIMITATIONS.md` («deskriptivt, ikke kausalt») and `COSTS.md` (cost per full run) from v0.1.
 - Python via `uv` only. Markdown scaffold until Oleksandr explicitly starts the build.
 - v2 generalization lives in THIS repo (core engine + `analyses/` instances) — no separate framework repo.
-- v2 first proof dataset: Nordic comparison (Sotkanet FI + Socialstyrelsen SE + KUHR NO) — not NHS EPD/BRFSS first.
+- v2 first proof dataset: Nordic comparison — Sotkanet (FI), Kolada/RKA (SE; Socialstyrelsen-data — sdb-API-et mangler äldreomsorg, verifisert 2026-06-12) + SCB, SSB/KUHR (NO). Not NHS EPD/BRFSS first.
+- Cross-country comparisons are within-country-normalized patterns only; never compare indicator levels across countries (different age cuts/definitions).
+- Kommune-merger lookup is generated from SSB KLASS (classification 131), never hand-written; splits excluded and documented.
 - Primary execution mode = subscription OAuth harnesses (Claude Code on Anthropic sub; Codex CLI on OpenAI sub).
   API-key (Anthropic/OpenAI/OpenRouter) and fully-local (LM Studio/Ollama via `ANTHROPIC_BASE_URL`) are
   config-swappable alternates; v1 ships a working local demo of ≥1 stage.

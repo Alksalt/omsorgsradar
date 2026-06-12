@@ -1,0 +1,454 @@
+{
+  "datasets": {
+    "no_kostra": {
+      "source": "generic",
+      "n_rows": 1782,
+      "missing_rates": {
+        "KOKkommuneregion0000": 0.0,
+        "ContentsCode": 0.0,
+        "Tid": 0.0,
+        "KOKkommuneregion0000_label": 0.0,
+        "ContentsCode_label": 0.0,
+        "Tid_label": 0.0,
+        "value": 0.5325
+      },
+      "year_range": null,
+      "n_geo": null,
+      "outliers": {
+        "value": {
+          "n_outliers": 1,
+          "lower_fence": 0.8,
+          "upper_fence": 63.1
+        }
+      },
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://data.ssb.no/api/v0/no/table"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Statistisk sentralbyrå (SSB)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "PASS",
+            "detail": "53.3% missing in value column"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=15.8 median=31.4 max=64.7"
+          }
+        ]
+      }
+    },
+    "no_befolkning": {
+      "source": "generic",
+      "n_rows": 99400,
+      "missing_rates": {
+        "Region": 0.0,
+        "Kjonn": 0.0,
+        "Alder": 0.0,
+        "ContentsCode": 0.0,
+        "Tid": 0.0,
+        "Region_label": 0.0,
+        "Kjonn_label": 0.0,
+        "Alder_label": 0.0,
+        "ContentsCode_label": 0.0,
+        "Tid_label": 0.0,
+        "value": 0.0
+      },
+      "year_range": null,
+      "n_geo": null,
+      "outliers": {
+        "value": {
+          "n_outliers": 17411,
+          "lower_fence": -3.0,
+          "upper_fence": 4.0
+        }
+      },
+      "realness": {
+        "verdict": "WARN",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://data.ssb.no/api/v0/no/table"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Statistisk sentralbyrå (SSB)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "WARN",
+            "detail": "0 missing values in 99,400 rows — implausibly perfect for real-world data (fabrication signature)"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=0 median=0 max=1.693e+04"
+          }
+        ]
+      }
+    },
+    "no_kuhr": {
+      "source": "generic",
+      "n_rows": 5748,
+      "missing_rates": {
+        "country": 0.0,
+        "geo_code": 0.0,
+        "geo_id": 0.0,
+        "knr_raw": 0.0,
+        "aar": 0.0,
+        "indicator": 0.0,
+        "fagomraade": 0.0,
+        "takstkode": 0.0,
+        "praksis_type_kode": 0.0,
+        "samhandler_praksis_type": 0.0,
+        "sum_antall_takst": 0.0,
+        "antall_regninger": 0.0,
+        "sum_refusjon": 0.0,
+        "sum_egenandel_betalt_av_pasient": 0.0,
+        "sum_egenandel_dekket_av_folketrygden": 0.0,
+        "value": 0.0
+      },
+      "year_range": [
+        2019,
+        2023
+      ],
+      "n_geo": 431,
+      "outliers": {
+        "value": {
+          "n_outliers": 545,
+          "lower_fence": -15671.25,
+          "upper_fence": 21861.0
+        }
+      },
+      "realness": {
+        "verdict": "WARN",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://opne-data-api.helserefusjon.no/v1"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Helsedirektoratet / NAV (helserefusjon, KUHR)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "WARN",
+            "detail": "0 missing values in 5,748 rows — implausibly perfect for real-world data (fabrication signature)"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=6 median=1714 max=1.742e+06"
+          }
+        ]
+      }
+    },
+    "se_hemtjanst": {
+      "source": "generic",
+      "n_rows": 290,
+      "missing_rates": {
+        "country": 0.0,
+        "geo_code": 0.0,
+        "geo_id": 0.0,
+        "geo_name": 0.0,
+        "aar": 0.0,
+        "indicator": 0.0,
+        "gender": 0.0,
+        "value": 0.0
+      },
+      "year_range": [
+        2023,
+        2023
+      ],
+      "n_geo": 290,
+      "outliers": {
+        "value": {
+          "n_outliers": 1,
+          "lower_fence": 3.43,
+          "upper_fence": 30.28
+        }
+      },
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://api.kolada.se/v3"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Kolada / RKA (Socialstyrelsen- og SCB-data per kommun)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "PASS",
+            "detail": "0.0% missing in value column"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=6.067 median=16.5 max=30.98"
+          }
+        ]
+      }
+    },
+    "se_befolkning": {
+      "source": "generic",
+      "n_rows": 13104,
+      "missing_rates": {
+        "Region": 0.0,
+        "Alder": 0.0,
+        "ContentsCode": 0.0,
+        "Tid": 0.0,
+        "Region_label": 0.0,
+        "Alder_label": 0.0,
+        "ContentsCode_label": 0.0,
+        "Tid_label": 0.0,
+        "value": 0.0
+      },
+      "year_range": null,
+      "n_geo": null,
+      "outliers": {
+        "value": {
+          "n_outliers": 984,
+          "lower_fence": -307.0,
+          "upper_fence": 442.0
+        }
+      },
+      "realness": {
+        "verdict": "WARN",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://api.scb.se/OV0104/v1/doris/sv/ssd/START/BE/BE0101/BE0101A"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Statistiska centralbyrån (SCB)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "WARN",
+            "detail": "0 missing values in 13,104 rows — implausibly perfect for real-world data (fabrication signature)"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=0 median=45 max=8.412e+04"
+          }
+        ]
+      }
+    },
+    "fi_homecare": {
+      "source": "generic",
+      "n_rows": 299,
+      "missing_rates": {
+        "country": 0.0,
+        "geo_code": 0.0,
+        "geo_id": 0.0,
+        "geo_name": 0.0,
+        "aar": 0.0,
+        "indicator": 0.0,
+        "gender": 0.0,
+        "value": 0.0
+      },
+      "year_range": [
+        2023,
+        2023
+      ],
+      "n_geo": 299,
+      "outliers": {
+        "value": {
+          "n_outliers": 1,
+          "lower_fence": -2.55,
+          "upper_fence": 33.5
+        }
+      },
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://sotkanet.fi/rest/1.1"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Terveyden ja hyvinvoinnin laitos (THL)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "PASS",
+            "detail": "0.0% missing in value column"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=4.3 median=15.2 max=35"
+          }
+        ]
+      }
+    },
+    "fi_elderly_share": {
+      "source": "generic",
+      "n_rows": 616,
+      "missing_rates": {
+        "country": 0.0,
+        "geo_code": 0.0,
+        "geo_id": 0.0,
+        "geo_name": 0.0,
+        "aar": 0.0,
+        "indicator": 0.0,
+        "gender": 0.0,
+        "value": 0.0
+      },
+      "year_range": [
+        2019,
+        2023
+      ],
+      "n_geo": 308,
+      "outliers": {
+        "value": {
+          "n_outliers": 0,
+          "lower_fence": -6.6,
+          "upper_fence": 33.48
+        }
+      },
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://sotkanet.fi/rest/1.1"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Terveyden ja hyvinvoinnin laitos (THL)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "PASS",
+            "detail": "0.0% missing in value column"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=4.2 median=13.5 max=23.9"
+          }
+        ]
+      }
+    },
+    "fi_population": {
+      "source": "generic",
+      "n_rows": 616,
+      "missing_rates": {
+        "country": 0.0,
+        "geo_code": 0.0,
+        "geo_id": 0.0,
+        "geo_name": 0.0,
+        "aar": 0.0,
+        "indicator": 0.0,
+        "gender": 0.0,
+        "value": 0.0
+      },
+      "year_range": [
+        2019,
+        2023
+      ],
+      "n_geo": 308,
+      "outliers": {
+        "value": {
+          "n_outliers": 39,
+          "lower_fence": -33774.75,
+          "upper_fence": 51203.5
+        }
+      },
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://sotkanet.fi/rest/1.1"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Terveyden ja hyvinvoinnin laitos (THL)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "PASS",
+            "detail": "0.0% missing in value column"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=88 median=6134 max=6.745e+05"
+          }
+        ]
+      }
+    }
+  }
+}

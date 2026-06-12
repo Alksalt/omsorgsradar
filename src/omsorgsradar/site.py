@@ -8,11 +8,13 @@ CI builds the site from committed artifacts only; it never runs the pipeline.
 """
 from __future__ import annotations
 
+import re
 import shutil
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import markdown as md
+import nh3
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 _TEMPLATES = Path(__file__).parent / "templates"
@@ -24,28 +26,100 @@ SITE_INTRO = (
     "(«tool receipts») før publisering."
 )
 
+# Allowed HTML tags and attributes for the nh3 sanitizer
+_ALLOWED_TAGS = {
+    "h1", "h2", "h3", "h4", "h5", "p", "ul", "ol", "li",
+    "table", "thead", "tbody", "tr", "th", "td",
+    "blockquote", "code", "pre", "em", "strong", "a", "img",
+    "hr", "br",
+}
+_ALLOWED_ATTRS = {"a": {"href"}, "img": {"src", "alt"}}
+_ALLOWED_URL_SCHEMES = {"https", "http"}
+
+# Card order for the index page: lower number = earlier in the list.
+# Unknown slugs sort last (fallback = 99), then alphabetically.
+_SLUG_PRIORITY: dict[str, int] = {
+    "omsorgsradar": 0,
+    "nordisk-omsorg": 1,
+    "brfss-demo": 2,
+}
+
+_MD_HEADING_RE = re.compile(r"^#{1,6}\s+")
+_MD_IMAGE_RE = re.compile(r"!\[.*?\]\(.*?\)")
+_MD_LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+_MD_BOLD_RE = re.compile(r"\*{1,2}([^*]*)\*{1,2}")
+
+
+def _first_paragraph(text: str, max_len: int = 160) -> str:
+    """Return the first non-empty, non-heading paragraph, stripped of markdown,
+    truncated to max_len characters."""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if _MD_HEADING_RE.match(stripped):
+            continue
+        # Strip images, links, bold/italic markers
+        stripped = _MD_IMAGE_RE.sub("", stripped)
+        stripped = _MD_LINK_RE.sub(r"\1", stripped)
+        stripped = _MD_BOLD_RE.sub(r"\1", stripped)
+        stripped = stripped.strip("*_ `").strip()
+        if not stripped:
+            continue
+        if len(stripped) > max_len:
+            stripped = stripped[:max_len].rsplit(" ", 1)[0] + "…"
+        return stripped
+    return ""
+
 
 @dataclass(frozen=True)
 class ReportDoc:
     slug: str
     title: str
+    summary: str
     md_path: Path
     figures_dir: Path | None
 
 
 def discover_reports(reports_dir: Path) -> list[ReportDoc]:
     """Find every `*_rapport.md` under reports_dir (recursive). Each report's
-    figures are the `figures/` dir SIBLING to its markdown file, if present."""
+    figures are the `figures/` dir SIBLING to its markdown file, if present.
+
+    DEFENSIVE: if more than one `*_rapport.md` shares the same parent dir,
+    no figures/ is attached to any of them — a shared figures/ must never
+    be cross-published to a sibling report's page.
+    """
     reports_dir = Path(reports_dir)
     docs: list[ReportDoc] = []
+
+    # Collect all report paths grouped by parent dir
+    by_parent: dict[Path, list[Path]] = {}
     for md_path in sorted(reports_dir.rglob(_REPORT_GLOB)):
-        slug = md_path.stem.replace("_rapport", "")
-        lines = md_path.read_text(encoding="utf-8").splitlines()
-        first_line = lines[0] if lines else slug
-        title = first_line.lstrip("# ").strip() or slug
-        fig = md_path.parent / "figures"
-        docs.append(ReportDoc(slug=slug, title=title, md_path=md_path,
-                              figures_dir=fig if fig.is_dir() else None))
+        by_parent.setdefault(md_path.parent, []).append(md_path)
+
+    for parent, paths in sorted(by_parent.items()):
+        # If multiple reports share a parent, figures/ is ambiguous — skip it for all
+        shared_parent = len(paths) > 1
+        fig_candidate = parent / "figures"
+        for md_path in paths:
+            slug = md_path.stem.replace("_rapport", "")
+            text = md_path.read_text(encoding="utf-8")
+            lines = text.splitlines()
+            first_line = lines[0] if lines else slug
+            title = first_line.lstrip("# ").strip() or slug
+            summary = _first_paragraph(text)
+            if shared_parent:
+                # Co-located reports: no figures to avoid cross-publishing
+                figures_dir = None
+            else:
+                figures_dir = fig_candidate if fig_candidate.is_dir() else None
+            docs.append(ReportDoc(
+                slug=slug,
+                title=title,
+                summary=summary,
+                md_path=md_path,
+                figures_dir=figures_dir,
+            ))
     return docs
 
 
@@ -68,11 +142,27 @@ def build_site(reports_dir: Path | str, out_dir: Path | str,
     for doc in docs:
         page_dir = out_dir / doc.slug
         page_dir.mkdir(parents=True, exist_ok=True)
-        html_body = converter.reset().convert(doc.md_path.read_text(encoding="utf-8"))
-        if doc.figures_dir:                       # copy ONLY png figures, nothing else
+
+        # Convert markdown → HTML → sanitize before rendering into template
+        raw_html = converter.reset().convert(doc.md_path.read_text(encoding="utf-8"))
+        html_body = nh3.clean(
+            raw_html,
+            tags=_ALLOWED_TAGS,
+            attributes=_ALLOWED_ATTRS,
+            url_schemes=_ALLOWED_URL_SCHEMES,
+        )
+
+        # Copy ONLY real PNG figures — skip symlinked dirs, symlinked files, non-PNG
+        if doc.figures_dir and not doc.figures_dir.is_symlink():
             (page_dir / "figures").mkdir(exist_ok=True)
             for png in sorted(doc.figures_dir.glob("*.png")):
+                if png.is_symlink() or not png.is_file():
+                    continue
+                with png.open("rb") as fh:
+                    if fh.read(8) != b"\x89PNG\r\n\x1a\n":
+                        continue
                 shutil.copy2(png, page_dir / "figures" / png.name)
+
         (page_dir / "index.html").write_text(
             env.get_template("report.html.j2").render(
                 title=doc.title, body=html_body, site_title=SITE_TITLE),
@@ -82,10 +172,19 @@ def build_site(reports_dir: Path | str, out_dir: Path | str,
     (out_dir / "static").mkdir(exist_ok=True)
     shutil.copy2(css_src, out_dir / "static" / "site.css")
 
+    # Sort analyses: known slugs first (by priority map), then alphabetical
+    def _sort_key(d: ReportDoc) -> tuple[int, str]:
+        return (_SLUG_PRIORITY.get(d.slug, 99), d.slug)
+
+    analyses = [
+        {"slug": d.slug, "title": d.title, "summary": d.summary}
+        for d in sorted(docs, key=_sort_key)
+    ]
+
     (out_dir / "index.html").write_text(
         env.get_template("index.html.j2").render(
             site_title=SITE_TITLE, intro=SITE_INTRO,
-            analyses=[{"slug": d.slug, "title": d.title} for d in docs],
+            analyses=analyses,
             marimo_embedded=marimo_embedded),
         encoding="utf-8")
     (out_dir / ".nojekyll").write_text("", encoding="utf-8")
@@ -95,18 +194,40 @@ def build_site(reports_dir: Path | str, out_dir: Path | str,
 def export_marimo(notebook: Path | str, out_dir: Path | str) -> Path:
     """Export a marimo notebook to WASM HTML under out_dir/explore/.
 
+    Runs from a clean temp dir containing ONLY a copy of the notebook so no
+    stray repo files (CLAUDE.md, etc.) are bundled into the export.
+
     Raises RuntimeError loudly if the export fails — a dead 'Utforsk' link
     must never be silently shipped.
     """
     import subprocess
+    import tempfile
+    import shutil as _sh
+
+    notebook = Path(notebook)
     target = Path(out_dir) / "explore"
     target.mkdir(parents=True, exist_ok=True)
-    res = subprocess.run(
-        ["marimo", "export", "html-wasm", str(notebook), "-o", str(target), "--mode", "run"],
-        capture_output=True, text=True)
+
+    with tempfile.TemporaryDirectory() as td:
+        nb_copy = Path(td) / notebook.name
+        _sh.copy2(notebook, nb_copy)
+        res = subprocess.run(
+            ["marimo", "export", "html-wasm", str(nb_copy), "-o", str(target), "--mode", "run"],
+            capture_output=True, text=True, cwd=td)
+
+    # Belt: drop any stray non-asset markdown the exporter may still bundle
+    for stray in ("CLAUDE.md", "AGENTS.md", "GEMINI.md"):
+        (target / stray).unlink(missing_ok=True)
+
     index = target / "index.html"
     if res.returncode != 0 or not index.exists():
         raise RuntimeError(f"marimo wasm export failed: {res.stderr or res.stdout}")
+
+    # Fix language attribute for Norwegian audience
+    html = index.read_text(encoding="utf-8")
+    html = html.replace('<html lang="en"', '<html lang="nb"', 1)
+    index.write_text(html, encoding="utf-8")
+
     return target
 
 
@@ -119,9 +240,13 @@ def main() -> None:
                    help="Path to a marimo notebook to export as WASM into out/explore/")
     args = p.parse_args()
     out = build_site(args.reports_dir, args.out,
-                     marimo_embedded=args.marimo is not None)
+                     marimo_embedded=bool(args.marimo))
     if args.marimo:
-        export_marimo(args.marimo, args.out)
+        try:
+            export_marimo(args.marimo, args.out)
+        except Exception:
+            shutil.rmtree(out, ignore_errors=True)
+            raise
     print(f"site built: {out} ({len(discover_reports(Path(args.reports_dir)))} analyses)")
 
 

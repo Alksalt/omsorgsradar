@@ -22,6 +22,7 @@
       {% for a in analyses %}
       <article class="card">
         <h2><a href="{{ a.slug }}/">{{ a.title }}</a></h2>
+        {% if a.summary %}<p class="card-desc">{{ a.summary }}</p>{% endif %}
       </article>
       {% endfor %}
     </section>

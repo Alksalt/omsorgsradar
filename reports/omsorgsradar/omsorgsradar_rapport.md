@@ -53,6 +53,8 @@ Høy indeks = rask vekst i eldre befolkning OG lav dekning av hjemmetjenester i 
 | 19 | Gran | 0.714 | 20 | 36.3% |
 | 20 | Sarpsborg | 0.708 | 20 | 36.3% |
 
+*Vekst 80+ bruker nasjonal framskrivingstakt for alle kommuner — kommunenivå-projeksjon er ikke tilgjengelig i datakilden (se forbehold).*
+
 ---
 
 ## Figurer
@@ -88,7 +90,7 @@ Høy indeks = rask vekst i eldre befolkning OG lav dekning av hjemmetjenester i 
 
 ## Begrensninger
 
-Se [`LIMITATIONS.md`](../LIMITATIONS.md) for fullstendig liste. Viktigste forbehold: analysen er deskriptiv, ikke kausal; kommunesammenslåingstabell dekker 2020-bølgen; framskrivinger er basert på nasjonal veksttakt, ikke kommunenivå-projeksjon.
+Se [LIMITATIONS.md](https://github.com/Alksalt/omsorgsradar/blob/main/LIMITATIONS.md) for fullstendig liste. Viktigste forbehold: analysen er deskriptiv, ikke kausal; kommunesammenslåingstabell dekker 2020-bølgen; framskrivinger er basert på nasjonal veksttakt, ikke kommunenivå-projeksjon.
 
 ## ML-analyse — XGBoost walk-forward CV
 
@@ -112,16 +114,7 @@ Se [`LIMITATIONS.md`](../LIMITATIONS.md) for fullstendig liste. Viktigste forbeh
 - `inst_per_1000_80plus`: mean |SHAP| = 0.3043
 
 **Merknader:**
-- TabPFN: TabPFN runtime error: TabPFN requires a one-time license acceptance to download
-model weights for local inference, but no interactive terminal
-is available.
-
-To authenticate in a non-interactive environment:
-  1. Open https://ux.priorlabs.ai in a browser and log in (or register)
-  2. Accept the license on the Licenses tab
-  3. Copy your API Key from https://ux.priorlabs.ai/account
-  4. Set the environment variable: export TABPFN_TOKEN="<your-api-key>"
-     or in Python (before calling .fit()): import os; os.environ["TABPFN_TOKEN"] = "<your-api-key>"
+- TabPFN-2.5: ikke kjørt (krever lisensregistrering hos PriorLabs) — XGBoost-resultatene presenteres alene.
 
 
 ---

@@ -37,7 +37,7 @@ is expected.
 
 1. Run the analysis pipeline locally:
    ```bash
-   uv run python -m omsorgsradar.pipeline --analysis <name>
+   uv run python -m omsorgsradar.pipeline analyses/<name>
    ```
 2. Commit the output artifacts:
    ```bash

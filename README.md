@@ -93,7 +93,7 @@ uv sync
 uv run python -m omsorgsradar.pipeline
 
 # Run a specific analysis by name (config in analyses/<name>/analysis.toml)
-uv run python -m omsorgsradar.pipeline --analysis nordisk-omsorg
+uv run python -m omsorgsradar.pipeline analyses/nordisk-omsorg
 
 # Run tests (fully offline, no API key needed)
 uv run pytest
@@ -105,11 +105,11 @@ uv run python -m omsorgsradar.site --reports-dir reports --out site
 ANTHROPIC_API_KEY=sk-... uv run python -m omsorgsradar.pipeline
 ```
 
-Output files (per analysis, under `reports/<name>/` or `reports/` for the default):
+Output files (per analysis, under `reports/<name>/`):
 - `*_rapport.md` — bokmål report
 - `figures/` — matplotlib figures
-- `analyses/<name>/data/findings.json` — structured analysis findings
-- `analyses/<name>/data/quality_profile.json` — data quality profile
+- `data/findings.json` — structured analysis findings (under `--data-dir`, default `data/`)
+- `data/quality_profile.json` — data quality profile (under `--data-dir`, default `data/`)
 
 ---
 

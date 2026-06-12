@@ -27,6 +27,9 @@ analyses/brfss-demo/microdata/*.XPT
 analyses/brfss-demo/microdata/LLCP*.csv
 analyses/brfss-demo/microdata/LLCP*.csv.zip
 
+# Site build output (CI-generated, not committed)
+site/
+
 # OS
 .DS_Store
 Thumbs.db

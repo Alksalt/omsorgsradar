@@ -230,3 +230,50 @@ class TestRegister:
         assert reg.get("verify") is mod.stage_verify_nordisk
         assert reg.get("report") is mod.stage_report_nordisk
         assert reg.get("ingest") is not None
+
+
+class TestNordiskE2E:
+    def test_full_offline_pipeline(self, tmp_path: Path) -> None:
+        import json as _json
+        import shutil
+
+        from omsorgsradar.pipeline import run_pipeline
+
+        data_dir = tmp_path / "data"
+        cache = data_dir / "cache"
+        cache.mkdir(parents=True)
+        fx = REPO / "tests" / "fixtures"
+        seeds = {
+            "nordisk_no_kostra_12209.json": "ssb_12209_g2_fixture.json",
+            "nordisk_no_befolkning_07459.json": "ssb_07459_g2_fixture.json",
+            "nordisk_se_befolkning.json": "scb_befolkning_fixture.json",
+            "sotkanet_regions.json": "sotkanet_regions_fixture.json",
+            "sotkanet_5513_2023_total.json": "sotkanet_5513_fixture.json",
+            "sotkanet_171_2019-2023_total.json": "sotkanet_171_fixture.json",
+            "sotkanet_127_2019-2023_total.json": "sotkanet_127_g2_fixture.json",
+            "kolada_municipalities.json": "kolada_municipalities_fixture.json",
+            "kolada_N21704_2023.json": "kolada_n21704_fixture.json",
+            "kuhr_LE_2019_2023_t2ad.json": "kuhr_le_2ad_g2_fixture.json",
+        }
+        for cache_name, fixture_name in seeds.items():
+            shutil.copy(fx / fixture_name, cache / cache_name)
+
+        report = run_pipeline(
+            REPO / "analyses" / "nordisk-omsorg",
+            data_dir=data_dir,
+            reports_dir=tmp_path / "reports",
+            runs_dir=tmp_path / "runs",
+        )
+        assert report is not None and report.exists()
+
+        v = _json.loads((data_dir / "verification.json").read_text(encoding="utf-8"))
+        assert v["verdict"] == "PASS" and v["failed"] == 0
+
+        q = _json.loads((data_dir / "quality_profile.json").read_text(encoding="utf-8"))
+        for sid in ("no_kostra", "se_hemtjanst", "fi_homecare"):
+            assert q["datasets"][sid]["realness"]["verdict"] in ("PASS", "WARN"), sid
+
+        run_files = list((tmp_path / "runs").glob("*/run.json"))
+        assert len(run_files) == 1
+        run = _json.loads(run_files[0].read_text(encoding="utf-8"))
+        assert run["status"] == "ok"

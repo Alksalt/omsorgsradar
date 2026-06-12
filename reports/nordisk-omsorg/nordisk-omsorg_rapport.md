@@ -8,29 +8,30 @@ og (3) en skvis-skår: z-skår for eldrevekst minus z-skår for dekning,
 normalisert **innen hvert land**. Høy skår = sterk aldring kombinert med lav
 dekning. Alle tall er beregnet av kode og kontrollregnet av en uavhengig
 verifiseringsmodul før denne rapporten ble generert
-(verifisering: 168/168 kontroller OK).
+(verifisering: 168/168 kontroller OK —
+én uavhengig omregning per rangert kommune pluss nasjonale aggregater per land).
 
 ## Funn per land
 
 ### Norge (aldersgrense 80+)
 
-344 kommuner i analysen (157 rader utelatt:
-manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **29.75 %**. Median vekst i
-eldre befolkning: **7.22 %**. Andel kommuner i
-høy-skvis-kvadranten: **0.3081**.
+346 kommuner i analysen (25 rader utelatt:
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **29.85 %**. Median vekst i
+eldre befolkning: **7.43 %**. Andel kommuner i
+høy-skvis-kvadranten: **0.3064**.
 
 | # | Kommune | Skvis | Dekning (%) | Eldrevekst (%) |
 |---|---------|-------|-------------|----------------|
-| 1 | Vestby (`NO-3019`) | 4.338 | 23.0 | 38.18 |
-| 2 | Austrheim (`NO-4632`) | 3.951 | 20.9 | 31.34 |
-| 3 | Frogn (`NO-3022`) | 3.824 | 19.8 | 28.48 |
-| 4 | Holtålen (`NO-5026`) | 3.808 | 22.6 | 32.48 |
-| 5 | Birkenes (`NO-4216`) | 3.706 | 27.5 | 38.75 |
-| 6 | Enebakk (`NO-3028`) | 3.428 | 20.2 | 25.26 |
-| 7 | Randaberg (`NO-1127`) | 3.162 | 25.6 | 30.69 |
-| 8 | Salangen (`NO-5417`) | 3.158 | 22.6 | 26.21 |
-| 9 | Bjerkreim (`NO-1114`) | 3.045 | 16.5 | 16.09 |
-| 10 | Nittedal (`NO-3031`) | 2.889 | 23.0 | 24.21 |
+| 1 | Vestby (`NO-3216`) | 4.35 | 23.0 | 38.18 |
+| 2 | Austrheim (`NO-4632`) | 3.963 | 20.9 | 31.34 |
+| 3 | Frogn (`NO-3214`) | 3.835 | 19.8 | 28.48 |
+| 4 | Holtålen (`NO-5026`) | 3.819 | 22.6 | 32.48 |
+| 5 | Birkenes (`NO-4216`) | 3.716 | 27.5 | 38.75 |
+| 6 | Enebakk (`NO-3220`) | 3.439 | 20.2 | 25.26 |
+| 7 | Randaberg (`NO-1127`) | 3.172 | 25.6 | 30.69 |
+| 8 | Salangen (`NO-5522`) | 3.168 | 22.6 | 26.21 |
+| 9 | Bjerkreim (`NO-1114`) | 3.056 | 16.5 | 16.09 |
+| 10 | Nittedal (`NO-3232`) | 2.899 | 23.0 | 24.21 |
 
 ### Sverige (aldersgrense 80+)
 
@@ -81,11 +82,11 @@ Vi sammenligner derfor bare *mønstre innen land*. Andelen kommuner i
 høy-skvis-kvadranten (eldrevekst over median OG dekning under median) er
 lavest i **Norge**.
 
-Kontekst (KUHR, åpne helserefusjonsdata): 13 431 401 fastlegekonsultasjoner (takst 2ad) i 2023, en endring på -7.0 % siden 2019.
+Kontekst (KUHR, åpne helserefusjonsdata): 13 431 401 fastlegekonsultasjoner (takst 2ad) i 2023, en endring på −7,0 % siden 2019. Fastlegekonsultasjonsvolum brukes her som kontekst-proxy for trykket på kommunal primærhelsetjeneste — nedgang kan reflektere økt kapasitet, men kan også gjenspeile endret behov eller rapporteringsendringer.
 
 ## Forbehold
 
-- Analysen er **deskriptivt, ikke kausalt** — rangerer og beskriver; forklarer ikke.
+- Analysen er **deskriptiv, ikke kausal** — rangerer og beskriver; forklarer ikke.
 - Aldersgrenser: NO/SE 80+, FI 75+. Definisjoner av hjemmetjeneste varierer.
 - Utelatte rader er talt opp per land (se tabellene); for Norge omfatter de
   både kommuner med supprimerte verdier og historiske kommunenummer fra

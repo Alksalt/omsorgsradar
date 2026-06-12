@@ -1,9 +1,9 @@
 {
   "artifact": "nordic_findings",
   "path": "data/nordisk-omsorg/nordic_findings.json",
-  "sha256": "073d3d3a153a2646bf90594aaa3f62f96447cc6a613b7b03354f188af66828e1",
+  "sha256": "f682bae6656852fc678e4320cd11543bdae65bb4cc4f84d919cd89cb4547123d",
   "schema_version": "1",
-  "created_at": "2026-06-12T07:49:35.115381+00:00",
+  "created_at": "2026-06-12T17:24:18.800586+00:00",
   "producer": "analyze",
   "inputs": [
     "data/nordisk-omsorg/nordic_table.csv"

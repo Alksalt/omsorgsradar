@@ -95,17 +95,17 @@
       ]
     },
     "NO": {
-      "n_municipalities": 344,
-      "n_dropped": 157,
-      "coverage_median": 29.75,
-      "growth_median": 7.22,
-      "high_squeeze_share": 0.3081,
+      "n_municipalities": 346,
+      "n_dropped": 25,
+      "coverage_median": 29.85,
+      "growth_median": 7.43,
+      "high_squeeze_share": 0.3064,
       "age_cut": "80+",
       "top_squeeze": [
         {
-          "geo_id": "NO-3019",
+          "geo_id": "NO-3216",
           "geo_name": "Vestby",
-          "squeeze": 4.338,
+          "squeeze": 4.35,
           "coverage": 23.0,
           "growth_pct": 38.18,
           "rank": 1
@@ -113,15 +113,15 @@
         {
           "geo_id": "NO-4632",
           "geo_name": "Austrheim",
-          "squeeze": 3.951,
+          "squeeze": 3.963,
           "coverage": 20.9,
           "growth_pct": 31.34,
           "rank": 2
         },
         {
-          "geo_id": "NO-3022",
+          "geo_id": "NO-3214",
           "geo_name": "Frogn",
-          "squeeze": 3.824,
+          "squeeze": 3.835,
           "coverage": 19.8,
           "growth_pct": 28.48,
           "rank": 3
@@ -129,7 +129,7 @@
         {
           "geo_id": "NO-5026",
           "geo_name": "Holtålen",
-          "squeeze": 3.808,
+          "squeeze": 3.819,
           "coverage": 22.6,
           "growth_pct": 32.48,
           "rank": 4
@@ -137,15 +137,15 @@
         {
           "geo_id": "NO-4216",
           "geo_name": "Birkenes",
-          "squeeze": 3.706,
+          "squeeze": 3.716,
           "coverage": 27.5,
           "growth_pct": 38.75,
           "rank": 5
         },
         {
-          "geo_id": "NO-3028",
+          "geo_id": "NO-3220",
           "geo_name": "Enebakk",
-          "squeeze": 3.428,
+          "squeeze": 3.439,
           "coverage": 20.2,
           "growth_pct": 25.26,
           "rank": 6
@@ -153,15 +153,15 @@
         {
           "geo_id": "NO-1127",
           "geo_name": "Randaberg",
-          "squeeze": 3.162,
+          "squeeze": 3.172,
           "coverage": 25.6,
           "growth_pct": 30.69,
           "rank": 7
         },
         {
-          "geo_id": "NO-5417",
+          "geo_id": "NO-5522",
           "geo_name": "Salangen",
-          "squeeze": 3.158,
+          "squeeze": 3.168,
           "coverage": 22.6,
           "growth_pct": 26.21,
           "rank": 8
@@ -169,15 +169,15 @@
         {
           "geo_id": "NO-1114",
           "geo_name": "Bjerkreim",
-          "squeeze": 3.045,
+          "squeeze": 3.056,
           "coverage": 16.5,
           "growth_pct": 16.09,
           "rank": 9
         },
         {
-          "geo_id": "NO-3031",
+          "geo_id": "NO-3232",
           "geo_name": "Nittedal",
-          "squeeze": 2.889,
+          "squeeze": 2.899,
           "coverage": 23.0,
           "growth_pct": 24.21,
           "rank": 10

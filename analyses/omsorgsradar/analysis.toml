@@ -28,7 +28,13 @@ table = "07459"
 adapter = "pxweb"
 id = "framskrivinger"
 base_url = "https://data.ssb.no/api/v0/no/table"
-table = "12880"
+# 13599: Framskrevet folkemengde etter kjønn, alder, framskrivingsalternativ —
+# national 1-year-age projection reaching 2100. fetch_population_projections
+# selects 80+ × main alternative (MMM) × years ≤ 2035 to derive the national
+# 80+ growth (stored as ssb_projection_growth_2035). The previous value (12880)
+# was the macroeconomic-accounts table — no age dimension, ends 2029 — so the
+# projection rate was never derivable (Finding 3 / docs/api_drift.md).
+table = "13599"
 
 [[sources]]
 adapter = "fhi"

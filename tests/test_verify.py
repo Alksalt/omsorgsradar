@@ -272,6 +272,111 @@ class TestStructuralDbCheck:
         assert "3011" in cr.message
 
 
+def _seed_multiyear_befolkning_db(db_path: Path) -> None:
+    """Befolkning table with a 7-year 80+ window for two living kommuner, so the
+    per-kommune CAGR path (growth_source='kommune') fires in run_analysis and the
+    DB-receipt recompute has a real series to check against. Latest year 2026."""
+    from omsorgsradar.ingest import save_to_duckdb
+
+    rows = []
+    for i, aar in enumerate(range(2020, 2027)):  # 2020..2026 → 6-year window
+        # 0301 grows ~3%/yr (plausible → kommune CAGR accepted)
+        rows.append({"knr": "0301", "knr_raw": "0301", "knr_name": "Oslo",
+                     "alder": "80 år", "aar": aar, "value": 1000.0 * (1.03 ** i)})
+        # 1103 grows ~2%/yr
+        rows.append({"knr": "1103", "knr_raw": "1103", "knr_name": "Stavanger",
+                     "alder": "80 år", "aar": aar, "value": 500.0 * (1.02 ** i)})
+    save_to_duckdb(pd.DataFrame(rows), "befolkning", db_path=db_path)
+
+
+def _kostra_for(knrs: list[str]) -> pd.DataFrame:
+    """Minimal KOSTRA coverage so the kommuner get a computable press index."""
+    rows = []
+    for k in knrs:
+        rows.append({"knr": k, "knr_name": k, "aar": 2025,
+                     "ContentsCode": "KOShjtj80aarover0001", "value": 20.0})
+        rows.append({"knr": k, "knr_name": k, "aar": 2025,
+                     "ContentsCode": "KOSsykhjand80aar0000", "value": 5.0})
+    return pd.DataFrame(rows)
+
+
+class TestIndependentDbReceipts:
+    """Finding 1: receipts that load findings.json FROM DISK and recompute from
+    DuckDB — a corrupted on-disk findings file must FAIL them."""
+
+    def _build_run(self, tmp_path: Path):
+        from omsorgsradar.analyze import run_analysis, save_findings
+        from omsorgsradar.ingest import load_from_duckdb
+
+        db = tmp_path / "befolkning.duckdb"
+        _seed_multiyear_befolkning_db(db)
+        df_pop = load_from_duckdb("befolkning", db_path=db)
+        df_kostra = _kostra_for(["0301", "1103"])
+        result = run_analysis(df_kostra, df_pop)
+        findings = tmp_path / "findings.json"
+        save_findings(result, path=findings)
+        return result, findings, db
+
+    def test_green_path_passes(self, tmp_path: Path) -> None:
+        """Untouched findings.json passes every DB receipt."""
+        from omsorgsradar.verify import independent_db_receipts
+
+        result, findings, db = self._build_run(tmp_path)
+        receipts = independent_db_receipts(findings, db)
+        assert receipts, "expected at least the national receipt"
+        assert all(r.passes for r in receipts), (
+            "green path failed: " + "; ".join(r.message for r in receipts if not r.passes)
+        )
+        # The national-total receipt must be present and passing.
+        nat = [r for r in receipts if r.claim.claim_type == "db_national_80plus_latest"]
+        assert nat and nat[0].passes
+
+    def test_corrupted_national_total_fails(self, tmp_path: Path) -> None:
+        """Tampering with national_80plus_latest on disk fails the DB receipt."""
+        import json
+        from omsorgsradar.verify import independent_db_receipts
+
+        result, findings, db = self._build_run(tmp_path)
+        d = json.loads(findings.read_text(encoding="utf-8"))
+        d["national_80plus_latest"] = float(d["national_80plus_latest"]) * 1.5  # +50%
+        findings.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+
+        receipts = independent_db_receipts(findings, db)
+        nat = [r for r in receipts if r.claim.claim_type == "db_national_80plus_latest"]
+        assert nat, "national receipt missing"
+        assert not nat[0].passes, "corrupted national total must FAIL the DB receipt"
+
+    def test_corrupted_kommune_growth_fails(self, tmp_path: Path) -> None:
+        """Inflating one kommune's growth by +5pp on disk fails its DB receipt."""
+        import json
+        from omsorgsradar.verify import independent_db_receipts
+
+        result, findings, db = self._build_run(tmp_path)
+        d = json.loads(findings.read_text(encoding="utf-8"))
+        # Corrupt the rank-1 kommune-source row by +5 percentage points.
+        target = next(
+            km for km in d["kommuner"]
+            if km["rank"] == 1 and km.get("growth_source") == "kommune"
+        )
+        target["pop_80plus_growth_pct"] = float(target["pop_80plus_growth_pct"]) + 5.0
+        findings.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+
+        receipts = independent_db_receipts(findings, db)
+        growth = [
+            r for r in receipts
+            if r.claim.claim_type == "db_kommune_growth"
+            and r.claim.parameters.get("knr") == target["knr"]
+        ]
+        assert growth, "no growth receipt for the corrupted kommune"
+        assert not growth[0].passes, "inflated kommune growth must FAIL the DB receipt"
+
+    def test_missing_inputs_return_empty(self, tmp_path: Path) -> None:
+        """No findings / no DB → empty receipt list (inconclusive, not a crash)."""
+        from omsorgsradar.verify import independent_db_receipts
+
+        assert independent_db_receipts(tmp_path / "nope.json", tmp_path / "nope.duckdb") == []
+
+
 class TestBuildStandardClaims:
     """Tests for the standard claim builder."""
 

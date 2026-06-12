@@ -235,6 +235,148 @@ class TestRankingOnlyLivingKommuner:
         assert ranks == list(range(1, len(ranks) + 1)), f"non-contiguous ranks: {ranks}"
 
 
+class TestRankOnlyComputablePressIndex:
+    """Finding 2: living kommuner with non-computable press_index (NaN coverage
+    → NaN press_index_norm) must NOT be ranked — they get rank 0 (retained,
+    unranked), like dead codes. Contradicts the old behaviour where a living
+    kommune with NaN press still held a rank."""
+
+    def _pop_two_living(self) -> pd.DataFrame:
+        rows = []
+        for aar in (2022, 2023, 2024):
+            rows.append({"knr": "0301", "knr_raw": "0301", "alder": "080",
+                         "aar": aar, "value": 1000.0 + (aar - 2022) * 50})
+            rows.append({"knr": "1151", "knr_raw": "1151", "alder": "080",
+                         "aar": aar, "value": 50.0 + (aar - 2022) * 2})
+        return pd.DataFrame(rows)
+
+    def test_living_kommune_with_nan_coverage_gets_rank_zero(self) -> None:
+        """A living kommune whose press_index is NaN (no KOSTRA coverage) is
+        retained but unranked (rank 0)."""
+        df_pop = self._pop_two_living()
+        # KOSTRA covers only 0301 → 1151 has NaN coverage → NaN press_index.
+        df_kostra = pd.DataFrame({
+            "knr": ["0301", "0301"],
+            "knr_name": ["Oslo", "Oslo"],
+            "aar": [2024, 2024],
+            "ContentsCode": ["KOShjtj80aarover0001", "KOSsykhjand80aar0000"],
+            "value": [20.0, 5.0],
+        })
+        result = run_analysis(df_kostra, df_pop)
+        by_knr = {km.knr: km for km in result.kommuner}
+        assert "1151" in by_knr, "living-but-uncovered kommune must remain in findings"
+        assert np.isnan(by_knr["1151"].press_index_norm), "precondition: NaN press"
+        assert by_knr["1151"].rank == 0, (
+            f"living kommune with NaN press_index must be unranked (rank 0), "
+            f"got {by_knr['1151'].rank}"
+        )
+
+    def test_no_ranked_kommune_has_nan_press_index(self) -> None:
+        """Invariant: every ranked kommune has a computable press_index_norm."""
+        df_pop = self._pop_two_living()
+        df_kostra = pd.DataFrame({
+            "knr": ["0301", "0301"],
+            "knr_name": ["Oslo", "Oslo"],
+            "aar": [2024, 2024],
+            "ContentsCode": ["KOShjtj80aarover0001", "KOSsykhjand80aar0000"],
+            "value": [20.0, 5.0],
+        })
+        result = run_analysis(df_kostra, df_pop)
+        for km in result.kommuner:
+            if km.rank >= 1:
+                assert not np.isnan(km.press_index_norm), (
+                    f"ranked knr {km.knr} has NaN press_index_norm"
+                )
+
+
+class TestNameLookupLatestYear:
+    """Finding 4: terminal codes must carry the LATEST-year name, not an
+    arbitrary (often predecessor) KOSTRA label kept by drop_duplicates()."""
+
+    def test_latest_year_label_wins(self) -> None:
+        """knr 5055 with year-2019 label 'Hemne' and year-2025 label 'Heim'
+        resolves to 'Heim' (the latest-year name)."""
+        from omsorgsradar.analyze import _build_name_lookup
+        df = pd.DataFrame({
+            "knr": ["5055", "5055", "5055"],
+            "knr_name": ["Hemne", "Hemne", "Heim"],
+            "aar": [2018, 2019, 2025],
+        })
+        lookup = _build_name_lookup(df)
+        assert lookup["5055"] == "Heim", f"expected Heim, got {lookup['5055']}"
+
+    def test_terminal_name_preferred_over_suffixed_predecessors(self) -> None:
+        """Real KOSTRA shape: normalize_knr_series collapses several historical
+        codes onto one terminal knr, so EVERY year carries both the current
+        (un-suffixed) terminal label and suffixed predecessor labels. The
+        terminal name must win even when a predecessor label is alphabetically
+        or positionally 'last'. knr 5055 → Heim (not Hemne/Halsa)."""
+        from omsorgsradar.analyze import _build_name_lookup
+        rows = []
+        for aar in (2015, 2024, 2025):
+            rows.append({"knr": "5055", "knr_name": "Heim", "aar": aar})
+            rows.append({"knr": "5055", "knr_name": "Hemne (-2017)", "aar": aar})
+            rows.append({"knr": "5055", "knr_name": "Hemne (2018-2019)", "aar": aar})
+            rows.append({"knr": "5055", "knr_name": "Halsa (-2019)", "aar": aar})
+        df = pd.DataFrame(rows)
+        lookup = _build_name_lookup(df)
+        assert lookup["5055"] == "Heim", f"expected Heim, got {lookup['5055']}"
+
+    def test_only_suffixed_labels_fall_back_to_latest(self) -> None:
+        """A pure historical code with only suffixed labels keeps its latest-year
+        label (suffix stripped) rather than dropping out."""
+        from omsorgsradar.analyze import _build_name_lookup
+        df = pd.DataFrame({
+            "knr": ["3011", "3011"],
+            "knr_name": ["Hvaler (-2019)", "Hvaler (2020-2023)"],
+            "aar": [2019, 2023],
+        })
+        lookup = _build_name_lookup(df)
+        assert lookup["3011"] == "Hvaler"
+
+    def test_latest_year_label_with_suffix_strip(self) -> None:
+        """Latest-year selection composes with the SSB validity-suffix strip."""
+        from omsorgsradar.analyze import _build_name_lookup
+        df = pd.DataFrame({
+            "knr": ["5059", "5059"],
+            "knr_name": ["Orkdal (-2019)", "Orkland"],
+            "aar": [2019, 2025],
+        })
+        lookup = _build_name_lookup(df)
+        assert lookup["5059"] == "Orkland"
+
+    def test_no_year_column_falls_back_to_drop_duplicates(self) -> None:
+        """Without an 'aar' column the lookup still works (legacy frames)."""
+        from omsorgsradar.analyze import _build_name_lookup
+        df = pd.DataFrame({
+            "knr": ["1818"],
+            "knr_name": ["Herøy (Nordland)"],
+        })
+        lookup = _build_name_lookup(df)
+        assert lookup["1818"] == "Herøy (Nordland)"
+
+
+class TestLoadFindingsRoundTrip:
+    """Finding 6: load_findings must preserve growth_method (Finding 1 makes
+    load_findings load-bearing)."""
+
+    def test_growth_method_round_trips(self, tmp_path: Path) -> None:
+        from omsorgsradar.analyze import load_findings, save_findings
+        result = AnalysisResult(
+            kommuner=[KommuneMetrics(knr="0301", navn="Oslo", rank=1,
+                                     press_index_norm=1.0)],
+            national_80plus_latest=1000.0,
+            national_80plus_2035=1300.0,
+            national_growth_rate_2035=30.0,
+            analysis_year_range=(2017, 2026),
+            growth_method="kommune for 354 of 480",
+        )
+        path = tmp_path / "findings.json"
+        save_findings(result, path=path)
+        loaded = load_findings(path)
+        assert loaded.growth_method == "kommune for 354 of 480"
+
+
 class TestNoMisleadingPopTotalField:
     """Bug-4 regression: the mislabeled pop_total_latest field is removed."""
 

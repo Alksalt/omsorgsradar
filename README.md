@@ -42,7 +42,7 @@ flowchart TD
     ENG --> D[(DuckDB per analysis)]
     D --> E[profile\nData quality audit]
     D --> F[analyze\nPress index · findings JSON]
-    F --> G[verify\nTool receipts — recomputes every claim]
+    F --> G[verify\nTool receipts — narration fidelity\n+ independent DuckDB recompute]
     G --> H[report\nBokmål markdown + matplotlib figures]
     F --> I[ml\nXGBoost walk-forward CV\nSHAP importance · naive baseline]
     F --> AN[anonymize (opt.)\nk-anonymity + measured residual-risk receipt]
@@ -51,7 +51,7 @@ flowchart TD
     J --> SITE[omsorgsradar.site\nGitHub Pages]
 ```
 
-**Key design choice:** the LLM *narrates*, never *calculates*. Every statistic is computed by deterministic Python code; the verifier module recomputes every claim in the narrative from the structured findings JSON. This "tool receipts" pattern is the portfolio differentiator.
+**Key design choice:** the LLM *narrates*, never *calculates*. Every statistic is computed by deterministic Python code; the verifier runs two layers of checks. **(1) Narration-fidelity:** each numeric claim in the narrative is recomputed from the structured findings JSON, so a hallucinated number in the report is caught. **(2) Independent DB receipts:** the verifier reloads `findings.json` *from disk* and recomputes its key numbers *straight from the DuckDB `befolkning` table* — the national 80+ living-set total and a deterministic sample of per-municipality growth rates (top-10 ranked + every 25th) — with no call to the analysis code. A corrupted `findings.json` therefore fails verification and aborts the pipeline before any report is written. This "tool receipts" pattern is the portfolio differentiator.
 
 ---
 
@@ -62,7 +62,7 @@ flowchart TD
 | P0 Ingest | `ingest.py` | SSB + FHI fetch, kommune merger normalization, DuckDB persistence |
 | P0 Profile | `profile.py` | Data quality audit → `data/quality_profile.json` |
 | P1 Analysis | `analyze.py` | 80+ projections, coverage rates, press index → `data/findings.json` |
-| P2 Verify | `verify.py` | Recomputes every claimed statistic ("tool receipts") |
+| P2 Verify | `verify.py` | Narration-fidelity recompute (claims vs findings) + independent DuckDB receipts (national 80+ total, sampled per-municipality growth, ranked⊆living) — corrupted `findings.json` aborts the run |
 | P3 Report | `report.py` + `maps.py` | Bokmål markdown + matplotlib figures + press-index choropleth (committed Kartverket-derived boundaries, no GIS deps) |
 | P4 ML | `ml.py` | XGBoost walk-forward CV + SHAP + naive baseline |
 | Anonymize (opt.) | `core/anonymize/` | Microdata → PII-redaction + k-anonymity + **measured residual-risk receipt** (EU WP216: singling-out / linkability / inference) |
@@ -127,7 +127,9 @@ Generated automatically by `profile.py` on the live SSB data.
 ### befolkning (population 80+)
 - Source: SSB table 07459 — folkemengde etter alder
 - Rows: 237,750
-- Municipalities: 483 code rows (357 current kommuner + historical codes, kept but never ranked)
+- Municipalities: 483 code rows (357 current kommuner + historical codes; historical codes are
+  kept for provenance but never ranked, and 3 current kommuner without computable KOSTRA coverage
+  are also unranked → **354 ranked**)
 - Year range: 2017–2026
 - Age groups: 80–104 år (1-year classes)
 
@@ -138,8 +140,9 @@ and the 2024 county-reshuffle renumberings (e.g. Viken 30xx → 31xx/32xx/33xx),
 **transitively to terminal codes** (old Hvaler 0111 → 3011 → maps directly to 3110, so each
 municipality has one contiguous time series). Genuine splits are excluded by design (1507 Ålesund
 → 1508 + 1580, 1850 Tysfjord, 5012 Snillfjord) — their pre-split history cannot be attributed
-unambiguously. Only municipalities alive in the latest data year are ranked; an independent
-structural check in the verifier enforces this on every run.
+unambiguously. Only municipalities alive in the latest data year **and with a computable press
+index** are ranked; independent DuckDB checks in the verifier (ranked⊆living, recomputed national
+80+ total, sampled per-municipality growth) enforce this on every run.
 
 ---
 
@@ -149,11 +152,14 @@ Based on KOSTRA 2025 + SSB population 2026, with the KLASS-corrected merger tabl
 per-municipality growth rates (earlier published numbers used a flawed hand-written merger
 table and a uniform national growth rate — superseded by this run):
 
-- **357 municipalities** ranked by press index (historical code rows excluded from ranking)
-- **National 80+ population**: ~285,000 today → ~373,000 in 2035 (**+30.9%**) if each
+- **354 municipalities** ranked by press index (historical code rows AND living municipalities
+  without computable KOSTRA coverage excluded from ranking — only municipalities with a real
+  press index are ranked)
+- **National 80+ population**: ~285,000 today → ~373,000 in 2035 (**+31.1%**) if each
   municipality's 2017–2026 trend continues. This is a trend extrapolation, not an official SSB
-  projection — SSB's main alternative implies faster 80+ growth as the post-war cohorts age in
-  (see LIMITATIONS)
+  projection — **SSB's main alternative (table 13599, alternative MMM) implies ~46% growth for
+  80+ over 2026→2035**, materially faster, as the post-war cohorts age in. The trend method is a
+  lower planning bound; both numbers are reported (see LIMITATIONS)
 - **Highest press**: Frogn, Vestby, Lørenskog, Hvaler — the Oslo-belt commuter municipalities,
   where the 80+ population is growing fastest (+68–117% by 2035 on current trends) while
   home-care coverage is among the lowest (~17–22% of 80+ receiving services). The squeeze is
@@ -189,7 +195,10 @@ Documented in [`docs/api_drift.md`](docs/api_drift.md). Key findings:
 - SSB table 13873 (municipality projections) is **not accessible to anonymous API callers**
   (confirmed 2026-06-12 against both PxWeb v0 and v2; a nonexistent table gives the same error
   class). Per-municipality growth therefore uses historical trend extrapolation from table 07459
-  with robustness guards; national projections (table 12880) provide the fallback rate
+  with robustness guards; SSB's **national main-alternative projection (table 13599, age 80+ ×
+  MMM)** provides the fallback rate and the cited SSB-projection comparison (table 12880 was
+  previously — wrongly — configured here; it is the macroeconomic-accounts table with no age
+  dimension. Fixed 2026-06-12, see `docs/api_drift.md`)
 - FHI NOKKEL indicator endpoint returns 404 (re-checked 2026-06-12; no working replacement
   found — `statistikk.fhi.no` is a frontend without a public REST API). FHI data is excluded
 - KOSTRA 12209 region variable code is `KOKkommuneregion0000` (not `Region`) — discovered at runtime

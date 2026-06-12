@@ -92,6 +92,7 @@ def stage_verify(ctx: StageContext) -> None:
     from .verify import (
         Verifier,
         build_standard_claims,
+        independent_db_receipts,
         verify_ranked_knrs_exist_in_db,
     )
 
@@ -99,11 +100,39 @@ def stage_verify(ctx: StageContext) -> None:
     claims = build_standard_claims(result)
     vreport = Verifier(result).verify_all(claims)
 
+    # ── Independent DB receipts (Finding 1) ──────────────────────────────────
+    # The Verifier claims above are narration-fidelity checks: every claim is
+    # derived from the same in-memory AnalysisResult it is compared against, so
+    # they verify report↔findings fidelity, NOT that findings.json itself is
+    # correct. The receipts below load findings.json FROM DISK and recompute its
+    # numbers straight from the DuckDB befolkning table (no analyze call), so a
+    # corrupted on-disk findings file FAILS here and aborts the pipeline.
+    db_path = ctx.artifacts.get("duckdb")
+    findings_path = ctx.artifacts.get("findings")
+    structural: list[str] = []
+    if db_path is not None and findings_path is not None:
+        receipts = independent_db_receipts(
+            findings_path, db_path, params=ctx.config.params
+        )
+        for cr in receipts:
+            vreport.total_claims += 1
+            if cr.passes:
+                vreport.passed += 1
+            else:
+                vreport.failed += 1
+                vreport.verdict = "FAIL"
+                structural.append(cr.message)
+            logger.info("DB receipt (%s): %s", cr.claim.claim_type, cr.message)
+        if not receipts:
+            logger.warning(
+                "Independent DB receipts produced no checks (missing/empty "
+                "findings or befolkning table) — only narration-fidelity and "
+                "structural checks ran"
+            )
+
     # Structural gate (independent of analyze internals): every ranked knr must
     # be a kommune alive in the latest befolkning year, recomputed from DuckDB.
     # Catches dead/defunct codes leaking into the ranking forever.
-    db_path = ctx.artifacts.get("duckdb")
-    structural: list[str] = []
     if db_path is not None:
         cr = verify_ranked_knrs_exist_in_db(result, db_path)
         vreport.total_claims += 1

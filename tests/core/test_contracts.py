@@ -38,6 +38,45 @@ class TestManifest:
         artifact.write_text('{"hello": 2}', encoding="utf-8")
         assert sha256_of(artifact) != h1
 
+    def test_absolute_path_inside_repo_is_relativized(self) -> None:
+        """Finding 5: an absolute artifact path inside the repo must be stored
+        repo-relative — committed manifests must not leak /Users/... local
+        paths. The omsorgsradar top-level passes absolute paths; the manifest
+        on disk must carry neither a leading '/' nor a '/Users/' segment."""
+        from omsorgsradar.core.contracts import REPO_ROOT, read_manifest
+
+        data_dir = REPO_ROOT / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        art = data_dir / "_finding5_probe.json"
+        art.write_text('{"probe": 1}', encoding="utf-8")
+        try:
+            inp = REPO_ROOT / "data" / "quality_profile.json"
+            write_manifest(
+                art, artifact="findings", producer="analyze", inputs=[str(inp)]
+            )
+            m = read_manifest(art)
+            assert not m.path.startswith("/"), f"leaked absolute path: {m.path}"
+            assert "/Users/" not in m.path, f"leaked user path: {m.path}"
+            assert m.path == "data/_finding5_probe.json", m.path
+            for i in m.inputs:
+                assert not i.startswith("/") and "/Users/" not in i, i
+            assert m.inputs == ["data/quality_profile.json"], m.inputs
+        finally:
+            art.unlink(missing_ok=True)
+            (art.with_name(art.name + ".manifest.json")).unlink(missing_ok=True)
+
+    def test_path_outside_repo_falls_back_to_basename(self, tmp_path: Path) -> None:
+        """An artifact path outside the repo root (no relative_to) falls back to
+        the basename, never leaking the absolute directory."""
+        from omsorgsradar.core.contracts import read_manifest
+
+        art = tmp_path / "outside.json"
+        art.write_text('{"x": 1}', encoding="utf-8")
+        write_manifest(art, artifact="findings", producer="analyze")
+        m = read_manifest(art)
+        assert m.path == "outside.json", m.path
+        assert "/Users/" not in m.path
+
 
 VALID_FINDINGS = {
     "kommuner": [

@@ -540,3 +540,258 @@ def verify_ranked_knrs_exist_in_db(
                  f"(dead/defunct codes ranked): {dead_ranked}"
         ),
     )
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Independent DB receipts (Finding 1) — recompute from DuckDB, compare to the
+# findings JSON ON DISK. These do NOT call any analyze function and do NOT use
+# the in-memory AnalysisResult, so a corrupted findings.json cannot pass.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Sampling for the per-kommune growth receipt: top-N ranked + every STEP-th
+# ranked knr. Deterministic, so the receipt set is reproducible run to run.
+RECEIPT_SAMPLE_TOP_N = 10
+RECEIPT_SAMPLE_STEP = 25
+# Growth comparison tolerance (percentage points). The recompute mirrors the
+# documented method exactly, so this is tight — it only absorbs float rounding
+# and the JSON round-trip, not method drift.
+RECEIPT_GROWTH_ABS_TOL_PP = 0.5
+# National-total comparison tolerance (relative).
+RECEIPT_NATIONAL_REL_TOL = 0.001
+
+
+def _read_befolkning_80plus(db_path: Path | str, table: str = "befolkning") -> pd.DataFrame:
+    """Read the persisted befolkning table and return tidy 80+ rows
+    (``knr``, ``aar``, ``pop_80plus``) — one row per (knr, year), zero-count
+    years dropped. Independent re-derivation of analyze's all-years 80+ frame,
+    written inline here so the receipt does not import analyze internals.
+    Returns an empty frame if the table is missing/empty.
+    """
+    import duckdb
+
+    db_path = Path(db_path)
+    if not db_path.exists():
+        return pd.DataFrame(columns=["knr", "aar", "pop_80plus"])
+    con = duckdb.connect(str(db_path), read_only=True)
+    try:
+        df = con.execute(f"SELECT knr, alder, aar, value FROM {table}").df()  # noqa: S608
+    except Exception as exc:
+        logger.warning("Could not read %s from %s: %s", table, db_path, exc)
+        return pd.DataFrame(columns=["knr", "aar", "pop_80plus"])
+    finally:
+        con.close()
+    if df.empty:
+        return pd.DataFrame(columns=["knr", "aar", "pop_80plus"])
+    df = df.copy()
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+    df["aar"] = pd.to_numeric(df["aar"], errors="coerce")
+    df["age_int"] = df["alder"].map(_parse_age_to_int)
+    df_80 = df[df["age_int"].fillna(0) >= 80]
+    if df_80.empty:
+        return pd.DataFrame(columns=["knr", "aar", "pop_80plus"])
+    out = (
+        df_80.groupby(["knr", "aar"], as_index=False)["value"]
+        .sum()
+        .rename(columns={"value": "pop_80plus"})
+    )
+    out["knr"] = out["knr"].astype(str)
+    return out[out["pop_80plus"] > 0]
+
+
+def recompute_national_80plus_latest_from_db(
+    db_path: Path | str, table: str = "befolkning"
+) -> tuple[float, int]:
+    """National 80+ total in the latest population year, straight from DuckDB.
+    Mirrors ``analyze.run_analysis``'s ``national_80plus_latest`` without calling
+    it. Returns ``(total, latest_year)``; ``(nan, 0)`` if unavailable."""
+    df = _read_befolkning_80plus(db_path, table)
+    if df.empty:
+        return float("nan"), 0
+    latest = int(df["aar"].max())
+    total = float(df[df["aar"] == latest]["pop_80plus"].sum())
+    return total, latest
+
+
+def recompute_kommune_growth_from_db(
+    knr: str,
+    df_80_all: pd.DataFrame,
+    *,
+    target_year: int,
+    baseline_year: int,
+    min_window_years: int,
+    rate_min_pa: float,
+    rate_max_pa: float,
+) -> tuple[float | None, str]:
+    """Recompute one kommune's 80+ growth-to-target the documented way, using
+    ONLY that kommune's own DB 80+ series.
+
+    Mirrors ``analyze._compute_kommune_growth_rates`` + the ``"kommune"`` branch
+    of ``analyze._project_80plus``: CAGR from first→last positive year, accepted
+    only when the window ≥ *min_window_years* and the per-annum rate is within
+    ``[rate_min_pa, rate_max_pa]``. Returns ``(growth_pct, "kommune")`` when the
+    kommune-CAGR path applies, else ``(None, <fallback_tag>)`` — the caller skips
+    the comparison for fallback rows because their rate is national/projection-
+    derived, not a pure DB recompute.
+    """
+    grp = df_80_all[df_80_all["knr"] == str(knr)].sort_values("aar")
+    valid = grp[grp["pop_80plus"] > 0]
+    if len(valid) < 2:
+        return None, "no_history"
+    pop_start = float(valid.iloc[0]["pop_80plus"])
+    pop_end = float(valid.iloc[-1]["pop_80plus"])
+    first_year = int(valid.iloc[0]["aar"])
+    last_year = int(valid.iloc[-1]["aar"])
+    window = last_year - first_year
+    if pop_start <= 0 or window <= 0:
+        return None, "no_history"
+    cagr = (pop_end / pop_start) ** (1.0 / window) - 1.0
+    if window < min_window_years:
+        return None, "national_short_window"
+    if not (rate_min_pa <= cagr <= rate_max_pa):
+        return None, "national_outlier_rate"
+    years_ahead = target_year - baseline_year
+    pop_latest = pop_end  # kommune's own latest-year 80+
+    pop_2035 = pop_latest * (1 + cagr) ** years_ahead
+    growth_pct = (pop_2035 - pop_latest) / pop_latest * 100 if pop_latest else None
+    return growth_pct, "kommune"
+
+
+def independent_db_receipts(
+    findings_path: Path | str,
+    db_path: Path | str,
+    *,
+    params: dict[str, Any] | None = None,
+    table: str = "befolkning",
+) -> list[ClaimResult]:
+    """Build the DB-independent receipt set (Finding 1).
+
+    Loads ``findings.json`` FROM DISK (via :func:`analyze.load_findings`) and
+    recomputes its key numbers straight from the DuckDB ``befolkning`` table —
+    never calling an analyze computation. A corrupted on-disk findings file
+    (wrong national total, inflated per-kommune growth) therefore FAILS here.
+
+    Receipts produced:
+      * ``db_national_80plus_latest`` — DB latest-year national 80+ total vs the
+        findings' ``national_80plus_latest``.
+      * ``db_kommune_growth[knr]`` — for a deterministic sample (top-10 ranked +
+        every 25th ranked knr) whose ``growth_source == "kommune"``, the
+        DB-recomputed growth-to-target vs the findings' ``pop_80plus_growth_pct``.
+
+    Returns a list of :class:`ClaimResult`. An empty list means the inputs were
+    unusable (missing DB/findings) — the caller treats that as inconclusive.
+    """
+    from .analyze import (
+        DEFAULT_KOMMUNE_RATE_MAX_PA,
+        DEFAULT_KOMMUNE_RATE_MIN_PA,
+        DEFAULT_MIN_GROWTH_WINDOW_YEARS,
+        load_findings,
+    )
+
+    params = dict(params or {})
+    target_year = int(params.get("projection_year", 2035))
+    min_window_years = int(
+        params.get("min_growth_window_years", DEFAULT_MIN_GROWTH_WINDOW_YEARS)
+    )
+    rate_min_pa = float(params.get("kommune_rate_min_pa", DEFAULT_KOMMUNE_RATE_MIN_PA))
+    rate_max_pa = float(params.get("kommune_rate_max_pa", DEFAULT_KOMMUNE_RATE_MAX_PA))
+
+    findings_path = Path(findings_path)
+    if not findings_path.exists():
+        return []
+    disk = load_findings(findings_path)  # the ON-DISK numbers under test
+
+    df_80_all = _read_befolkning_80plus(db_path, table)
+    if df_80_all.empty:
+        return []
+    baseline_year = int(df_80_all["aar"].max())
+
+    receipts: list[ClaimResult] = []
+
+    # ── Receipt 1: national 80+ latest total ─────────────────────────────────
+    db_total, db_year = recompute_national_80plus_latest_from_db(db_path, table)
+    claimed_total = float(disk.national_80plus_latest)
+    if not np.isnan(db_total) and not np.isnan(claimed_total) and db_total > 0:
+        rel_err = abs(claimed_total - db_total) / db_total
+        passes = rel_err <= RECEIPT_NATIONAL_REL_TOL
+        receipts.append(ClaimResult(
+            claim=Claim(
+                claim_type="db_national_80plus_latest",
+                claimed_value=round(claimed_total, 1),
+                parameters={"db_year": db_year},
+                source_text="findings.national_80plus_latest vs DB latest-year 80+ sum",
+            ),
+            recomputed_value=round(db_total, 1),
+            passes=passes,
+            relative_error=rel_err,
+            message=(
+                f"OK: national 80+ {db_year} = {db_total:,.0f} (findings {claimed_total:,.0f})"
+                if passes
+                else f"FAIL: findings national_80plus_latest {claimed_total:,.0f} != "
+                     f"DB {db_year} 80+ sum {db_total:,.0f} (rel err {rel_err:.2%})"
+            ),
+        ))
+
+    # ── Receipt set 2: sampled per-kommune growth (kommune-source rows) ───────
+    ranked = sorted(
+        (km for km in disk.kommuner if km.rank >= 1), key=lambda k: k.rank
+    )
+    sample_idx = sorted(set(
+        list(range(min(RECEIPT_SAMPLE_TOP_N, len(ranked))))
+        + list(range(0, len(ranked), RECEIPT_SAMPLE_STEP))
+    ))
+    for i in sample_idx:
+        km = ranked[i]
+        # Only the pure-kommune-CAGR rows are a DB-independent recompute; national
+        # / projection / default fallbacks depend on the config rate, not the DB.
+        if km.growth_source != "kommune":
+            continue
+        recomputed, tag = recompute_kommune_growth_from_db(
+            km.knr, df_80_all,
+            target_year=target_year, baseline_year=baseline_year,
+            min_window_years=min_window_years,
+            rate_min_pa=rate_min_pa, rate_max_pa=rate_max_pa,
+        )
+        if recomputed is None or tag != "kommune":
+            # DB recompute disagrees that this is a kommune-CAGR row → that itself
+            # is a mismatch with the on-disk growth_source claim.
+            receipts.append(ClaimResult(
+                claim=Claim(
+                    claim_type="db_kommune_growth",
+                    claimed_value=km.pop_80plus_growth_pct,
+                    parameters={"knr": km.knr, "rank": km.rank},
+                    source_text=f"per-kommune growth recompute for {km.knr}",
+                ),
+                recomputed_value=None,
+                passes=False,
+                message=(
+                    f"FAIL knr={km.knr} (rank {km.rank}): findings growth_source="
+                    f"'kommune' but DB recompute yields '{tag}'"
+                ),
+            ))
+            continue
+        claimed = float(km.pop_80plus_growth_pct)
+        if np.isnan(claimed):
+            continue
+        abs_err = abs(claimed - recomputed)
+        passes = abs_err <= RECEIPT_GROWTH_ABS_TOL_PP
+        receipts.append(ClaimResult(
+            claim=Claim(
+                claim_type="db_kommune_growth",
+                claimed_value=round(claimed, 2),
+                parameters={"knr": km.knr, "rank": km.rank},
+                source_text=f"per-kommune growth recompute for {km.knr}",
+            ),
+            recomputed_value=round(recomputed, 2),
+            passes=passes,
+            relative_error=abs_err,
+            message=(
+                f"OK knr={km.knr} (rank {km.rank}): growth {recomputed:.2f}% "
+                f"(findings {claimed:.2f}%)"
+                if passes
+                else f"FAIL knr={km.knr} (rank {km.rank}): findings growth "
+                     f"{claimed:.2f}% != DB recompute {recomputed:.2f}% "
+                     f"(Δ {abs_err:.2f} pp)"
+            ),
+        ))
+
+    return receipts

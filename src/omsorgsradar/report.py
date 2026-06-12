@@ -347,17 +347,30 @@ def render_template(
     lines.append("")
     lines.append(
         f"Analysen rangerer **{n_ranked} kommuner** (av {n_total} koderader — historiske "
-        f"kommunenummer er ekskludert fra rangeringen) etter en press-indeks som kombinerer "
-        f"forventet vekst i 80+-befolkningen mot 2035 med dagens dekning av hjemmetjenester."
+        f"kommunenummer og kommuner uten beregnbar dekningsgrad er ekskludert fra rangeringen) "
+        f"etter en press-indeks som kombinerer forventet vekst i 80+-befolkningen mot 2035 med "
+        f"dagens dekning av hjemmetjenester."
     )
     lines.append("")
     if not np.isnan(growth):
+        proj = result.ssb_projection_growth_2035
+        proj_base = result.ssb_projection_baseline_year
+        if not np.isnan(proj):
+            ssb_clause = (
+                f"Dette er en trendframskriving, ikke SSBs offisielle "
+                f"befolkningsframskriving: SSBs hovedalternativ (tabell 13599, "
+                f"alternativ MMM) gir til sammenligning **~{proj:.0f}%** vekst for "
+                f"80+ fra {proj_base} til 2035 — vesentlig raskere (se Begrensninger)."
+            )
+        else:
+            ssb_clause = (
+                "Dette er en trendframskriving, ikke SSBs offisielle "
+                "befolkningsframskriving (se Begrensninger)."
+            )
         lines.append(
             f"På nasjonalt nivå vokser 80+-befolkningen med anslagsvis **{growth:.1f}%** "
             f"fra {baseline/1000:,.0f} 000 (siste datapunkt) til {projected/1000:,.0f} 000 i 2035 "
-            f"dersom hver kommunes historiske trend (2017–2026) fortsetter. Dette er en "
-            f"trendframskriving, ikke SSBs offisielle befolkningsframskriving — SSBs "
-            f"hovedalternativ ligger høyere for 80+ (se Begrensninger)."
+            f"dersom hver kommunes historiske trend (2017–2026) fortsetter. {ssb_clause}"
         )
         lines.append("")
     lines.append(

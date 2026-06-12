@@ -55,6 +55,21 @@ logger = logging.getLogger(__name__)
 DEFAULT_DB = Path(__file__).parent.parent.parent / "data" / "omsorgsradar.duckdb"
 DEFAULT_CACHE = Path(__file__).parent.parent.parent / "data" / "cache"
 
+# ── Population-projection fetch (SSB national framskriving) ───────────────────
+# Table 13599 (Framskrevet folkemengde etter kjønn, alder, framskrivingsalternativ)
+# is the national 1-year-age projection table reaching past 2035. The "framskrivinger"
+# source in analysis.toml is configured to it; these defaults shape the 80+ ×
+# main-alternative selection. (The old config pointed at 12880, which is the
+# *macroeconomic* accounts table — no age dimension, ends 2029 — so the projection
+# rate was never derivable; see docs/api_drift.md and Finding 3.)
+PROJECTION_MIN_AGE = 80
+PROJECTION_TARGET_YEAR = 2035
+# SSB main-alternative ("hovedalternativ") projection code. 13599 labels it "MMM";
+# the long-form "MMMM" appears in some regional tables. We discover the actual
+# main-alternative code from metadata and fall back to these candidates.
+PROJECTION_MAIN_ALT_CANDIDATES = ("MMMM", "MMM")
+PROJECTION_ALT_VAR_CANDIDATES = ("Framskriv", "Alternativ", "PerFramskrives")
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # SSB table metadata discovery
@@ -308,84 +323,156 @@ def fetch_population_current(
     return df
 
 
+def _select_main_alternative(values: list[str]) -> str | None:
+    """Pick the SSB main-projection ("hovedalternativ") code from a Framskriv
+    value list. Prefers the known codes (MMMM/MMM); otherwise None."""
+    for cand in PROJECTION_MAIN_ALT_CANDIDATES:
+        if cand in values:
+            return cand
+    return None
+
+
+def parse_projection_payload(
+    payload: dict[str, Any],
+    *,
+    time_code: str,
+    age_code: str,
+) -> pd.DataFrame:
+    """Parse a json-stat2 projection payload into a tidy national 80+ frame.
+
+    Sums across sex (and any remaining dimensions) per (year) and returns
+    columns ``knr`` (``"NATIONAL"``), ``alder`` (``"80+"``), ``aar`` (int),
+    ``value`` (float). Factored out so the offline known-value test can drive it
+    directly from a fixture without any network.
+    """
+    df = jsonstat2_to_df(payload, use_codes=True)
+    rename_map: dict[str, str] = {}
+    if time_code in df.columns:
+        rename_map[time_code] = "aar"
+    df = df.rename(columns=rename_map)
+    df["aar"] = pd.to_numeric(df["aar"], errors="coerce")
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+    # Sum every remaining dimension (sex, age, alternative) per year → national 80+.
+    out = df.groupby("aar", as_index=False)["value"].sum()
+    out["knr"] = "NATIONAL"
+    out["alder"] = f"{PROJECTION_MIN_AGE}+"
+    return out[["knr", "alder", "aar", "value"]]
+
+
 def fetch_population_projections(
     *,
     base_url: str,
     table_id: str,
     cache_dir: Path | None = None,
+    target_year: int = PROJECTION_TARGET_YEAR,
 ) -> pd.DataFrame:
-    """Fetch SSB population projections (medium scenario) at the national level.
+    """Fetch SSB's *national* 80+ population projection (main alternative).
 
-    SSB's kommune-level projections are published in separate tables (e.g.
-    13873, 12880).  We try 13873 first, then the configured table_id (fallback),
-    then return an empty DataFrame.
+    Queries the configured projection table (default 13599 — Framskrevet
+    folkemengde etter kjønn, alder, framskrivingsalternativ), selecting:
+      - ages ``>= PROJECTION_MIN_AGE`` (80+),
+      - the main-alternative ("hovedalternativ") projection code (MMMM/MMM),
+      - both sexes (summed),
+      - years spanning the earliest available projection year through
+        ``target_year``.
 
-    Returns a tidy DataFrame with columns:
-        - ``knr``: kommune number (``"NATIONAL"`` if only aggregate available)
-        - ``alder``: age group label
-        - ``aar``: year (int)
-        - ``value``: projected population
+    Returns a tidy DataFrame with columns ``knr`` (``"NATIONAL"``), ``alder``
+    (``"80+"``), ``aar`` (int), ``value`` (summed 80+ count per year). The
+    analysis module derives the national growth rate from this frame
+    (:func:`analyze._project_80plus`) and stores the 80+ baseline→2035 growth as
+    ``ssb_projection_growth_2035``.
 
-    Note: Projections are only available in 5-year intervals or as national
-    aggregates in the public PxWebAPI.  For municipality-level projections
-    we use the national growth-rate adjustment method in the analysis module.
+    On any failure (table shape unexpected, network error, no age/alternative
+    dimension) returns an empty frame with the expected schema, and the analysis
+    falls back to the documented default national rate.
     """
-    # Try the discovery table first, then fall back to configured table_id
-    candidates = ["13873", table_id] if table_id != "13873" else [table_id]
-    for tid in candidates:
-        try:
-            logger.info("Trying SSB projection table %s", tid)
-            meta = _discover_ssb_table(base_url, tid)
-            variables = meta.get("variables", [])
-            time_var = next(
-                (v for v in variables if v.get("code") in ("Tid", "AAR", "Aar")),
-                None,
+    try:
+        logger.info("Fetching SSB projection table %s (national 80+ main alt.)", table_id)
+        meta = _discover_ssb_table(base_url, table_id)
+        variables = meta.get("variables", [])
+
+        time_var = next(
+            (v for v in variables if v.get("code") in ("Tid", "AAR", "Aar")), None
+        )
+        age_var = next(
+            (v for v in variables if v.get("code") in ("Alder", "alder")), None
+        )
+        sex_var = next(
+            (v for v in variables if v.get("code") in ("Kjonn", "kjonn")), None
+        )
+        alt_var = next(
+            (v for v in variables if v.get("code") in PROJECTION_ALT_VAR_CANDIDATES),
+            None,
+        )
+        if time_var is None or age_var is None:
+            raise ValueError(
+                f"projection table {table_id} lacks a time or age dimension "
+                f"(found {[v.get('code') for v in variables]}) — not a usable "
+                f"age-resolved projection table"
             )
-            if time_var is None:
-                continue
 
-            all_years = time_var.get("values", [])
-            projection_years = [y for y in all_years if int(y) >= 2024][:12]
-            if not projection_years:
-                continue
-
-            query = {
-                "query": [
-                    {
-                        "code": time_var["code"],
-                        "selection": {"filter": "item", "values": projection_years},
-                    },
-                ],
-                "response": {"format": "json-stat2"},
-            }
-
-            adapter = PxWebAdapter(base_url=base_url, cache_dir=cache_dir)
-            payload = adapter.post_table(tid, query, cache_key=f"proj_{tid}")
-            df = jsonstat2_to_df(payload)
-
-            rename_map: dict[str, str] = {}
-            if time_var["code"] in df.columns:
-                rename_map[time_var["code"]] = "aar"
-            df = df.rename(columns=rename_map)
-            df["aar"] = pd.to_numeric(df["aar"], errors="coerce")
-            df["knr"] = "NATIONAL"
-
-            logger.info(
-                "Projection table %s: %d rows, years %s",
-                tid,
-                len(df),
-                sorted(df["aar"].unique()),
+        all_years = [y for y in time_var.get("values", []) if str(y).isdigit()]
+        years = sorted(y for y in all_years if int(y) <= target_year)
+        if str(target_year) not in years:
+            raise ValueError(
+                f"projection table {table_id} does not reach {target_year} "
+                f"(max year {max(years) if years else 'n/a'})"
             )
-            return df
 
-        except Exception as exc:
-            logger.warning("Table %s failed: %s", tid, exc)
-            time.sleep(REQUEST_PAUSE)
-            continue
+        ages = [
+            a for a in age_var.get("values", [])
+            if str(a).isdigit() and int(a) >= PROJECTION_MIN_AGE
+        ]
+        if not ages:
+            raise ValueError(
+                f"projection table {table_id} age dimension has no {PROJECTION_MIN_AGE}+ codes"
+            )
 
-    # If all projection tables fail, return empty dataframe with expected schema
-    logger.warning("All projection table attempts failed; returning empty projection df")
-    return pd.DataFrame(columns=["knr", "aar", "value"])
+        query_items: list[dict[str, Any]] = [
+            {"code": age_var["code"], "selection": {"filter": "item", "values": ages}},
+            {"code": time_var["code"], "selection": {"filter": "item", "values": years}},
+        ]
+        if sex_var and sex_var.get("values"):
+            query_items.append({
+                "code": sex_var["code"],
+                "selection": {"filter": "item", "values": list(sex_var["values"])},
+            })
+        if alt_var is not None:
+            main_alt = _select_main_alternative(alt_var.get("values", []))
+            if main_alt is None:
+                raise ValueError(
+                    f"projection table {table_id} alternative dimension "
+                    f"{alt_var['code']} has no known main-alternative code "
+                    f"(looked for {PROJECTION_MAIN_ALT_CANDIDATES})"
+                )
+            query_items.append({
+                "code": alt_var["code"],
+                "selection": {"filter": "item", "values": [main_alt]},
+            })
+
+        query = {"query": query_items, "response": {"format": "json-stat2"}}
+        adapter = PxWebAdapter(base_url=base_url, cache_dir=cache_dir)
+        payload = adapter.post_table(table_id, query, cache_key=f"proj_{table_id}")
+        df = parse_projection_payload(
+            payload, time_code=time_var["code"], age_code=age_var["code"]
+        )
+
+        logger.info(
+            "Projection table %s: national 80+ %s rows, years %s",
+            table_id,
+            len(df),
+            sorted(int(y) for y in df["aar"].dropna().unique()),
+        )
+        return df
+
+    except Exception as exc:
+        logger.warning(
+            "Projection table %s failed (%s); national rate falls back to default",
+            table_id, exc,
+        )
+        time.sleep(REQUEST_PAUSE)
+
+    return pd.DataFrame(columns=["knr", "alder", "aar", "value"])
 
 
 def fetch_fhi_nokkel(

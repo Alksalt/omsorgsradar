@@ -85,6 +85,88 @@ class TestJsonStat2ToDf:
             jsonstat2_to_df(bad_payload)
 
 
+class TestPopulationProjections:
+    """Finding 3: the projection fetch must produce a real national 80+ ×
+    main-alternative frame (SSB table 13599), driving the SSB-projection growth
+    cited in the report. Offline against committed fixtures — no network."""
+
+    def _meta(self) -> dict:
+        return json.loads(
+            (FIXTURE_DIR / "ssb_13599_meta_fixture.json").read_text(encoding="utf-8")
+        )
+
+    def _payload(self) -> dict:
+        return json.loads(
+            (FIXTURE_DIR / "ssb_13599_proj_fixture.json").read_text(encoding="utf-8")
+        )
+
+    def test_fetch_returns_national_80plus_per_year(self) -> None:
+        """fetch_population_projections returns a NATIONAL 80+ frame with the
+        known SSB main-alternative totals (2025/2026/2035)."""
+        from omsorgsradar.ingest import fetch_population_projections
+
+        with patch("omsorgsradar.ingest._discover_ssb_table", return_value=self._meta()), \
+             patch(
+                 "omsorgsradar.ingest.PxWebAdapter.post_table",
+                 return_value=self._payload(),
+             ):
+            df = fetch_population_projections(
+                base_url="https://data.ssb.no/api/v0/no/table", table_id="13599"
+            )
+        assert set(df["knr"].unique()) == {"NATIONAL"}
+        by_year = df.groupby("aar")["value"].sum()
+        # Known values fetched live 2026-06-12 (table 13599, MMM, 80+):
+        assert by_year.loc[2025] == 272848
+        assert by_year.loc[2026] == 288360
+        assert by_year.loc[2035] == 422314
+
+    def test_ssb_projection_growth_known_value(self) -> None:
+        """_ssb_projection_growth gives the known ~46% (2026→2035) — materially
+        above the ~31% trend method, supporting the report's comparative claim."""
+        from omsorgsradar.analyze import _ssb_projection_growth
+        from omsorgsradar.ingest import fetch_population_projections
+
+        with patch("omsorgsradar.ingest._discover_ssb_table", return_value=self._meta()), \
+             patch(
+                 "omsorgsradar.ingest.PxWebAdapter.post_table",
+                 return_value=self._payload(),
+             ):
+            df = fetch_population_projections(
+                base_url="https://data.ssb.no/api/v0/no/table", table_id="13599"
+            )
+        growth, base = _ssb_projection_growth(df, baseline_year=2026, target_year=2035)
+        assert base == 2026
+        assert 46.0 <= growth <= 47.0, f"expected ~46.45%, got {growth:.2f}%"
+
+    def test_growth_empty_frame_is_nan(self) -> None:
+        from omsorgsradar.analyze import _ssb_projection_growth
+        import numpy as np
+
+        growth, base = _ssb_projection_growth(pd.DataFrame(), 2026, 2035)
+        assert np.isnan(growth) and base == 0
+
+    def test_fetch_table_without_age_returns_empty(self) -> None:
+        """A table lacking an age dimension (e.g. the old 12880 macro table)
+        yields an empty frame, not a bogus row — the analysis then falls back to
+        the default national rate."""
+        from omsorgsradar.ingest import fetch_population_projections
+
+        macro_meta = {
+            "title": "12880: Makroøkonomiske hovedstørrelser",
+            "variables": [
+                {"code": "ContentsCode", "values": ["KonsumHushold"], "valueTexts": ["x"]},
+                {"code": "Tid", "values": ["2027", "2028", "2029"],
+                 "valueTexts": ["2027", "2028", "2029"]},
+            ],
+        }
+        with patch("omsorgsradar.ingest._discover_ssb_table", return_value=macro_meta):
+            df = fetch_population_projections(
+                base_url="https://data.ssb.no/api/v0/no/table", table_id="12880"
+            )
+        assert df.empty
+        assert list(df.columns) == ["knr", "alder", "aar", "value"]
+
+
 class TestRunIngestOffline:
     """Offline tests for run_ingest orchestration and _FETCHERS dispatch."""
 

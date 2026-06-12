@@ -91,6 +91,14 @@ class AnalysisResult:
     notes: list[str] = field(default_factory=list)
     # Description of which growth-rate path dominated for this run
     growth_method: str = "default"
+    # National 80+ growth to the target year per SSB's main projection
+    # alternative (table 13599, "hovedalternativ" MMM), measured from the
+    # population baseline year. NaN when no projection frame was available.
+    # Independent of the per-kommune trend extrapolation — lets the report
+    # cite "trendmetoden ~31 %, SSBs hovedalternativ ~X %" with a real number
+    # (Finding 3).
+    ssb_projection_growth_2035: float = float("nan")
+    ssb_projection_baseline_year: int = 0
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -385,6 +393,43 @@ def _project_80plus(
     return df_out
 
 
+def _ssb_projection_growth(
+    df_proj: pd.DataFrame | None,
+    baseline_year: int,
+    target_year: int,
+) -> tuple[float, int]:
+    """National 80+ growth (%) from SSB's projection frame, baseline→target.
+
+    *df_proj* is the tidy national 80+ projection (``aar``, ``value``) from
+    :func:`ingest.fetch_population_projections`. Uses the projection value at
+    *baseline_year* when present, else the earliest projection year ≥ a sane
+    floor. Returns ``(growth_pct, baseline_used)``; ``(nan, 0)`` if the frame is
+    empty or the target year is missing.
+
+    This is the SSB-projection ("hovedalternativ") number cited in the report —
+    deliberately separate from the per-kommune trend extrapolation.
+    """
+    if df_proj is None or df_proj.empty or "value" not in df_proj.columns:
+        return float("nan"), 0
+    d = df_proj.copy()
+    d["aar"] = pd.to_numeric(d["aar"], errors="coerce")
+    d["value"] = pd.to_numeric(d["value"], errors="coerce")
+    by_year = d.groupby("aar")["value"].sum()
+    by_year = by_year[by_year > 0]
+    if by_year.empty or target_year not in by_year.index:
+        return float("nan"), 0
+    # Prefer the analysis baseline year; else the earliest available proj year.
+    if baseline_year in by_year.index:
+        base_year_used = baseline_year
+    else:
+        base_year_used = int(by_year.index.min())
+    base_val = float(by_year.loc[base_year_used])
+    target_val = float(by_year.loc[target_year])
+    if base_val <= 0:
+        return float("nan"), 0
+    return (target_val / base_val - 1.0) * 100.0, int(base_year_used)
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # KOSTRA analysis
 # ──────────────────────────────────────────────────────────────────────────────
@@ -542,6 +587,13 @@ def _clean_kommune_name(name: str) -> str:
     return _SSB_VALIDITY_SUFFIX_RE.sub("", str(name)).strip()
 
 
+def _has_validity_suffix(name: str) -> bool:
+    """True if *name* carries an SSB year-range validity suffix, e.g.
+    "Hemne (-2017)" or "Orkdal (2018-2019)" — i.e. it is a *predecessor* label,
+    not the current/terminal kommune name."""
+    return bool(_SSB_VALIDITY_SUFFIX_RE.search(str(name)))
+
+
 def _build_name_lookup(df_kostra: pd.DataFrame) -> dict[str, str]:
     """Build a knr → municipality name dict from KOSTRA region labels.
 
@@ -551,12 +603,36 @@ def _build_name_lookup(df_kostra: pd.DataFrame) -> dict[str, str]:
     """
     # Prefer the dedicated knr_name column (new ingest format)
     if "knr_name" in df_kostra.columns and "knr" in df_kostra.columns:
-        lookup = (
-            df_kostra[["knr", "knr_name"]]
-            .drop_duplicates()
-            .set_index("knr")["knr_name"]
-            .to_dict()
-        )
+        # Terminal codes carry PREDECESSOR names if we keep an arbitrary row
+        # (Finding 4: drop_duplicates kept old labels — knr 5055 had "Hemne" /
+        # "Heim", 5059 had "Orkdal" / "Orkland", 1806 had "Ballangen" / "Narvik").
+        # Because normalize_knr_series maps several historical codes to one
+        # terminal code, every year contains BOTH the current/terminal label
+        # (no validity suffix) and several predecessor labels (suffixed, e.g.
+        # "Hemne (-2017)"). The current name is the un-suffixed one and it is
+        # present in every year, so:
+        #   1. prefer rows whose label has NO SSB validity suffix (terminal name),
+        #   2. among those, take the latest year (deterministic).
+        # If a knr only ever has suffixed labels (pure historical code) we fall
+        # back to its latest-year suffixed label, then strip the suffix.
+        if "aar" in df_kostra.columns:
+            sub = df_kostra[["knr", "knr_name", "aar"]].copy()
+            sub["aar"] = pd.to_numeric(sub["aar"], errors="coerce")
+            sub = sub[sub["knr_name"].astype(str).str.strip() != ""]
+            sub["_suffixed"] = sub["knr_name"].map(_has_validity_suffix)
+            # Sort so the chosen row per knr is: un-suffixed first, then latest
+            # year. groupby(...).last() then picks the terminal+latest label.
+            sub = sub.sort_values(
+                ["_suffixed", "aar"], ascending=[False, True], kind="mergesort"
+            )
+            lookup = sub.groupby("knr")["knr_name"].last().to_dict()
+        else:
+            lookup = (
+                df_kostra[["knr", "knr_name"]]
+                .drop_duplicates()
+                .set_index("knr")["knr_name"]
+                .to_dict()
+            )
         # Filter out empty/missing names; strip SSB validity suffixes
         return {
             k: _clean_kommune_name(v)
@@ -681,6 +757,16 @@ def run_analysis(
             result.national_80plus_2035 / result.national_80plus_latest - 1
         ) * 100
 
+    # SSB main-alternative projection 80+ growth (Finding 3) — independent of the
+    # per-kommune trend extrapolation above. Cited in the report alongside the
+    # trend number. Baseline = the analysis's latest observed population year.
+    pop_baseline_year = int(df_80["aar"].max())
+    proj_growth, proj_base = _ssb_projection_growth(
+        df_proj, pop_baseline_year, target_year
+    )
+    result.ssb_projection_growth_2035 = proj_growth
+    result.ssb_projection_baseline_year = proj_base
+
     # Step 3: Coverage rates from KOSTRA
     df_coverage = _extract_coverage_rate(df_kostra, df_80)
 
@@ -690,39 +776,49 @@ def run_analysis(
     # Step 5: Pressure index
     df_merged = _compute_press_index(df_merged)
 
-    # Step 6: Rank — only kommuner alive in the latest population year (Bug-2).
-    # Dead historical codes (no positive 80+ in the latest year) are retained in
-    # the output for provenance but assigned rank 0 and sorted to the bottom, so
-    # they never appear in any "topp N" ranking and never crash the growth sort.
-    # If we have no living set (e.g. minimal fixtures without an all-years
-    # frame), fall back to ranking everything (legacy behaviour).
+    # Step 6: Rank — only kommuner that are (a) alive in the latest population
+    # year (Bug-2) AND (b) have a computable press index (Finding 2). A living
+    # kommune with no KOSTRA coverage has press_index_norm = NaN; ranking it
+    # contradicts LIMITATIONS ("kommuner uten data er ekskludert fra
+    # rankingen"). Such rows are retained for provenance with rank 0, exactly
+    # like dead historical codes — so they never appear in any "topp N" ranking
+    # and never crash the growth sort. With no living set (minimal fixtures
+    # without an all-years frame) every kommune is treated as living, but the
+    # computable-press requirement still gates the rank.
     if living:
         df_merged["_is_living"] = df_merged["knr"].astype(str).isin(living)
     else:
         df_merged["_is_living"] = True
+    df_merged["_is_rankable"] = (
+        df_merged["_is_living"] & df_merged["press_index_norm"].notna()
+    )
 
     df_merged = df_merged.sort_values(
-        ["_is_living", "press_index_norm"],
+        ["_is_rankable", "press_index_norm"],
         ascending=[False, False],
         na_position="last",
     ).reset_index(drop=True)
 
-    n_living = int(df_merged["_is_living"].sum())
+    n_ranked = int(df_merged["_is_rankable"].sum())
     ranks: list[int] = []
     next_rank = 1
-    for is_living in df_merged["_is_living"]:
-        if is_living:
+    for is_rankable in df_merged["_is_rankable"]:
+        if is_rankable:
             ranks.append(next_rank)
             next_rank += 1
         else:
-            ranks.append(0)  # unranked: dead/defunct code
+            ranks.append(0)  # unranked: dead code OR living-but-NaN press index
     df_merged["rank"] = ranks
 
+    n_living = int(df_merged["_is_living"].sum())
     n_dead = len(df_merged) - n_living
-    if n_dead:
+    n_living_unranked = n_living - n_ranked
+    if n_dead or n_living_unranked:
         notes.append(
-            f"{n_dead} defunct/dead kommune code(s) excluded from ranking "
-            f"(no positive 80+ population in {living_year}); {n_living} ranked."
+            f"{n_dead} defunct/dead kommune code(s) and {n_living_unranked} "
+            f"living kommune(s) without a computable press index excluded from "
+            f"ranking (no positive 80+ population in {living_year}, or no KOSTRA "
+            f"coverage); {n_ranked} ranked."
         )
 
     # Step 7: Municipality names
@@ -753,9 +849,9 @@ def run_analysis(
     result.notes = notes
 
     logger.info(
-        "Analysis complete: %d of %d kommuner ranked (living); national 80+ "
-        "growth to 2035: %.1f%%; growth_method: %s",
-        n_living,
+        "Analysis complete: %d of %d kommuner ranked (living with computable "
+        "press index); national 80+ growth to 2035: %.1f%%; growth_method: %s",
+        n_ranked,
         len(kommuner),
         result.national_growth_rate_2035,
         result.growth_method,
@@ -842,4 +938,9 @@ def load_findings(path: Path = FINDINGS_PATH) -> AnalysisResult:
         national_growth_rate_2035=raw.get("national_growth_rate_2035") or float("nan"),
         analysis_year_range=tuple(raw.get("analysis_year_range", (0, 0))),
         notes=raw.get("notes", []),
+        growth_method=raw.get("growth_method", "default"),
+        ssb_projection_growth_2035=(
+            raw.get("ssb_projection_growth_2035") or float("nan")
+        ),
+        ssb_projection_baseline_year=raw.get("ssb_projection_baseline_year", 0) or 0,
     )

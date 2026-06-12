@@ -44,13 +44,36 @@ Indeksen bør brukes som **startpunkt for videre analyse**, ikke som beslutnings
   («kommune», «national_short_window», «national_outlier_rate», «national», «default»).
 - **Metoden undervurderer trolig veksten.** De store etterkrigskullene begynner å passere 80 år
   rundt 2025–2030; historisk CAGR fra 2017–2026 fanger ikke denne akselerasjonen. Aggregert gir
-  trendmetoden ~31 % nasjonal 80+-vekst til 2035, mens SSBs nasjonale hovedalternativ (tabell
-  12880) impliserer raskere vekst. Den **relative** rangeringen mellom kommuner påvirkes mindre
-  enn nivåene, men 2035-nivåene bør leses som nedre planleggingsanslag.
+  trendmetoden ~31 % nasjonal 80+-vekst til 2035, mens **SSBs nasjonale hovedalternativ (tabell
+  13599, framskrivingsalternativ MMM) gir ~46 %** for 80+ over samme periode (2026→2035; hentet
+  og verifisert 2026-06-12, lagret som funn-feltet `ssb_projection_growth_2035`). SSBs
+  hovedalternativ impliserer altså vesentlig raskere vekst enn trendmetoden. Den **relative**
+  rangeringen mellom kommuner påvirkes mindre enn nivåene, men 2035-nivåene bør leses som nedre
+  planleggingsanslag. (Den tidligere refererte tabellen 12880 var feil — det er SSBs
+  makroøkonomiske regnskapstabell uten alders- eller framskrivingsdimensjon; se `docs/api_drift.md`.)
 - Fremskrivinger er usikre utover 5 år. 2035-tallene er planleggingshorisonter, ikke prediksjoner.
 
 ### FHI NOKKEL
 - FHI NOKKEL-endepunktet ble re-sjekket 2026-06-12: `statistikk-data.fhi.no/api/open/v1` returnerer fortsatt 404 for alle stier; det finnes ingen kjent offentlig REST-API som erstatter det. FHI-data er ekskludert fra analysen.
+
+## Hva verifikatoren faktisk kontrollerer («tool receipts»)
+
+Verifikasjonssteget gir to lag, og overselger ikke:
+
+- **Narrasjons-troverdighet (claims vs funn):** hver tallpåstand i rapportteksten
+  regnes om fra det strukturerte `findings.json` og flagges ved avvik. Dette fanger
+  en hallusinert verdi i narrativet, men det er **ikke** et uavhengig bevis på at
+  `findings.json` selv er riktig — påstanden og fasiten kommer fra samme objekt.
+- **Uavhengige DB-kvitteringer:** verifikatoren laster `findings.json` **fra disk** og
+  regner om nøkkeltallene **direkte fra DuckDB-tabellen `befolkning`**, uten å kalle
+  analysekoden: (1) nasjonal 80+-sum i siste år mot funnenes `national_80plus_latest`,
+  (2) den strukturelle kontrollen at hver rangert kommune lever i siste befolkningsår,
+  og (3) per-kommune 80+-vekst for et deterministisk utvalg (topp-10 rangerte + hver
+  25. rangerte) for radene som brukte kommune-egen CAGR. Et korrupt `findings.json`
+  (feil nasjonal sum, oppblåst kommune-vekst) får verifikasjonen til å **FAILE** og
+  stopper pipelinen før rapport skrives. Fallback-rader (national/projection/default
+  vekstkilde) sammenlignes ikke per kommune, siden raten der er konfigurert/projisert,
+  ikke en ren DB-omregning.
 
 ## ML-begrensninger
 

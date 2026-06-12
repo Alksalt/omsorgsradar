@@ -18,9 +18,44 @@ import jsonschema
 
 SCHEMA_VERSION = "1"
 
+# Repo root: src/omsorgsradar/core/contracts.py → parents[3] is the repo root.
+# Used to store manifest paths repo-relative so committed manifests never leak
+# absolute local paths (Finding 5: /Users/... leaked into data/*.manifest.json).
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
 
 class ArtifactValidationError(ValueError):
     """An artifact payload does not match its declared schema."""
+
+
+def _relativize(path: str | Path) -> str:
+    """Return *path* as a repo-relative POSIX string.
+
+    - Absolute (or relative) paths under :data:`REPO_ROOT` become relative to it
+      (e.g. ``/Users/.../omsorgsradar/data/findings.json`` → ``data/findings.json``).
+    - A path already relative and not resolvable under the repo is kept verbatim
+      (an upstream input like ``data/x.json`` stays ``data/x.json``).
+    - Anything that resolves outside the repo falls back to the basename, so no
+      absolute directory ever lands in a committed manifest.
+
+    Empty strings pass through unchanged (callers pass ``""`` for absent inputs).
+    """
+    s = str(path)
+    if not s:
+        return s
+    p = Path(s)
+    try:
+        resolved = p.resolve()
+    except (OSError, ValueError):
+        resolved = p
+    try:
+        return resolved.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        # Not under the repo. If the original was already relative, keep it
+        # (it is repo-relative by convention); otherwise drop to the basename.
+        if not p.is_absolute():
+            return p.as_posix()
+        return p.name
 
 
 @dataclass
@@ -55,12 +90,12 @@ def write_manifest(
 ) -> Path:
     manifest = ArtifactManifest(
         artifact=artifact,
-        path=str(artifact_path),
+        path=_relativize(artifact_path),
         sha256=sha256_of(artifact_path),
         schema_version=SCHEMA_VERSION,
         created_at=datetime.now(timezone.utc).isoformat(),
         producer=producer,
-        inputs=list(inputs or []),
+        inputs=[_relativize(i) for i in (inputs or [])],
     )
     out = _manifest_path(artifact_path)
     out.write_text(

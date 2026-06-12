@@ -35,3 +35,5 @@ Hard constraints. Workspace-wide rules in `../CLAUDE.md` apply on top.
   for that analysis only). Core is never edited for a variant; contracts + verify-gate still apply.
 - v2 includes GitHub Pages report site + `/add-dataset` skill. Parked: planted-fault suite beyond the three
   gate tests, API drift watchdog.
+- Machine-authored analysis.toml executes only behind the startup security gate: base_url host-allowlist (`ALLOWED_BASE_URL_HOSTS`; owner extends via workflow.toml `[security].extra_allowed_hosts`) + csv path containment. Skills (`/magic-analyze`, `/add-dataset`) never bypass it.
+- `/magic-analyze` presents the ingest+profile realness verdict to the owner and stops; analyze/report run only on the owner's green.

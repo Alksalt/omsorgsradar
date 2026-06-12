@@ -82,3 +82,12 @@
   offentlige — lav sensitivitet), ærlig `n_dropped`-formulering i rapporten (historiske
   kommunenummer ≠ manglende data) + v1-forbehold i LIMITATIONS.md. Live-rapport regenerert
   (168/168 kontroller). Tester: 219 offline + 4 live.
+- **2026-06-12** — **G3 (agentic shell) shipped.** `/magic-analyze` (klassifiser →
+  utkast analysis.toml → `--validate-only` → `--until profile`-gate → eier-verdikt →
+  full kjøring) + `/add-dataset` (én prøvespørring → sources-blokk eller ny adapter
+  etter G1-mønsteret) som tynne skills over testbare motor-kommandoer. Motor:
+  `ALLOWED_BASE_URL_HOSTS`-allowlist håndhevet ved oppstart (+ workflow.toml
+  `[security].extra_allowed_hosts`), csv-path-containment, `--validate-only`/`--until`,
+  `core/discovery.py` pointer-klassifisering. `docs/dataset-registry.md` (Tier 1
+  verifisert / Tier 2 kandidater). Tests: 219 → 244 offline. **Next: G4 — anonymize
+  stage (Presidio nb + anonymeter) + BRFSS-demo + planted-PII-test.**

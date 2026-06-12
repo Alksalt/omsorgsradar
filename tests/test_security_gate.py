@@ -90,3 +90,42 @@ class TestValidateOnly:
         )
         assert proc.returncode != 0
         assert "not allowlisted" in (proc.stderr + proc.stdout)
+
+
+class TestMachineAuthoredConfigGate:
+    """The two G3 security controls, end-to-end through run_pipeline."""
+
+    def test_csv_escape_blocked_at_ingest(self, tmp_path: Path) -> None:
+        from omsorgsradar.core.config import ConfigError
+        from omsorgsradar.pipeline import run_pipeline
+
+        (tmp_path / "secret.csv").write_text("a\n1\n", encoding="utf-8")
+        adir = tmp_path / "analyses" / "sneaky"
+        adir.mkdir(parents=True)
+        (adir / "analysis.toml").write_text(
+            '[analysis]\nname = "sneaky"\n[stages]\nlist = ["ingest"]\n'
+            '[[sources]]\nadapter = "csv"\nid = "leak"\n'
+            'path = "../../secret.csv"\n'
+            '[sources.provenance]\ninstitution = "X"\nurl = "https://x"\n',
+            encoding="utf-8",
+        )
+        with pytest.raises(ConfigError, match="escapes the analysis dir"):
+            run_pipeline(adir, data_dir=tmp_path / "d",
+                         reports_dir=tmp_path / "r", runs_dir=tmp_path / "runs")
+
+    def test_extra_allowed_hosts_honored_end_to_end(self, tmp_path: Path) -> None:
+        from omsorgsradar.core.config import load_workflow_config
+        from omsorgsradar.core.adapters import validate_source_host
+
+        (tmp_path / "workflow.toml").write_text(
+            '[endpoint]\nmode = "subscription"\n'
+            '[security]\nextra_allowed_hosts = ["api.statbank.dk"]\n',
+            encoding="utf-8",
+        )
+        wf = load_workflow_config(tmp_path / "workflow.toml")
+        extra = frozenset(wf["security"]["extra_allowed_hosts"])
+        validate_source_host(
+            {"id": "dk", "adapter": "pxweb",
+             "base_url": "https://api.statbank.dk/v1", "table": "x"},
+            extra,
+        )  # no raise

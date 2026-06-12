@@ -9,6 +9,8 @@ description: How to run, extend, and debug the omsorgsradar analysis pipeline (i
 - Full run: `uv run python -m omsorgsradar.pipeline` (default analysis: omsorgsradar)
 - Any instance: `uv run python -m omsorgsradar.pipeline analyses/<name>`
 - Offline iteration: add `--skip-ingest` (reads DuckDB) and `--skip-ml`
+- Validate a config without running: `uv run python -m omsorgsradar.pipeline analyses/<name> --validate-only`
+- Owner-gate run (ingest+profile only): add `--until profile`
 - Tests: `uv run pytest -x -q` — must be green before any commit
 
 ## Rules (DECISIONS.md, enforced)

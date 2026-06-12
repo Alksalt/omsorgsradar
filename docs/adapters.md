@@ -133,7 +133,12 @@ mapping original → tidy column names).
 
 The realness provenance gate has no known-host fallback for local files, so
 `[sources.provenance]` with a named institution and URL is **mandatory** (enforced by
-`validate_source` at startup). Example:
+`validate_source` at startup).
+
+`path` must resolve inside the analysis dir — absolute paths and `../` escapes are
+rejected (G3 gate).
+
+Example:
 
 ```toml
 [[sources]]

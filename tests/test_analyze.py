@@ -172,3 +172,84 @@ class TestRunAnalysis:
         """Empty DataFrames return an AnalysisResult (possibly empty kommuner)."""
         result = run_analysis(pd.DataFrame(), pd.DataFrame())
         assert isinstance(result, AnalysisResult)
+
+
+def _pop_with_dead_code() -> pd.DataFrame:
+    """Population frame where one knr ('3011') is dead in the latest year.
+
+    SSB emits a row for every historical code in every year, with value 0 in
+    years where the code was not active. '3011' is nonzero through 2022 then
+    0 from 2023; '0301' (Oslo, live) is nonzero throughout. Latest year 2024.
+    """
+    rows = []
+    for aar in (2022, 2023, 2024):
+        # live kommune Oslo
+        rows.append({"knr": "0301", "knr_raw": "0301", "alder": "080",
+                     "aar": aar, "value": 1000.0 + (aar - 2022) * 50})
+        # dead code: nonzero in 2022, zero afterwards
+        dead_val = 200.0 if aar == 2022 else 0.0
+        rows.append({"knr": "3011", "knr_raw": "3011", "alder": "080",
+                     "aar": aar, "value": dead_val})
+    return pd.DataFrame(rows)
+
+
+class TestRankingOnlyLivingKommuner:
+    """Bug-2 regression: dead codes must not be ranked."""
+
+    def test_dead_code_gets_no_rank(self) -> None:
+        """A code with zero 80+ in the latest year gets rank 0 (unranked)."""
+        df_pop = _pop_with_dead_code()
+        result = run_analysis(pd.DataFrame(), df_pop)
+        by_knr = {km.knr: km for km in result.kommuner}
+        assert "3011" in by_knr, "dead code should still appear in findings"
+        assert by_knr["3011"].rank == 0, (
+            f"dead code 3011 must be unranked (rank 0), got {by_knr['3011'].rank}"
+        )
+
+    def test_ranked_set_subset_of_latest_year(self) -> None:
+        """Every ranked knr exists in the latest population year with positive 80+."""
+        df_pop = _pop_with_dead_code()
+        result = run_analysis(pd.DataFrame(), df_pop)
+        latest = df_pop["aar"].max()
+        living = set(
+            df_pop[(df_pop["aar"] == latest) & (df_pop["value"] > 0)]["knr"]
+        )
+        ranked = {km.knr for km in result.kommuner if km.rank >= 1}
+        assert ranked <= living, f"ranked set {ranked} not ⊆ living set {living}"
+
+    def test_no_ranked_row_has_none_growth(self) -> None:
+        """No ranked kommune has NaN/None pop_80plus_growth_pct (sort-crash guard)."""
+        df_pop = _pop_with_dead_code()
+        result = run_analysis(pd.DataFrame(), df_pop)
+        for km in result.kommuner:
+            if km.rank >= 1:
+                assert not np.isnan(km.pop_80plus_growth_pct), (
+                    f"ranked knr {km.knr} has NaN growth_pct"
+                )
+
+    def test_ranks_are_contiguous_from_one(self) -> None:
+        """Ranks on the living set are 1..N with no gaps."""
+        df_pop = _pop_with_dead_code()
+        result = run_analysis(pd.DataFrame(), df_pop)
+        ranks = sorted(km.rank for km in result.kommuner if km.rank >= 1)
+        assert ranks == list(range(1, len(ranks) + 1)), f"non-contiguous ranks: {ranks}"
+
+
+class TestNoMisleadingPopTotalField:
+    """Bug-4 regression: the mislabeled pop_total_latest field is removed."""
+
+    def test_kommune_metrics_has_no_pop_total_latest(self) -> None:
+        """KommuneMetrics no longer carries the pop_total_latest field."""
+        import dataclasses
+        field_names = {f.name for f in dataclasses.fields(KommuneMetrics)}
+        assert "pop_total_latest" not in field_names, (
+            "pop_total_latest was 80+-only mislabeled as total population — remove it"
+        )
+
+    def test_findings_json_has_no_pop_total_latest(self) -> None:
+        """Serialized findings carry no pop_total_latest key."""
+        df_pop = _pop_with_dead_code()
+        result = run_analysis(pd.DataFrame(), df_pop)
+        d = result_to_dict(result)
+        for km in d["kommuner"]:
+            assert "pop_total_latest" not in km

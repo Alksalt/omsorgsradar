@@ -38,3 +38,25 @@ source = "nokkel"
 
 [params]
 projection_year = 2035
+
+# Per-kommune 80+ CAGR guards (G7-fix). A short or noisy historical window
+# extrapolated 9+ years explodes (e.g. a 2-year split-artifact window once
+# put Hvaler at +252% to 2035). When a kommune rate fails either guard we
+# fall back to the national rate and record it in `growth_source`.
+#
+# min_growth_window_years: fewest years between first and last positive 80+
+#   observation required to trust a kommune-level CAGR. Below it → national
+#   fallback (growth_source = "national_short_window"). Default 5: a 5-year
+#   window over a 9-year projection keeps the extrapolation ratio < 2:1.
+min_growth_window_years = 5
+
+# Per-annum CAGR clamp band. A kommune rate outside [min, max] p.a. is treated
+# as noise/artifact and replaced by the national rate
+# (growth_source = "national_outlier_rate"). Bounds (fractions, not %):
+#   -0.05  a kommune losing >5%/yr of its 80+ cohort would more than halve it
+#          over the horizon — beyond plausible demographic decline, treat as noise.
+#   +0.10  Norway's 80+ grows ~3.5%/yr nationally; even fast suburban kommuner
+#          rarely sustain >6-7%/yr. 10% admits real signal while clamping the
+#          short-window/merger artifacts that drove the Hvaler explosion.
+kommune_rate_min_pa = -0.05
+kommune_rate_max_pa = 0.10

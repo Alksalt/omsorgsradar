@@ -32,17 +32,21 @@ class TestNormalizeKnr:
         assert normalize_knr("1543") == "1506"
         assert normalize_knr("1545") == "1506"
 
-    def test_alesund_merger_2020(self) -> None:
-        """Old Ålesund (1504) and absorbed communes map to 1507 per KLASS."""
-        assert normalize_knr("1504") == "1507"  # old Ålesund -> new Ålesund
-        assert normalize_knr("1523") == "1507"  # Ørskog
-        assert normalize_knr("1529") == "1507"  # Skodje
-        assert normalize_knr("1534") == "1507"  # Haram
-        assert normalize_knr("1546") == "1507"  # Sandøy
+    def test_alesund_chain_into_2024_split_is_dropped(self) -> None:
+        """Old Ålesund (1504) merged to 1507 in 2020, but 1507 SPLIT in 2024
+        (1507 → 1508 Ålesund + 1580 Haram). A chain running into a split has no
+        single terminal successor, so 1504 et al. are dropped (pass through)."""
+        assert normalize_knr("1504") == "1504"  # chain into 1507 split → dropped
+        assert normalize_knr("1523") == "1523"  # Ørskog
+        assert normalize_knr("1529") == "1529"  # Skodje
+        assert normalize_knr("1534") == "1534"  # Haram
+        assert normalize_knr("1546") == "1546"  # Sandøy
+        assert "1507" in SPLIT_CODES_EXCLUDED
 
-    def test_halden_renumbering_2020(self) -> None:
-        """0101 (Halden) renumbered to 3001 per KLASS."""
-        assert normalize_knr("0101") == "3001"
+    def test_halden_renumbering_terminal_2024(self) -> None:
+        """0101 (Halden): renumbered 0101→3001 in 2020, then 3001→3101 in the
+        2024 Viken dissolution. Closure resolves to the terminal code 3101."""
+        assert normalize_knr("0101") == "3101"
 
     def test_trondheim_renumbering(self) -> None:
         """Old 1601 -> 5001 (Trondheim renumbering in 2018)."""
@@ -61,19 +65,20 @@ class TestNormalizeKnr:
         assert normalize_knr("9999") == "9999"
 
     def test_asker_predecessors(self) -> None:
-        """Old Asker-area communes merge to 3025 per KLASS.
+        """Old Asker-area communes merge to Asker, terminal code 3203 (2024).
 
-        KLASS: 0220 (Asker) -> 3025, 0627 (Røyken) -> 3025, 0628 (Hurum) -> 3025.
-        Note: 0226 (Sørum) was WRONG in the old hand-written table — KLASS
-        records 0226 -> 3030 (Lillestrøm).
+        KLASS: 0220/0627/0628 -> 3025 (2020 Viken), then 3025 -> 3203 (2024
+        Viken dissolution). Closure resolves to the terminal 3203.
+        Note: 0226 (Sørum) -> 3205 (Lillestrøm), not Asker.
         """
-        assert normalize_knr("0220") == "3025"
-        assert normalize_knr("0627") == "3025"
-        assert normalize_knr("0628") == "3025"
+        assert normalize_knr("0220") == "3203"
+        assert normalize_knr("0627") == "3203"
+        assert normalize_knr("0628") == "3203"
 
     def test_soerrum_to_lillestroen(self) -> None:
-        """0226 (Sørum) -> 3030 (Lillestrøm) per KLASS (not Asker)."""
-        assert normalize_knr("0226") == "3030"
+        """0226 (Sørum) -> Lillestrøm, terminal code 3205 (3030 in 2020 → 3205
+        in 2024) per KLASS (not Asker)."""
+        assert normalize_knr("0226") == "3205"
 
     def test_kristiansand_merger(self) -> None:
         """Kristiansand merger per KLASS.
@@ -94,6 +99,15 @@ class TestNormalizeKnr:
         assert normalize_knr("5012") == "5012"  # Snillfjord split
         assert normalize_knr("1850") == "1850"  # Tysfjord split
 
+    def test_hvaler_chain_resolves_to_terminal_2024(self) -> None:
+        """Bug-1 regression: 0111 (Hvaler) was renumbered 0111→3011 in 2020,
+        then 3011→3110 in the 2024 Viken dissolution. The closure must resolve
+        0111 DIRECTLY to the terminal 3110 (not the intermediate 3011), so the
+        population series under 0111/3011/3110 collapses into one knr."""
+        assert normalize_knr("0111") == "3110"
+        # The intermediate code also resolves to the terminal.
+        assert normalize_knr("3011") == "3110"
+
 
 class TestNormalizeKnrSeries:
     """Tests for the vectorized pandas Series normalizer."""
@@ -111,16 +125,19 @@ class TestNormalizeKnrSeries:
         assert result.tolist() == ["1506", "0301", "5001"]
 
     def test_split_codes_unchanged_in_series(self) -> None:
-        """Split codes in a series pass through unchanged."""
+        """Split codes in a series pass through unchanged; chained codes resolve
+        to their terminal (0101 → 3101 after the 2024 wave)."""
         s = pd.Series(["5012", "1850", "0101"])
         result = normalize_knr_series(s)
-        assert result.tolist() == ["5012", "1850", "3001"]
+        assert result.tolist() == ["5012", "1850", "3101"]
 
-    def test_klass_verified_wave_2020(self) -> None:
-        """Key KLASS-verified 2020 mappings work in series form."""
+    def test_klass_verified_terminal_codes(self) -> None:
+        """Key KLASS-verified mappings resolve to terminal codes in series form.
+        1504 chains into the 2024 Ålesund split → dropped; 1502→1506 (Molde,
+        unchanged 2024); 0101→3101 (Halden, renumbered twice)."""
         s = pd.Series(["1504", "1502", "0101"])
         result = normalize_knr_series(s)
-        assert result.tolist() == ["1507", "1506", "3001"]
+        assert result.tolist() == ["1504", "1506", "3101"]
 
 
 class TestMergerLookupIntegrity:
@@ -156,7 +173,29 @@ class TestMergerLookupIntegrity:
             )
 
     def test_table_size_matches_klass(self) -> None:
-        """Merger lookup has the expected number of entries from KLASS (358 one-to-one)."""
-        assert len(MERGER_LOOKUP) == 358, (
-            f"Expected 358 KLASS-sourced entries, got {len(MERGER_LOOKUP)}"
+        """Merger lookup has the expected number of entries from KLASS across the
+        2018+2020+2024 waves (468 one-to-one after transitive closure; 6 codes
+        dropped because their chain runs into the 2024 Ålesund/Snillfjord split)."""
+        assert len(MERGER_LOOKUP) == 468, (
+            f"Expected 468 KLASS-sourced entries, got {len(MERGER_LOOKUP)}"
+        )
+
+    def test_table_fully_resolved_no_value_is_a_key(self) -> None:
+        """Bug-1 invariant: the table is resolved to terminal codes — no mapping
+        VALUE is itself a mapping KEY. Otherwise normalize_knr would leave a code
+        one hop short of its current number (the original 0111→3011 bug)."""
+        keys = set(MERGER_LOOKUP.keys())
+        values = set(MERGER_LOOKUP.values())
+        leaked = values & keys
+        assert not leaked, (
+            f"table not fully resolved — these codes are both a value and a key: "
+            f"{sorted(leaked)}"
+        )
+
+    def test_no_value_is_a_split_code(self) -> None:
+        """No terminal code is itself an excluded split source (a chain into a
+        split must be dropped, never point at the split code)."""
+        values = set(MERGER_LOOKUP.values())
+        assert not (values & SPLIT_CODES_EXCLUDED), (
+            f"split code leaked as a terminal: {sorted(values & SPLIT_CODES_EXCLUDED)}"
         )

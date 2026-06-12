@@ -25,9 +25,11 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 
 from .analyze import AnalysisResult, KommuneMetrics
 
@@ -436,3 +438,105 @@ def build_standard_claims(result: AnalysisResult) -> list[Claim]:
         ))
 
     return claims
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Structural check — ranked knrs must be living kommuner (recomputed from DB)
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def _parse_age_to_int(label: str) -> int | None:
+    """Parse an SSB age label ("80 år", "100 år eller eldre", or a bare code
+    like "080") to an integer. Returns None if no leading digits are present."""
+    digits = "".join(c for c in str(label).strip().split()[0] if c.isdigit())
+    return int(digits) if digits else None
+
+
+def recompute_living_knrs_from_db(
+    db_path: Path | str,
+    *,
+    table: str = "befolkning",
+) -> tuple[set[str], int]:
+    """Recompute, straight from DuckDB, the set of kommuner alive in the latest
+    population year (positive summed 80+ count).
+
+    This is deliberately INDEPENDENT of :mod:`analyze`: it re-reads the
+    persisted ``befolkning`` table and re-derives the living set, so it catches
+    a dead-code-ranking regression even if ``run_analysis`` is broken.
+
+    Returns ``(living_knr_set, latest_year)``; ``(set(), 0)`` if the table is
+    empty or unavailable.
+    """
+    import duckdb
+
+    db_path = Path(db_path)
+    if not db_path.exists():
+        return set(), 0
+    con = duckdb.connect(str(db_path), read_only=True)
+    try:
+        df = con.execute(f"SELECT knr, alder, aar, value FROM {table}").df()  # noqa: S608 (table is a fixed literal / pattern-locked id)
+    except Exception as exc:  # missing table → treat as no data
+        logger.warning("Could not read %s from %s: %s", table, db_path, exc)
+        return set(), 0
+    finally:
+        con.close()
+
+    if df.empty:
+        return set(), 0
+
+    df = df.copy()
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+    df["age_int"] = df["alder"].map(_parse_age_to_int)
+    df_80 = df[df["age_int"].fillna(0) >= 80]
+    if df_80.empty:
+        return set(), 0
+    latest = int(df_80["aar"].max())
+    grp = df_80[df_80["aar"] == latest].groupby("knr")["value"].sum()
+    living = {str(k) for k, v in grp.items() if v > 0}
+    return living, latest
+
+
+def verify_ranked_knrs_exist_in_db(
+    result: AnalysisResult,
+    db_path: Path | str,
+    *,
+    table: str = "befolkning",
+) -> ClaimResult:
+    """Structural gate: every ranked knr in *result* must be a kommune alive in
+    the latest population year of the persisted ``befolkning`` table.
+
+    Catches dead/defunct codes leaking into the ranking forever, independent of
+    analyze internals. Returns a :class:`ClaimResult` (passes / message) so it
+    composes with the rest of the verifier's reporting.
+    """
+    claim = Claim(
+        claim_type="ranked_knrs_living",
+        claimed_value=None,
+        parameters={"db_path": str(db_path), "table": table},
+        source_text="Every ranked kommune exists in the latest befolkning year",
+    )
+    living, latest = recompute_living_knrs_from_db(db_path, table=table)
+    if not living:
+        return ClaimResult(
+            claim=claim,
+            recomputed_value=None,
+            passes=False,
+            message=(
+                f"structural check inconclusive: no living kommuner recomputed "
+                f"from {table} in {db_path}"
+            ),
+        )
+    ranked = {km.knr for km in result.kommuner if km.rank >= 1}
+    dead_ranked = sorted(ranked - living)
+    passes = not dead_ranked
+    return ClaimResult(
+        claim=claim,
+        recomputed_value=len(ranked),
+        passes=passes,
+        message=(
+            f"OK: all {len(ranked)} ranked knrs alive in {latest}"
+            if passes
+            else f"FAIL: {len(dead_ranked)} ranked knr(s) not alive in {latest} "
+                 f"(dead/defunct codes ranked): {dead_ranked}"
+        ),
+    )

@@ -73,6 +73,7 @@ def stage_analyze(ctx: StageContext) -> None:
         df_kostra=datasets.get("kostra_pleie", pd.DataFrame()),
         df_pop=datasets.get("befolkning", pd.DataFrame()),
         df_proj=datasets.get("framskrivinger"),
+        params=ctx.config.params,
     )
     path = ctx.data_dir / "findings.json"
     save_findings(result, path=path)
@@ -88,17 +89,38 @@ def stage_analyze(ctx: StageContext) -> None:
 
 
 def stage_verify(ctx: StageContext) -> None:
-    from .verify import Verifier, build_standard_claims
+    from .verify import (
+        Verifier,
+        build_standard_claims,
+        verify_ranked_knrs_exist_in_db,
+    )
 
     result = ctx.state["result"]
     claims = build_standard_claims(result)
     vreport = Verifier(result).verify_all(claims)
+
+    # Structural gate (independent of analyze internals): every ranked knr must
+    # be a kommune alive in the latest befolkning year, recomputed from DuckDB.
+    # Catches dead/defunct codes leaking into the ranking forever.
+    db_path = ctx.artifacts.get("duckdb")
+    structural: list[str] = []
+    if db_path is not None:
+        cr = verify_ranked_knrs_exist_in_db(result, db_path)
+        vreport.total_claims += 1
+        if cr.passes:
+            vreport.passed += 1
+        else:
+            vreport.failed += 1
+            vreport.verdict = "FAIL"
+            structural.append(cr.message)
+        logger.info("Structural check (ranked_knrs_living): %s", cr.message)
+
     payload = {
         "verdict": vreport.verdict,
         "total_claims": vreport.total_claims,
         "passed": vreport.passed,
         "failed": vreport.failed,
-        "failures": [r.message for r in vreport.results if not r.passes],
+        "failures": [r.message for r in vreport.results if not r.passes] + structural,
     }
     path = ctx.data_dir / "verification.json"
     path.write_text(
@@ -114,7 +136,10 @@ def stage_verify(ctx: StageContext) -> None:
     ctx.state["verification"] = vreport
     ctx.artifacts["verification"] = path
     if vreport.verdict != "PASS":
-        raise PipelineGateError(vreport.summary())
+        msg = vreport.summary()
+        if structural:
+            msg += " | structural: " + "; ".join(structural)
+        raise PipelineGateError(msg)
 
 
 def stage_anonymize(ctx: StageContext) -> None:

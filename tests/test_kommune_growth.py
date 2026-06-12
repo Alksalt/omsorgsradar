@@ -201,6 +201,95 @@ class TestPerKommuneGrowth:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# G7-fix Bug 3 — CAGR guards (short window + outlier clamp)
+# ──────────────────────────────────────────────────────────────────────────────
+
+class TestCagrGuards:
+    """Short windows and outlier per-annum rates fall back to the national rate."""
+
+    def _two_point(self, knr: str, y0: int, p0: float, y1: int, p1: float) -> pd.DataFrame:
+        """Build a minimal all-years 80+ frame with one age row per year."""
+        rows = [
+            {"knr": knr, "aar": y0, "alder": "080", "pop_80plus": p0},
+            {"knr": knr, "aar": y1, "alder": "080", "pop_80plus": p1},
+        ]
+        # _compute_kommune_growth_rates consumes the *raw* population frame and
+        # re-extracts 80+; emulate that shape (alder + value columns).
+        return pd.DataFrame(
+            [{"knr": r["knr"], "aar": r["aar"], "alder": r["alder"],
+              "value": r["pop_80plus"]} for r in rows]
+        )
+
+    def test_short_window_falls_back_to_national(self) -> None:
+        """A 2-year window (< min_growth_window_years) → national_short_window."""
+        # Hvaler-like: 80+ jumps 248→328 over only 2 years (2024→2026).
+        df_pop = self._two_point("3110", 2024, 248.0, 2026, 328.0)
+        df_80 = pd.DataFrame({"knr": ["3110"], "aar": [2026], "pop_80plus": [328.0]})
+        df_proj = _project_80plus(
+            df_80, target_year=2035, df_pop_all_years=df_pop,
+            min_window_years=5,
+        )
+        row = df_proj[df_proj["knr"] == "3110"].iloc[0]
+        assert row["growth_source"] == "national_short_window", (
+            f"expected national_short_window for a 2-year window, got "
+            f"{row['growth_source']}"
+        )
+        # And the explosion is gone: growth_pct must be sane (national ~3.5%/yr
+        # over 9 years ≈ 36%, nowhere near the 252% artifact).
+        assert row["pop_80plus_growth_pct"] < 80.0
+
+    def test_long_window_above_min_uses_kommune_rate(self) -> None:
+        """A window ≥ min_growth_window_years with an in-band rate stays kommune."""
+        # 10-year window, ~2.5%/yr — well within the clamp band.
+        df_pop = self._two_point("0301", 2016, 1000.0, 2026, 1280.0)
+        df_80 = pd.DataFrame({"knr": ["0301"], "aar": [2026], "pop_80plus": [1280.0]})
+        df_proj = _project_80plus(
+            df_80, target_year=2035, df_pop_all_years=df_pop,
+            min_window_years=5,
+        )
+        row = df_proj[df_proj["knr"] == "0301"].iloc[0]
+        assert row["growth_source"] == "kommune"
+
+    def test_outlier_high_rate_falls_back_to_national(self) -> None:
+        """A long window but implausibly high p.a. rate → national_outlier_rate."""
+        # 8-year window but 80+ triples → ~14.7%/yr, above the +10% clamp.
+        df_pop = self._two_point("9001", 2018, 100.0, 2026, 300.0)
+        df_80 = pd.DataFrame({"knr": ["9001"], "aar": [2026], "pop_80plus": [300.0]})
+        df_proj = _project_80plus(
+            df_80, target_year=2035, df_pop_all_years=df_pop,
+            min_window_years=5, rate_min_pa=-0.05, rate_max_pa=0.10,
+        )
+        row = df_proj[df_proj["knr"] == "9001"].iloc[0]
+        assert row["growth_source"] == "national_outlier_rate", (
+            f"expected national_outlier_rate for ~14.7%/yr, got {row['growth_source']}"
+        )
+
+    def test_outlier_negative_rate_falls_back_to_national(self) -> None:
+        """A steep decline below the -5% p.a. floor → national_outlier_rate."""
+        # 8-year window, 80+ more than halves → ~ -8.3%/yr, below the -5% floor.
+        df_pop = self._two_point("9002", 2018, 300.0, 2026, 150.0)
+        df_80 = pd.DataFrame({"knr": ["9002"], "aar": [2026], "pop_80plus": [150.0]})
+        df_proj = _project_80plus(
+            df_80, target_year=2035, df_pop_all_years=df_pop,
+            min_window_years=5, rate_min_pa=-0.05, rate_max_pa=0.10,
+        )
+        row = df_proj[df_proj["knr"] == "9002"].iloc[0]
+        assert row["growth_source"] == "national_outlier_rate"
+
+    def test_in_band_long_window_keeps_kommune_rate(self) -> None:
+        """A modest decline within the clamp band stays kommune (not clamped)."""
+        # 8-year window, gentle -2%/yr decline — inside [-5%, +10%].
+        df_pop = self._two_point("9003", 2018, 200.0, 2026, 170.0)
+        df_80 = pd.DataFrame({"knr": ["9003"], "aar": [2026], "pop_80plus": [170.0]})
+        df_proj = _project_80plus(
+            df_80, target_year=2035, df_pop_all_years=df_pop,
+            min_window_years=5, rate_min_pa=-0.05, rate_max_pa=0.10,
+        )
+        row = df_proj[df_proj["knr"] == "9003"].iloc[0]
+        assert row["growth_source"] == "kommune"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # A4 — Verifier catches corrupt per-kommune growth
 # ──────────────────────────────────────────────────────────────────────────────
 

@@ -5,8 +5,11 @@ deliberately planted false statistic (a claimed press index of 0.999 when
 the true value is much lower, and a fake growth rate).
 """
 
+from pathlib import Path
+
 import pytest
 import numpy as np
+import pandas as pd
 
 from omsorgsradar.analyze import AnalysisResult, KommuneMetrics
 from omsorgsradar.verify import (
@@ -15,6 +18,8 @@ from omsorgsradar.verify import (
     VerificationReport,
     Verifier,
     build_standard_claims,
+    recompute_living_knrs_from_db,
+    verify_ranked_knrs_exist_in_db,
 )
 
 
@@ -208,6 +213,63 @@ class TestVerificationReport:
         report = verifier.verify_all(claims)
         assert report.verdict == "FAIL"
         assert "FAIL" in report.summary()
+
+
+def _seed_befolkning_db(db_path: Path) -> None:
+    """Write a tiny befolkning table: 0301 live, 3011 dead in latest year 2024."""
+    from omsorgsradar.ingest import save_to_duckdb
+
+    rows = []
+    for aar in (2022, 2023, 2024):
+        rows.append({"knr": "0301", "knr_raw": "0301", "alder": "80 år",
+                     "aar": aar, "value": 1000.0})
+        # dead code: positive only in 2022, zero afterwards
+        rows.append({"knr": "3011", "knr_raw": "3011", "alder": "80 år",
+                     "aar": aar, "value": 200.0 if aar == 2022 else 0.0})
+    save_to_duckdb(pd.DataFrame(rows), "befolkning", db_path=db_path)
+
+
+class TestStructuralDbCheck:
+    """Bug-'Also': independent DuckDB recompute that ranked knrs are living.
+
+    These checks read the persisted befolkning table directly — they do NOT
+    trust analyze internals — so a dead-code-ranking regression is caught even
+    if run_analysis is later broken.
+    """
+
+    def test_recompute_living_knrs_from_db(self, tmp_path: Path) -> None:
+        db = tmp_path / "t.duckdb"
+        _seed_befolkning_db(db)
+        living, year = recompute_living_knrs_from_db(db)
+        assert year == 2024
+        assert living == {"0301"}, f"expected only 0301 living, got {living}"
+
+    def test_ranked_living_kommune_passes(self, tmp_path: Path) -> None:
+        db = tmp_path / "t.duckdb"
+        _seed_befolkning_db(db)
+        result = AnalysisResult(kommuner=[
+            KommuneMetrics(knr="0301", navn="Oslo", rank=1,
+                           pop_80plus_growth_pct=10.0, press_index_norm=1.0),
+            KommuneMetrics(knr="3011", navn="Hvaler (-2019)", rank=0,
+                           pop_80plus_growth_pct=float("nan"),
+                           press_index_norm=float("nan")),
+        ])
+        cr = verify_ranked_knrs_exist_in_db(result, db)
+        assert cr.passes, cr.message
+
+    def test_ranked_dead_code_fails(self, tmp_path: Path) -> None:
+        db = tmp_path / "t.duckdb"
+        _seed_befolkning_db(db)
+        # Plant a regression: a DEAD code (3011) carries a rank.
+        result = AnalysisResult(kommuner=[
+            KommuneMetrics(knr="0301", navn="Oslo", rank=1,
+                           pop_80plus_growth_pct=10.0, press_index_norm=1.0),
+            KommuneMetrics(knr="3011", navn="Hvaler (-2019)", rank=2,
+                           pop_80plus_growth_pct=5.0, press_index_norm=0.5),
+        ])
+        cr = verify_ranked_knrs_exist_in_db(result, db)
+        assert not cr.passes, "structural check must FAIL when a dead code is ranked"
+        assert "3011" in cr.message
 
 
 class TestBuildStandardClaims:

@@ -21,6 +21,7 @@ All intermediate series are preserved in the returned :class:`AnalysisResult`.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import logging
 from dataclasses import asdict, dataclass, field
@@ -37,6 +38,17 @@ FINDINGS_PATH = Path(__file__).parent.parent.parent / "data" / "findings.json"
 # Small epsilon to guard against division by zero in coverage rate
 _EPSILON = 1e-6
 
+# ── CAGR-guard code defaults (overridable via analysis.toml [params]) ─────────
+# A per-kommune CAGR computed from a short or noisy window, then extrapolated
+# ~9 years, explodes. These defaults are the last-resort fallback when the
+# pipeline does not pass config values; the documented source of truth is
+# analyses/<name>/analysis.toml. See run_analysis().
+DEFAULT_MIN_GROWTH_WINDOW_YEARS = 5
+DEFAULT_KOMMUNE_RATE_MIN_PA = -0.05  # -5%/yr floor (steeper decline = noise)
+DEFAULT_KOMMUNE_RATE_MAX_PA = 0.10   # +10%/yr ceiling (faster = artifact)
+# National default 80+ CAGR (SSB 2024 report: ~3.5% p.a. over 2010–2024).
+DEFAULT_NATIONAL_RATE_PA = 0.035
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Data structures
@@ -50,7 +62,6 @@ class KommuneMetrics:
     knr: str
     navn: str = ""
     # Population
-    pop_total_latest: float = float("nan")
     pop_80plus_latest: float = float("nan")
     pop_80plus_projected_2035: float = float("nan")
     pop_80plus_growth_pct: float = float("nan")
@@ -198,11 +209,13 @@ def _compute_kommune_growth_rates(df_pop: pd.DataFrame) -> pd.DataFrame:
 
     Returns:
         DataFrame with columns ``knr``, ``kommune_cagr`` (as a fraction,
-        e.g. 0.0134 for 1.34% p.a.).  One row per kommune.
+        e.g. 0.0134 for 1.34% p.a.) and ``window_years`` (span between the
+        first and last positive-count year, used by the short-window guard in
+        :func:`_project_80plus`).  One row per kommune.
     """
     df_all = _extract_80plus_all_years(df_pop)
     if df_all.empty:
-        return pd.DataFrame(columns=["knr", "kommune_cagr"])
+        return pd.DataFrame(columns=["knr", "kommune_cagr", "window_years"])
 
     records: list[dict] = []
     for knr, grp in df_all.groupby("knr"):
@@ -210,16 +223,18 @@ def _compute_kommune_growth_rates(df_pop: pd.DataFrame) -> pd.DataFrame:
         # Need at least 2 data points with positive population
         valid = grp_sorted[grp_sorted["pop_80plus"] > 0]
         if len(valid) < 2:
-            records.append({"knr": knr, "kommune_cagr": float("nan")})
+            records.append({"knr": knr, "kommune_cagr": float("nan"),
+                            "window_years": 0})
             continue
         pop_start = float(valid.iloc[0]["pop_80plus"])
         pop_end = float(valid.iloc[-1]["pop_80plus"])
         years = int(valid.iloc[-1]["aar"]) - int(valid.iloc[0]["aar"])
         if pop_start <= 0 or years <= 0:
-            records.append({"knr": knr, "kommune_cagr": float("nan")})
+            records.append({"knr": knr, "kommune_cagr": float("nan"),
+                            "window_years": years})
             continue
         cagr = (pop_end / pop_start) ** (1.0 / years) - 1.0
-        records.append({"knr": knr, "kommune_cagr": cagr})
+        records.append({"knr": knr, "kommune_cagr": cagr, "window_years": years})
 
     return pd.DataFrame(records)
 
@@ -229,19 +244,34 @@ def _project_80plus(
     target_year: int = 2035,
     df_proj: pd.DataFrame | None = None,
     df_pop_all_years: pd.DataFrame | None = None,
+    *,
+    min_window_years: int = DEFAULT_MIN_GROWTH_WINDOW_YEARS,
+    rate_min_pa: float = DEFAULT_KOMMUNE_RATE_MIN_PA,
+    rate_max_pa: float = DEFAULT_KOMMUNE_RATE_MAX_PA,
 ) -> pd.DataFrame:
     """Project 80+ population to *target_year* per kommune.
 
     Growth-rate fallback chain (best available wins):
       1. **Kommune-level historical CAGR** — computed from ``df_pop_all_years``
-         (the full multi-year population DataFrame).  Requires ≥2 years of
-         positive 80+ count per kommune.
+         (the full multi-year population DataFrame).  Accepted only when the
+         observation window is long enough AND the per-annum rate is plausible
+         (two guards, below); otherwise we fall back to the national rate.
       2. **National-level CAGR from SSB projections** — derived from
          ``df_proj`` if supplied.
       3. **Default 3.5% p.a.** — Norwegian 80+ trend 2010–2024 (SSB 2024).
 
+    CAGR guards (G7-fix Bug 3) — a short or noisy window extrapolated ~9 years
+    explodes (a 2-year split-artifact window once put Hvaler at +252%):
+      * **Short-window guard**: if the window between the first and last
+        positive-count year is ``< min_window_years``, use the national rate
+        and tag ``growth_source = "national_short_window"``.
+      * **Outlier-clamp guard**: if the kommune CAGR is outside
+        ``[rate_min_pa, rate_max_pa]`` p.a., use the national rate and tag
+        ``growth_source = "national_outlier_rate"``.
+
     Emits a ``growth_source`` column: ``"kommune"`` | ``"national"`` |
-    ``"default"`` indicating which path was used per row.
+    ``"default"`` | ``"national_short_window"`` | ``"national_outlier_rate"``
+    indicating which path was used per row.
 
     Args:
         df_80: DataFrame from :func:`_extract_80plus_by_kommune` (one row per
@@ -250,6 +280,10 @@ def _project_80plus(
         df_proj: Optional national projection DataFrame.
         df_pop_all_years: Optional full population DataFrame with all years
             (used to compute per-kommune historical CAGR).
+        min_window_years: Minimum first-to-last positive-year span to trust a
+            kommune-level CAGR (below it → national fallback).
+        rate_min_pa: Lower clamp on the per-annum kommune CAGR (fraction).
+        rate_max_pa: Upper clamp on the per-annum kommune CAGR (fraction).
 
     Returns:
         *df_80* with additional columns ``pop_80plus_2035``,
@@ -267,6 +301,7 @@ def _project_80plus(
 
     # ── Step 1: Attempt to derive national growth rate from SSB projections ──
     national_growth_rate: float | None = None
+    national_is_projection = False
     if df_proj is not None and not df_proj.empty and "value" in df_proj.columns:
         try:
             df_proj_num = df_proj.copy()
@@ -275,6 +310,7 @@ def _project_80plus(
             total_2035 = df_proj_num[df_proj_num["aar"] == target_year]["value"].sum()
             if total_now > 0 and total_2035 > 0 and years_ahead > 0:
                 national_growth_rate = (total_2035 / total_now) ** (1 / years_ahead) - 1
+                national_is_projection = True
                 logger.info(
                     "National growth rate from projections: %.3f%% p.a.",
                     national_growth_rate * 100,
@@ -284,33 +320,50 @@ def _project_80plus(
 
     if national_growth_rate is None:
         # Default: Norwegian 80+ cohort grew ~3.5% p.a. over 2010–2024 (SSB 2024 report)
-        national_growth_rate = 0.035
+        national_growth_rate = DEFAULT_NATIONAL_RATE_PA
 
     # ── Step 2: Compute per-kommune CAGR from historical data ─────────────────
-    kommune_rates: pd.DataFrame = pd.DataFrame(columns=["knr", "kommune_cagr"])
+    kommune_rates: pd.DataFrame = pd.DataFrame(
+        columns=["knr", "kommune_cagr", "window_years"]
+    )
     if df_pop_all_years is not None and not df_pop_all_years.empty:
         kommune_rates = _compute_kommune_growth_rates(df_pop_all_years)
 
-    # ── Step 3: Build per-row growth rate with fallback chain ─────────────────
+    # ── Step 3: Build per-row growth rate with guarded fallback chain ─────────
     df_out = df_80.copy()
     if not kommune_rates.empty:
         df_out = df_out.merge(kommune_rates, on="knr", how="left")
     else:
         df_out["kommune_cagr"] = float("nan")
+        df_out["window_years"] = 0
+
+    # Label used when we fall back to the national rate for "no usable kommune
+    # CAGR" reasons (missing history): "national" if a real projection drove the
+    # rate, else "default" (the 3.5% constant).
+    national_label = "national" if national_is_projection else "default"
 
     rates: list[float] = []
     sources: list[str] = []
     for _, row in df_out.iterrows():
         k_cagr = row.get("kommune_cagr", float("nan"))
-        if pd.notna(k_cagr) and k_cagr > 0:
+        window = row.get("window_years", 0)
+        window = int(window) if pd.notna(window) else 0
+
+        if pd.isna(k_cagr):
+            # No usable kommune history → national/default.
+            rates.append(float(national_growth_rate))
+            sources.append(national_label)
+        elif window < min_window_years:
+            # Short-window guard: too few years to trust the kommune CAGR.
+            rates.append(float(national_growth_rate))
+            sources.append("national_short_window")
+        elif not (rate_min_pa <= float(k_cagr) <= rate_max_pa):
+            # Outlier-clamp guard: implausible per-annum rate → national.
+            rates.append(float(national_growth_rate))
+            sources.append("national_outlier_rate")
+        else:
             rates.append(float(k_cagr))
             sources.append("kommune")
-        elif national_growth_rate is not None:
-            rates.append(float(national_growth_rate))
-            sources.append("national" if df_proj is not None and not df_proj.empty else "default")
-        else:
-            rates.append(0.035)
-            sources.append("default")
 
     df_out["_rate"] = rates
     df_out["growth_source"] = sources
@@ -321,8 +374,9 @@ def _project_80plus(
         * 100
     )
     df_out = df_out.drop(columns=["_rate"])
-    if "kommune_cagr" in df_out.columns:
-        df_out = df_out.drop(columns=["kommune_cagr"])
+    for col in ("kommune_cagr", "window_years"):
+        if col in df_out.columns:
+            df_out = df_out.drop(columns=[col])
 
     # Log distribution
     source_counts = pd.Series(sources).value_counts().to_dict()
@@ -515,11 +569,30 @@ def _build_name_lookup(df_kostra: pd.DataFrame) -> dict[str, str]:
 # ──────────────────────────────────────────────────────────────────────────────
 
 
+def _living_knr_set(df_pop: pd.DataFrame) -> tuple[set[str], int]:
+    """Return (set of knr alive in the latest population year, that year).
+
+    A kommune is *alive* if it has a positive summed 80+ count in the latest
+    available population year. SSB emits a row for every historical code in
+    every year — with value 0 in years the code was not active — so a dead code
+    (e.g. the pre-2024 Hvaler code 3011) appears in the latest year with a zero
+    sum and must be excluded from ranking. Mirrors the independent DuckDB check
+    in :func:`verify.recompute_living_ranked_knrs`.
+    """
+    df = _extract_80plus_all_years(df_pop)
+    if df.empty:
+        return set(), 0
+    latest = int(df["aar"].max())
+    alive = df[(df["aar"] == latest) & (df["pop_80plus"] > 0)]["knr"]
+    return set(alive.astype(str)), latest
+
+
 def run_analysis(
     df_kostra: pd.DataFrame,
     df_pop: pd.DataFrame,
     df_proj: pd.DataFrame | None = None,
     target_year: int = 2035,
+    params: dict[str, Any] | None = None,
 ) -> AnalysisResult:
     """Run the full analysis pipeline and return structured findings.
 
@@ -527,13 +600,32 @@ def run_analysis(
         df_kostra: KOSTRA pleie DataFrame.
         df_pop: Population by age DataFrame.
         df_proj: Optional national projection DataFrame.
-        target_year: Projection horizon year.
+        target_year: Projection horizon year (overridden by
+            ``params['projection_year']`` when present).
+        params: Optional ``[params]`` block from analysis.toml. Recognised keys:
+            ``projection_year``, ``min_growth_window_years``,
+            ``kommune_rate_min_pa``, ``kommune_rate_max_pa``. Missing keys fall
+            back to the module ``DEFAULT_*`` constants.
 
     Returns:
-        :class:`AnalysisResult` with all metrics per kommune.
+        :class:`AnalysisResult` with all metrics per kommune. Only kommuner
+        alive in the latest population year (positive 80+) are ranked; dead
+        historical codes are retained with ``rank = 0``.
     """
+    params = dict(params or {})
+    target_year = int(params.get("projection_year", target_year))
+    min_window_years = int(
+        params.get("min_growth_window_years", DEFAULT_MIN_GROWTH_WINDOW_YEARS)
+    )
+    rate_min_pa = float(params.get("kommune_rate_min_pa", DEFAULT_KOMMUNE_RATE_MIN_PA))
+    rate_max_pa = float(params.get("kommune_rate_max_pa", DEFAULT_KOMMUNE_RATE_MAX_PA))
+
     result = AnalysisResult()
     notes: list[str] = []
+
+    # Step 0: Which kommuner are alive in the latest population year? Only these
+    # may be ranked (Bug-2 fix); dead historical codes are kept but unranked.
+    living, living_year = _living_knr_set(df_pop)
 
     # Step 1: Extract 80+ population
     df_80 = _extract_80plus_by_kommune(df_pop)
@@ -545,12 +637,16 @@ def run_analysis(
     logger.info("80+ population extracted for %d kommuner", len(df_80))
     result.analysis_year_range = (int(df_80["aar"].min()), int(df_80["aar"].max()))
 
-    # Step 2: Project 80+ to target year — using per-kommune historical CAGR where available
+    # Step 2: Project 80+ to target year — using per-kommune historical CAGR
+    # where available, guarded against short-window / outlier explosions.
     df_80 = _project_80plus(
         df_80,
         target_year=target_year,
         df_proj=df_proj,
         df_pop_all_years=df_pop if not df_pop.empty else None,
+        min_window_years=min_window_years,
+        rate_min_pa=rate_min_pa,
+        rate_max_pa=rate_max_pa,
     )
 
     # Derive growth_method summary
@@ -579,11 +675,40 @@ def run_analysis(
     # Step 5: Pressure index
     df_merged = _compute_press_index(df_merged)
 
-    # Step 6: Rank (highest press first; NaN → sorted to bottom)
+    # Step 6: Rank — only kommuner alive in the latest population year (Bug-2).
+    # Dead historical codes (no positive 80+ in the latest year) are retained in
+    # the output for provenance but assigned rank 0 and sorted to the bottom, so
+    # they never appear in any "topp N" ranking and never crash the growth sort.
+    # If we have no living set (e.g. minimal fixtures without an all-years
+    # frame), fall back to ranking everything (legacy behaviour).
+    if living:
+        df_merged["_is_living"] = df_merged["knr"].astype(str).isin(living)
+    else:
+        df_merged["_is_living"] = True
+
     df_merged = df_merged.sort_values(
-        "press_index_norm", ascending=False, na_position="last"
+        ["_is_living", "press_index_norm"],
+        ascending=[False, False],
+        na_position="last",
     ).reset_index(drop=True)
-    df_merged["rank"] = range(1, len(df_merged) + 1)
+
+    n_living = int(df_merged["_is_living"].sum())
+    ranks: list[int] = []
+    next_rank = 1
+    for is_living in df_merged["_is_living"]:
+        if is_living:
+            ranks.append(next_rank)
+            next_rank += 1
+        else:
+            ranks.append(0)  # unranked: dead/defunct code
+    df_merged["rank"] = ranks
+
+    n_dead = len(df_merged) - n_living
+    if n_dead:
+        notes.append(
+            f"{n_dead} defunct/dead kommune code(s) excluded from ranking "
+            f"(no positive 80+ population in {living_year}); {n_living} ranked."
+        )
 
     # Step 7: Municipality names
     name_lookup = _build_name_lookup(df_kostra)
@@ -595,7 +720,6 @@ def run_analysis(
         km = KommuneMetrics(
             knr=knr,
             navn=name_lookup.get(knr, ""),
-            pop_total_latest=float(row.get("pop_80plus", float("nan"))),  # closest proxy
             pop_80plus_latest=float(row.get("pop_80plus", float("nan"))),
             pop_80plus_projected_2035=float(row.get("pop_80plus_2035", float("nan"))),
             pop_80plus_growth_pct=float(row.get("pop_80plus_growth_pct", float("nan"))),
@@ -614,7 +738,9 @@ def run_analysis(
     result.notes = notes
 
     logger.info(
-        "Analysis complete: %d kommuner ranked; national 80+ growth to 2035: %.1f%%; growth_method: %s",
+        "Analysis complete: %d of %d kommuner ranked (living); national 80+ "
+        "growth to 2035: %.1f%%; growth_method: %s",
+        n_living,
         len(kommuner),
         result.national_growth_rate_2035,
         result.growth_method,
@@ -687,7 +813,13 @@ def load_findings(path: Path = FINDINGS_PATH) -> AnalysisResult:
         FileNotFoundError: if the file does not exist.
     """
     raw = json.loads(Path(path).read_text(encoding="utf-8"))
-    kommuner = [KommuneMetrics(**k) for k in raw.get("kommuner", [])]
+    # Tolerate schema drift: drop keys that are no longer dataclass fields
+    # (e.g. the removed pop_total_latest) so older findings.json still loads.
+    valid_fields = {f.name for f in dataclasses.fields(KommuneMetrics)}
+    kommuner = [
+        KommuneMetrics(**{k: v for k, v in km.items() if k in valid_fields})
+        for km in raw.get("kommuner", [])
+    ]
     return AnalysisResult(
         kommuner=kommuner,
         national_80plus_latest=raw.get("national_80plus_latest") or float("nan"),

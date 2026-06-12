@@ -53,7 +53,9 @@ class TestFetch:
             json.dumps(payload), encoding="utf-8"
         )
         df = ad.fetch(SOURCE)
-        assert "NO-3025" in set(df["geo_id"])  # 0220 -> 3025 (Asker, 2020-merger)
+        # 0220 (old Asker) → 3025 (2020 Viken) → 3203 (2024 Viken dissolution);
+        # transitive closure resolves directly to the terminal code 3203.
+        assert "NO-3203" in set(df["geo_id"])
 
 
 @pytest.mark.live

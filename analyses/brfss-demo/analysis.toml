@@ -1,0 +1,35 @@
+[analysis]
+name = "brfss-demo"
+question = "Hvordan kan vi publisere demografi-stratifisert diabetes-prevalens fra mikrodata med målt gjenidentifiseringsrisiko?"
+language = "nb"
+
+[stages]
+list = ["ingest", "profile", "anonymize", "analyze", "verify", "report"]
+
+[[sources]]
+adapter = "csv"
+id = "brfss"
+path = "microdata/brfss_sample.csv"
+row_level = true
+[sources.dtype]
+state = "str"
+[sources.provenance]
+institution = "US CDC — Behavioral Risk Factor Surveillance System (BRFSS)"
+url = "https://www.cdc.gov/brfss/annual_data/annual_data.htm"
+
+[params.anonymize]
+source = "brfss"
+text_columns = ["notes"]
+quasi_identifiers = ["state", "age", "sex"]
+sensitive = "diabetes"
+k = 10
+[params.anonymize.generalize.age]
+bins = [18, 30, 45, 60, 75, 200]
+labels = ["18-29", "30-44", "45-59", "60-74", "75+"]
+[params.anonymize.thresholds]
+l_min = 2
+inference = 0.5
+linkability = 0.5
+
+[params]
+min_class_for_report = 10

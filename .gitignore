@@ -21,6 +21,12 @@ data/*/*.duckdb
 # Run journals — regenerable, snapshot the workflow config
 runs/
 
+# brfss-demo: real CDC BRFSS downloads (not committed — only the synthetic fixture is tracked)
+analyses/brfss-demo/microdata/*.xpt
+analyses/brfss-demo/microdata/*.XPT
+analyses/brfss-demo/microdata/LLCP*.csv
+analyses/brfss-demo/microdata/LLCP*.csv.zip
+
 # OS
 .DS_Store
 Thumbs.db

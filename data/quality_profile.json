@@ -3,7 +3,7 @@
     "kostra_pleie": {
       "source": "SSB KOSTRA table 12209",
       "n_rows": 39204,
-      "n_kommuner": 849,
+      "n_kommuner": 423,
       "year_range": [
         2015,
         2025
@@ -42,12 +42,42 @@
         "KOShjtj80aarover0001",
         "KOSsykhjand80aar0000"
       ],
-      "merger_adjusted_rows": 1848
+      "merger_adjusted_rows": 20592,
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://data.ssb.no/api/v0/no/table"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Statistisk sentralbyrå (SSB)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "PASS",
+            "detail": "53.1% missing in value column"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=0 median=21.9 max=1.398e+05"
+          }
+        ]
+      }
     },
     "befolkning": {
       "source": "SSB table 07459 — folkemengde etter alder",
       "n_rows": 237750,
-      "n_kommuner": 908,
+      "n_kommuner": 483,
       "year_range": [
         2017,
         2026
@@ -60,23 +90,113 @@
         "aar": 0.0,
         "value": 0.0
       },
-      "age_groups_found": 25
+      "age_groups_found": 25,
+      "realness": {
+        "verdict": "WARN",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://data.ssb.no/api/v0/no/table"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Statistisk sentralbyrå (SSB)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "WARN",
+            "detail": "0 missing values in 237,750 rows — implausibly perfect for real-world data (fabrication signature)"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=0 median=0 max=3603"
+          }
+        ]
+      }
     },
     "framskrivinger": {
       "source": "SSB population projections",
-      "n_rows": 258,
+      "n_rows": 14,
       "is_national_aggregate": true,
       "year_range": [
-        2024,
-        2029
-      ]
+        2022,
+        2035
+      ],
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://data.ssb.no/api/v0/no/table"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Statistisk sentralbyrå (SSB)"
+          },
+          {
+            "name": "duplicates",
+            "status": "PASS",
+            "detail": "0.00% exact duplicate rows"
+          },
+          {
+            "name": "missingness",
+            "status": "PASS",
+            "detail": "0.0% missing in value column"
+          },
+          {
+            "name": "distribution",
+            "status": "PASS",
+            "detail": "min=2.402e+05 median=3.341e+05 max=4.223e+05"
+          }
+        ]
+      }
     },
     "fhi_nokkel": {
       "source": "FHI NOKKEL (folkehelsestatistikk)",
       "n_rows": 0,
       "n_kommuner": 0,
       "indicators": [],
-      "missing_value_rate": NaN
+      "missing_value_rate": NaN,
+      "realness": {
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "provenance",
+            "status": "PASS",
+            "detail": "url: https://statistikk-data.fhi.no/api/open/v1"
+          },
+          {
+            "name": "institution",
+            "status": "PASS",
+            "detail": "Folkehelseinstituttet (FHI)"
+          },
+          {
+            "name": "duplicates",
+            "status": "SKIP",
+            "detail": "empty dataset"
+          },
+          {
+            "name": "missingness",
+            "status": "SKIP",
+            "detail": "empty dataset or no value column"
+          },
+          {
+            "name": "distribution",
+            "status": "SKIP",
+            "detail": "empty dataset or no value column"
+          }
+        ]
+      }
     }
   }
 }

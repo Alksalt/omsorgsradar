@@ -1,9 +1,9 @@
 {
   "artifact": "verification",
   "path": "data/verification.json",
-  "sha256": "7a3073925d39cf5dc9d2fc116b811b83faf4c3169bf37734e9cfc56a6434b224",
+  "sha256": "9dd9bbaff03c2be5f78046313900868dede3d1b4ee8b9aa30adc0b34543e0c8d",
   "schema_version": "1",
-  "created_at": "2026-06-11T21:04:31.741062+00:00",
+  "created_at": "2026-06-12T15:38:35.141089+00:00",
   "producer": "verify",
   "inputs": [
     "data/findings.json"

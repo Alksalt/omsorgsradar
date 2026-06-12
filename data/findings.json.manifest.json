@@ -1,9 +1,9 @@
 {
   "artifact": "findings",
   "path": "data/findings.json",
-  "sha256": "a4441945b237dd82438ba3dd467c530a301e267b75586aaf14b93461da321d4c",
+  "sha256": "3d3f48e00d7b469c49d9c34578c059c24c9772bd3f7b6562ff19abce6dfcc9d3",
   "schema_version": "1",
-  "created_at": "2026-06-11T21:04:31.738236+00:00",
+  "created_at": "2026-06-12T15:38:34.816439+00:00",
   "producer": "analyze",
   "inputs": [
     "data/quality_profile.json"

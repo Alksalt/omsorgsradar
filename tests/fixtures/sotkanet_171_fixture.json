@@ -1,0 +1,82 @@
+[
+ {
+  "indicator": 171,
+  "region": 46,
+  "year": 2019,
+  "gender": "total",
+  "value": 7.4,
+  "absValue": 48189
+ },
+ {
+  "indicator": 171,
+  "region": 389,
+  "year": 2019,
+  "gender": "total",
+  "value": 9.3,
+  "absValue": 17865
+ },
+ {
+  "indicator": 171,
+  "region": 261,
+  "year": 2019,
+  "gender": "total",
+  "value": 6.6,
+  "absValue": 13481
+ },
+ {
+  "indicator": 171,
+  "region": 378,
+  "year": 2019,
+  "gender": "total",
+  "value": 8.4,
+  "absValue": 20096
+ },
+ {
+  "indicator": 171,
+  "region": 46,
+  "year": 2023,
+  "gender": "total",
+  "value": 8.6,
+  "absValue": 57877
+ },
+ {
+  "indicator": 171,
+  "region": 261,
+  "year": 2023,
+  "gender": "total",
+  "value": 7.8,
+  "absValue": 16701
+ },
+ {
+  "indicator": 171,
+  "region": 20,
+  "year": 2023,
+  "gender": "total",
+  "value": 7.2,
+  "absValue": 22725
+ },
+ {
+  "indicator": 171,
+  "region": 389,
+  "year": 2023,
+  "gender": "total",
+  "value": 10.5,
+  "absValue": 21174
+ },
+ {
+  "indicator": 171,
+  "region": 20,
+  "year": 2019,
+  "gender": "total",
+  "value": 5.9,
+  "absValue": 17186
+ },
+ {
+  "indicator": 171,
+  "region": 378,
+  "year": 2023,
+  "gender": "total",
+  "value": 9.4,
+  "absValue": 23990
+ }
+]

@@ -1,0 +1,42 @@
+[
+ {
+  "indicator": 5513,
+  "region": 20,
+  "year": 2023,
+  "gender": "total",
+  "value": 11.6,
+  "absValue": 2642
+ },
+ {
+  "indicator": 5513,
+  "region": 389,
+  "year": 2023,
+  "gender": "total",
+  "value": 13.0,
+  "absValue": 2749
+ },
+ {
+  "indicator": 5513,
+  "region": 46,
+  "year": 2023,
+  "gender": "total",
+  "value": 12.9,
+  "absValue": 7491
+ },
+ {
+  "indicator": 5513,
+  "region": 378,
+  "year": 2023,
+  "gender": "total",
+  "value": 12.7,
+  "absValue": 3035
+ },
+ {
+  "indicator": 5513,
+  "region": 261,
+  "year": 2023,
+  "gender": "total",
+  "value": 13.5,
+  "absValue": 2254
+ }
+]

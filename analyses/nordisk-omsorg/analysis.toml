@@ -1,0 +1,145 @@
+[analysis]
+name = "nordisk-omsorg"
+question = "Hvilke kommuner får den hardeste skvisen mellom aldring og hjemmetjenestekapasitet — og ser mønsteret bedre ut i Norge enn i Sverige og Finland?"
+language = "nb"
+
+[stages]
+list = ["ingest", "profile", "analyze", "verify", "report"]
+
+[params]
+base_year = 2019
+latest_year = 2023
+top_n = 10
+
+# ── Norge: dekning (KOSTRA 12209) ────────────────────────────────────────────
+[[sources]]
+adapter = "pxweb"
+id = "no_kostra"
+base_url = "https://data.ssb.no/api/v0/no/table"
+table = "12209"
+cache_key = "nordisk_no_kostra_12209"
+use_codes = true
+label_columns = true
+
+[sources.query]
+response = { format = "json-stat2" }
+
+[[sources.query.query]]
+code = "KOKkommuneregion0000"
+selection = { filter = "all", values = ["*"] }
+
+[[sources.query.query]]
+code = "ContentsCode"
+selection = { filter = "item", values = ["KOShjtj80aarover0001"] }
+
+[[sources.query.query]]
+code = "Tid"
+selection = { filter = "item", values = ["2019", "2023"] }
+
+# ── Norge: 80+ befolkning (07459) ────────────────────────────────────────────
+# 07459 has 4 variables: Region, Kjonn, Alder, ContentsCode, Tid
+# Kjonn has no "total" code — fetch both genders (1=Menn, 2=Kvinner); stages.py sums.
+# Alder 80+ codes are 3-digit zero-padded: 080..099, 100..104 (live-verified 2026-06-12).
+# ContentsCode has only one value: Person1 (live-verified).
+[[sources]]
+adapter = "pxweb"
+id = "no_befolkning"
+base_url = "https://data.ssb.no/api/v0/no/table"
+table = "07459"
+cache_key = "nordisk_no_befolkning_07459"
+use_codes = true
+label_columns = true
+
+[sources.query]
+response = { format = "json-stat2" }
+
+[[sources.query.query]]
+code = "Region"
+selection = { filter = "all", values = ["*"] }
+
+[[sources.query.query]]
+code = "Kjonn"
+selection = { filter = "item", values = ["1", "2"] }
+
+[[sources.query.query]]
+code = "Alder"
+selection = { filter = "item", values = [
+  "080", "081", "082", "083", "084", "085", "086", "087", "088", "089",
+  "090", "091", "092", "093", "094", "095", "096", "097", "098", "099",
+  "100", "101", "102", "103", "104",
+] }
+
+[[sources.query.query]]
+code = "ContentsCode"
+selection = { filter = "item", values = ["Personer1"] }
+
+[[sources.query.query]]
+code = "Tid"
+selection = { filter = "item", values = ["2019", "2023"] }
+
+# ── Norge: kontekst — legekonsultasjoner (KUHR) ──────────────────────────────
+[[sources]]
+adapter = "kuhr"
+id = "no_kuhr"
+fagomraade = "LE"
+fomar = 2019
+tomar = 2023
+takstkoder = ["2ad"]
+
+# ── Sverige: hemtjänst-dekning 80+ (Kolada N21704) ───────────────────────────
+[[sources]]
+adapter = "kolada"
+id = "se_hemtjanst"
+kpi = "N21704"
+years = [2023]
+
+# ── Sverige: 80+ befolkning (SCB BefolkningNy) ───────────────────────────────
+[[sources]]
+adapter = "pxweb"
+id = "se_befolkning"
+base_url = "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/BE/BE0101/BE0101A"
+table = "BefolkningNy"
+cache_key = "nordisk_se_befolkning"
+use_codes = true
+label_columns = true
+
+[sources.query]
+response = { format = "json-stat2" }
+
+[[sources.query.query]]
+code = "Region"
+selection = { filter = "all", values = ["*"] }
+
+[[sources.query.query]]
+code = "Alder"
+selection = { filter = "item", values = [
+  "80", "81", "82", "83", "84", "85", "86", "87", "88", "89",
+  "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100+",
+] }
+
+[[sources.query.query]]
+code = "ContentsCode"
+selection = { filter = "item", values = ["BE0101N1"] }
+
+[[sources.query.query]]
+code = "Tid"
+selection = { filter = "item", values = ["2019", "2023"] }
+
+# ── Finland: kotihoito-dekning 75+ (Sotkanet 5513; 3216 er død) ──────────────
+[[sources]]
+adapter = "sotkanet"
+id = "fi_homecare"
+indicators = [5513]
+years = [2023]
+
+[[sources]]
+adapter = "sotkanet"
+id = "fi_elderly_share"
+indicators = [171]
+years = [2019, 2023]
+
+[[sources]]
+adapter = "sotkanet"
+id = "fi_population"
+indicators = [127]
+years = [2019, 2023]

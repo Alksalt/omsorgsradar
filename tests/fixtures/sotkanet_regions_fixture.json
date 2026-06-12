@@ -1,0 +1,146 @@
+[
+ {
+  "id": 20,
+  "code": "049",
+  "category": "KUNTA",
+  "title": {
+   "fi": "Espoo",
+   "en": "Espoo",
+   "sv": "Esbo"
+  },
+  "memberOf": [
+   658,
+   921,
+   833,
+   840,
+   488,
+   510,
+   629,
+   727,
+   901,
+   969,
+   845
+  ],
+  "uri": "http://www.yso.fi/onto/kunnat/k049"
+ },
+ {
+  "id": 46,
+  "code": "091",
+  "category": "KUNTA",
+  "title": {
+   "fi": "Helsinki",
+   "en": "Helsinki",
+   "sv": "Helsingfors"
+  },
+  "memberOf": [
+   658,
+   833,
+   840,
+   921,
+   488,
+   510,
+   629,
+   727,
+   901,
+   960,
+   845
+  ],
+  "uri": "http://www.yso.fi/onto/kunnat/k091"
+ },
+ {
+  "id": 261,
+  "code": "564",
+  "category": "KUNTA",
+  "title": {
+   "fi": "Oulu",
+   "en": "Oulu",
+   "sv": "Uleåborg"
+  },
+  "memberOf": [
+   843,
+   933,
+   503,
+   579,
+   616,
+   727,
+   905,
+   658,
+   837,
+   973,
+   849
+  ],
+  "uri": "http://www.yso.fi/onto/kunnat/k564"
+ },
+ {
+  "id": 378,
+  "code": "837",
+  "category": "KUNTA",
+  "title": {
+   "fi": "Tampere",
+   "en": "Tampere",
+   "sv": "Tammerfors"
+  },
+  "memberOf": [
+   842,
+   492,
+   531,
+   604,
+   727,
+   925,
+   836,
+   903,
+   658,
+   970,
+   847
+  ],
+  "uri": "http://www.yso.fi/onto/kunnat/k837"
+ },
+ {
+  "id": 389,
+  "code": "853",
+  "category": "KUNTA",
+  "title": {
+   "fi": "Turku",
+   "en": "Turku",
+   "sv": "Åbo"
+  },
+  "memberOf": [
+   841,
+   902,
+   489,
+   518,
+   601,
+   727,
+   922,
+   834,
+   658,
+   978,
+   848
+  ],
+  "uri": "http://www.yso.fi/onto/kunnat/k853"
+ },
+ {
+  "id": 488,
+  "code": "01",
+  "category": "MAAKUNTA",
+  "title": {
+   "fi": "Uusimaa",
+   "en": "Uusimaa",
+   "sv": "Nyland"
+  },
+  "memberOf": [],
+  "uri": "http://www.yso.fi/onto/kunnat/mk01"
+ },
+ {
+  "id": 489,
+  "code": "02",
+  "category": "MAAKUNTA",
+  "title": {
+   "fi": "Varsinais-Suomi",
+   "en": "Southwest Finland",
+   "sv": "Egentliga Finland"
+  },
+  "memberOf": [],
+  "uri": "http://www.yso.fi/onto/kunnat/mk02"
+ }
+]

@@ -1,0 +1,37 @@
+[
+ {
+  "indicator": 127,
+  "region": 20,
+  "year": 2023,
+  "gender": "total",
+  "value": 314024
+ },
+ {
+  "indicator": 127,
+  "region": 389,
+  "year": 2023,
+  "gender": "total",
+  "value": 201863
+ },
+ {
+  "indicator": 127,
+  "region": 46,
+  "year": 2023,
+  "gender": "total",
+  "value": 674500
+ },
+ {
+  "indicator": 127,
+  "region": 378,
+  "year": 2023,
+  "gender": "total",
+  "value": 255050
+ },
+ {
+  "indicator": 127,
+  "region": 261,
+  "year": 2023,
+  "gender": "total",
+  "value": 214633
+ }
+]

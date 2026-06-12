@@ -53,6 +53,15 @@ WORKFLOW_SCHEMA: dict[str, Any] = {
                 "runs_dir": {"type": "string"},
             },
         },
+        "security": {
+            "type": "object",
+            "properties": {
+                "extra_allowed_hosts": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                }
+            },
+        },
     },
 }
 

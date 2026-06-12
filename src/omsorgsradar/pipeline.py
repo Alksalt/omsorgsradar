@@ -64,10 +64,14 @@ def run_pipeline(
     )
     cfg = load_run_config(analysis_dir, workflow_path)
 
-    from .core.adapters import validate_source
+    from .core.adapters import validate_source, validate_source_host
 
+    extra_hosts = frozenset(
+        cfg.workflow.get("security", {}).get("extra_allowed_hosts", [])
+    )
     for src in cfg.sources:
         validate_source(src)
+        validate_source_host(src, extra_hosts)
 
     data_dir, reports_dir = Path(data_dir), Path(reports_dir)
     data_dir.mkdir(parents=True, exist_ok=True)

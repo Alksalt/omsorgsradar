@@ -128,3 +128,26 @@ class TestCanonicalConfigs:
         assert cfg.stage_list[0] == "ingest"
         ids = [s["id"] for s in cfg.sources]
         assert ids == ["kostra_pleie", "befolkning", "framskrivinger", "fhi_nokkel"]
+
+
+class TestSecuritySchema:
+    def test_security_extra_hosts_accepted(self, tmp_path) -> None:
+        from omsorgsradar.core.config import load_workflow_config
+        (tmp_path / "workflow.toml").write_text(
+            '[endpoint]\nmode = "subscription"\n'
+            '[security]\nextra_allowed_hosts = ["api.statbank.dk"]\n',
+            encoding="utf-8",
+        )
+        cfg = load_workflow_config(tmp_path / "workflow.toml")
+        assert cfg["security"]["extra_allowed_hosts"] == ["api.statbank.dk"]
+
+    def test_security_wrong_type_rejected(self, tmp_path) -> None:
+        import pytest
+        from omsorgsradar.core.config import ConfigError, load_workflow_config
+        (tmp_path / "workflow.toml").write_text(
+            '[endpoint]\nmode = "subscription"\n'
+            '[security]\nextra_allowed_hosts = "api.statbank.dk"\n',
+            encoding="utf-8",
+        )
+        with pytest.raises(ConfigError, match="extra_allowed_hosts"):
+            load_workflow_config(tmp_path / "workflow.toml")

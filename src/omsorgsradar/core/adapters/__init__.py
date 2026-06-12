@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Mapping, Protocol, runtime_checkable
+from urllib.parse import urlparse
 
 import pandas as pd
 
@@ -44,6 +45,43 @@ REQUIRED_SOURCE_FIELDS: dict[str, tuple[str, ...]] = {
     "csv": ("path", "provenance"),
     "kolada": ("kpi", "years"),
 }
+
+# Hosts the engine may fetch from — the startup security gate for
+# machine-authored configs (spec 2026-06-11 §magic-analyze). Extend per repo
+# via workflow.toml [security].extra_allowed_hosts, never by editing this
+# list for one analysis.
+ALLOWED_BASE_URL_HOSTS: frozenset[str] = frozenset({
+    "data.ssb.no",
+    "statistikk-data.fhi.no",
+    "sotkanet.fi",
+    "sdb.socialstyrelsen.se",
+    "opne-data-api.helserefusjon.no",
+    "api.kolada.se",
+    "api.scb.se",
+})
+
+
+def validate_source_host(
+    source: Mapping[str, Any],
+    extra_hosts: frozenset[str] | set[str] = frozenset(),
+) -> None:
+    """Reject ``base_url`` hosts outside the allowlist (startup gate).
+
+    Sources without ``base_url`` use their adapter's default endpoint, which
+    is allowlisted by construction. Suffix matches only on dot boundaries.
+    """
+    base = str(source.get("base_url", ""))
+    if not base:
+        return
+    host = urlparse(base).netloc.lower()
+    allowed = set(ALLOWED_BASE_URL_HOSTS) | set(extra_hosts)
+    if host in allowed or any(host.endswith("." + h) for h in allowed):
+        return
+    raise ConfigError(
+        f"source '{source.get('id', '<missing id>')}': base_url host {host!r} "
+        f"is not allowlisted — extend workflow.toml [security].extra_allowed_hosts "
+        f"if this host is genuinely needed (allowed: {sorted(allowed)})"
+    )
 
 
 def _make_pxweb(source: Mapping[str, Any], *, cache_dir: Path | None = None, base_dir: Path | None = None) -> PxWebAdapter:

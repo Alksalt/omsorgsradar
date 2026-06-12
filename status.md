@@ -157,3 +157,24 @@
   + identisk 36,3%-vekst-kolonne i rapporten ryddet; symlink-herding på figur-kopiering; kort-rekkefølge
   (norsk først) + teasere. Lekkasje-sjekk: ingen fnr-verdi / 11-sifret tall / token i publiserte sider.
   Tester: 294 → **303 offline + 5 live**. **Next: push + aktiver Pages + verifiser live-URL.**
+- **2026-06-12** — **G7 (deferred fixes + choropleth + TabPFN) shipped.** Lukket alle utestående
+  panel-funn fra G2–G6 + to nye kritiske funnet underveis. (1) **v1-tallene republisert korrekt**:
+  KLASS-tabellen regenerert med 2024-omnummereringene (358 → 468 mappinger, transitiv lukking til
+  terminale koder — 0111→3110 direkte; splitter {1507,1850,5012} ekskludert); død-kode-rangering
+  fjernet (613 → **354 rangerte** av 483 koderader); CAGR-vakter (min 5-års vindu + ±ratebånd,
+  config-drevet). **Toppen flyttet seg fundamentalt: Frogn/Vestby/Lørenskog (Oslo-beltet) — ikke
+  Hasvik/Bjerkreim/Tydal (uniform-vekst-artefakt).** (2) **Per-kommune vekst** (13873 bekreftet
+  utilgjengelig → historisk CAGR fra 07459 med vakter; trend ~31 % vs **SSB 13599 MMM 46,5 %** —
+  hentet, beregnet og sitert, ikke påstått; 12880 var feil tabell = makroregnskap). (3) **Koropletkart**
+  (ren matplotlib PolyCollection, committet forenklet Kartverket-avledet GeoJSON 1,2 MB CC BY 4.0,
+  ingen GIS-deps). (4) **TabPFN fold-paritet** bak TABPFN_TOKEN (lisensfeil → ærlig status, aldri rå
+  exception; token-lekkasjetest). (5) **Verifikatoren gjort reelt uavhengig** (panel-funn: gamle
+  claims var tautologiske — claimed og recomputed fra samme objekt): nye DB-kvitteringer laster
+  findings.json fra disk og regner om fra DuckDB uten analysekode (nasjonal 80+-sum, samplet
+  per-kommune-CAGR, rangert⊆levende) — 31/31 PASS, plantet korrupsjon på disk FAILER. (6) Manifest-
+  sidecars relativisert (lekket /Users/-stier), navne-suffiks-fix (Frogn ikke «Frogn (-2019)»),
+  terminalnavn (Heim/Orkland/Narvik), rapport-ærlighetspass (354, trend-vs-SSB-forbehold, dynamisk
+  dato/versjon). Panel: correctness BLOCK + security BLOCK + integration PASS → fixes → 2× PASS.
+  Tester: 303 → **382 offline + 5 live**. Pushet; Pages redeployet. **Eier-handling (valgfri,
+  ikke-blokkerende): priorlabs.ai-konto → `export TABPFN_TOKEN=…` → kjør ml-steget på nytt for
+  ekte TabPFN-MAE.**

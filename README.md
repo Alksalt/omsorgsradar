@@ -54,6 +54,12 @@ The optional `anonymize` stage turns row-level microdata into a k-anonymized agg
 enters model context. Demo: `analyses/brfss-demo/` (diabetes prevalence by stratum). See
 [`docs/anonymize.md`](docs/anonymize.md).
 
+**Execution modes.** The engine is LLM-free; the only optional LLM use (report narration) is routed by
+`[endpoint].mode` — `subscription` (default, $0, the agentic shell narrates), `api`
+(anthropic/openai/openrouter, keys from env only), or `local` (LM Studio/Ollama, nothing leaves the
+machine — the privacy path for sensitive data). Provider, model, and placement are config, not code.
+See [`docs/execution-modes.md`](docs/execution-modes.md) for the Normen privacy→placement mapping.
+
 ---
 
 ## Quick start

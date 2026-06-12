@@ -46,6 +46,14 @@ description: How to run, extend, and debug the omsorgsradar analysis pipeline (i
 - Custom stages must write artifacts + manifests via
   `core.contracts.write_manifest` and validate known artifact types.
 
+## Execution modes (report narration)
+- The engine is LLM-free; the only optional LLM call is `report` narration, routed by
+  `[endpoint].mode` in `workflow.toml` (`core/endpoint.py`): `subscription` (default — no
+  engine calls, shell narrates, $0), `api` (anthropic/openai/openrouter), `local`
+  (LM Studio/Ollama — Anthropic- or OpenAI-compatible). Model = `[models].report`.
+- API keys come from the ENV only (`ANTHROPIC_API_KEY`/`OPENAI_API_KEY`/`OPENROUTER_API_KEY`);
+  a credential-named key in `workflow.toml` is rejected at load. See `docs/execution-modes.md`.
+
 ## Debug a run
 - Every run journals to `runs/<run-id>/run.json`: stage order, durations,
   artifact paths, status (`ok` | `gate_failed` | `error`).

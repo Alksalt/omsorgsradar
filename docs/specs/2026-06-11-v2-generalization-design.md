@@ -166,6 +166,15 @@ Security gate (review flag 2026-06-11): when [endpoint.api] gains fields, set
 additionalProperties: false in WORKFLOW_SCHEMA and reject key-material field names
 (api_key/key/token/secret) — keys live in env, never in TOML, never in run journals.
 
+**As built (G5, 2026-06-12):** `[endpoint].mode` resolves in `core/endpoint.py` to a provider-agnostic
+`LLMClient` (or `None` for subscription, where the engine makes no calls and the shell narrates). Providers:
+anthropic (Messages), openai + openrouter (Chat Completions), local (Anthropic- or OpenAI-compatible via
+`[endpoint.local].api`). Security gate landed: `additionalProperties:false` on the endpoint blocks +
+`_reject_key_material` (recursive) refuses any credential-named key in workflow.toml. The only LLM
+touchpoint is `report.render_llm`; the engine remains LLM-free. Bedrock/Vertex EU = documented placement
+targets, not implemented providers. Local demo verified offline (`tests/test_report_modes.py`).
+See `docs/execution-modes.md`.
+
 ## Testing strategy
 
 - Core suite (65 existing tests stay green through G0 refactor) + contract tests per schema.

@@ -5,14 +5,22 @@
 profile = "claude-sonnet-4-6"
 report = "claude-fable-5"
 
+# Execution mode — where the optional report narration runs. See docs/execution-modes.md.
+#   subscription (default): engine makes NO API calls; the agentic shell narrates ($0).
+#   api:   engine calls a cloud provider (key from ENV — never put keys in this file).
+#   local: engine calls a local server (LM Studio / Ollama); nothing leaves the machine.
 [endpoint]
 mode = "subscription"   # subscription | api | local
 
 [endpoint.api]
 provider = "anthropic"  # anthropic | openai | openrouter
+# base_url = "https://openrouter.ai/api/v1"   # optional, for openrouter/custom
+# Keys live in env only: ANTHROPIC_API_KEY / OPENAI_API_KEY / OPENROUTER_API_KEY.
 
 [endpoint.local]
 base_url = "http://localhost:1234"
+# api = "openai"        # "openai" for LM Studio/Ollama /v1; "anthropic" for an
+                        # Anthropic-compatible local server. Default: anthropic.
 
 [defaults]
 language = "nb"

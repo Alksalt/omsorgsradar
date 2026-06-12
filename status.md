@@ -123,3 +123,14 @@
   fjernet, `sex`-dtype låst i verify. Security re-review PASS. Tester: **272 offline + 5 live**.
   brfss-smoke: verdikt PASS, sluppet CSV = `state,age,sex,diabetes` (notes borte), 3 PII-entiteter
   redigert. **G4 levert. Next: G5 — kjøremoduser (subscription/api/local) + lokal demo + Normen-mapping.**
+- **2026-06-12** — **G5 (kjøremoduser) bygget.** `core/endpoint.py`: `[endpoint].mode` → provider-agnostisk
+  `LLMClient` (eller `None` for subscription der motoren ikke kaller LLM — skallet narrerer, $0).
+  `api` = anthropic (Messages) / openai+openrouter (Chat Completions); `local` = Anthropic- eller
+  OpenAI-kompatibel server (LM Studio/Ollama). `report.render_llm`/`run_report` ruter nå gjennom denne
+  (slutt på hardkodet klient/modell/prising); `stage_report` tråder `ctx.config.workflow`. **Sikkerhet:
+  `additionalProperties:false` på endpoint-blokkene + `_reject_key_material` (rekursiv) avviser ethvert
+  legitimasjons-navngitt felt i workflow.toml — nøkler bor KUN i env, aldri i TOML/journal.** Lokal-demo
+  verifisert offline (`test_report_modes.py` round-trip mot stubbet klient). `docs/execution-modes.md`
+  (Normen personvern→plassering: åpen→sky, pseudonymisert→EU-hostet Bedrock/Vertex [dokumentert mål,
+  ikke implementert], sensitiv→lokal). `openai`-dep lagt til (lazy). Alle tre analyser validerer mot
+  herdet skjema. Tester: 272 → **290 offline + 5 live**. **Next: G5 close-out (opus-panel) + push.**

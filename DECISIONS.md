@@ -20,6 +20,13 @@ Hard constraints. Workspace-wide rules in `../CLAUDE.md` apply on top.
 - Primary execution mode = subscription OAuth harnesses (Claude Code on Anthropic sub; Codex CLI on OpenAI sub).
   API-key (Anthropic/OpenAI/OpenRouter) and fully-local (LM Studio/Ollama via `ANTHROPIC_BASE_URL`) are
   config-swappable alternates; v1 ships a working local demo of ≥1 stage.
+- Execution modes (as built, G5): selected by `[endpoint].mode`; resolved in `core/endpoint.py` to a
+  provider-agnostic LLM client. `subscription` ⇒ engine makes NO API calls (shell narrates, $0);
+  `api` ⇒ anthropic (Messages) / openai+openrouter (Chat Completions); `local` ⇒ Anthropic- or
+  OpenAI-compatible server. **API keys live in the environment ONLY — never in `workflow.toml` (rejected
+  by `_reject_key_material`), never in run journals.** Bedrock `eu-central-1` / Vertex EU are documented
+  placement targets for pseudonymised data (Normen mapping), NOT implemented providers — omsorgsradar
+  uses open data only. See `docs/execution-modes.md`.
 - Row-level data never enters model context: the LLM orchestrates code; only schemas/profiles/aggregates
   return. Enforced by hook, not instruction.
 - Anonymize stage framing: «anonymisering med målt restrisiko» — never claim "fully anonymous";

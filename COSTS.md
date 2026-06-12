@@ -33,6 +33,16 @@ TabPFN-2.5 was not run in v0.1 because it requires an interactive license accept
 
 Both SSB PxWebAPI v2 and FHI NOKKEL are **free, no authentication required** (CC BY 4.0 / open government data). The pipeline caches responses to `data/cache/` after the first run — subsequent runs cost zero API calls for ingest.
 
+### Execution modes (report narration)
+
+The report narration is routed by `[endpoint].mode` (see `docs/execution-modes.md`):
+
+- **subscription** (default): engine makes **no API calls** → **$0**; the agentic shell narrates.
+- **api**: per-model token cost (anthropic/openai/openrouter). Estimated from `core/endpoint.MODEL_PRICING`; a typical narration is ~3,300 tokens ≈ **$0.01–0.02** depending on the model.
+- **local**: **$0 marginal** (local compute only; LM Studio/Ollama).
+
+Keys are read from the environment only — never stored, never journaled.
+
 ### Anonymize stage (LLM-free)
 
 The `anonymize` stage runs entirely in engine code (Presidio pattern recognizers + pandas

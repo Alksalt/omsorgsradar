@@ -103,7 +103,7 @@ def print_module_data(one_to_one: list[tuple], splits: dict) -> None:
     print(f"SPLIT_CODES_EXCLUDED: frozenset[str] = frozenset({{")
     for k in split_codes:
         # find old name
-        print(f'    "{k}",  # {splits[k][0][1]} / {splits[k][1][1]}', end="")
+        print(f'    {k!r},  # {splits[k][0][1]} / {splits[k][1][1]}', end="")
         if len(splits[k]) > 2:
             print(f' / {splits[k][2][1]}', end="")
         print()
@@ -112,7 +112,7 @@ def print_module_data(one_to_one: list[tuple], splits: dict) -> None:
     print(f"_ALL_CHANGES: list[MergerRecord] = [  # {len(one_to_one)} entries")
     for old_k, nc, nn, dt in one_to_one:
         yr = int(dt[:4])
-        print(f'    MergerRecord("{old_k}", "{nc}", "{nn}", {yr}),')
+        print(f"    MergerRecord({old_k!r}, {nc!r}, {nn!r}, {yr}),")
     print("]")
 
 

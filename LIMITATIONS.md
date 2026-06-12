@@ -54,3 +54,12 @@ Kartverket GeoJSON-grenser for kommuner (WFS/REST) er **ikke** inkludert i v0.1.
 ## «Utdannet lege (master i medisin)» som forfatter
 
 Analysen er laget av en lege med helseinformatikk-kompetanse, ikke en dedikert statistiker eller økonom. Metodologiske valg (press-indeksformel, veksttakt-proxy, feature engineering) er fornuftige men ikke ekspert-validert. Framtidige versjoner bør inkludere peer review fra helsestatistiker.
+
+## Kommunesammenslåinger — v1-tall (2026-06-11)
+
+v1-artefaktene (`data/findings.json`, «Key findings» i README) ble beregnet med en
+håndskrevet sammenslåingstabell som hadde minst én feil (1504 → 1506; gamle Ålesund
+ble tilskrevet Molde). Tabellen er fra 2026-06-12 regenerert fra SSB KLASS
+(klassifikasjon 131, 358 endringer, splitter ekskludert). Tall for
+sammenslåtte kommuner i v1-artefaktene er upålitelige inntil v1-analysen kjøres
+på nytt; nordisk-omsorg-analysen bruker den korrigerte tabellen.

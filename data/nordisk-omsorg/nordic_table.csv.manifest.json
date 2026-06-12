@@ -3,7 +3,7 @@
   "path": "data/nordisk-omsorg/nordic_table.csv",
   "sha256": "f461ed0574f37f6425767e3379c7987d1343d909cfdd9a6bdb123f71089de06f",
   "schema_version": "1",
-  "created_at": "2026-06-12T07:39:58.265522+00:00",
+  "created_at": "2026-06-12T07:49:35.111808+00:00",
   "producer": "analyze",
   "inputs": []
 }

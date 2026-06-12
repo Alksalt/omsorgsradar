@@ -480,8 +480,8 @@ def _country_section(name_nb: str, c: dict[str, Any]) -> str:
     )
     return f"""### {name_nb} (aldersgrense {c['age_cut']})
 
-{c['n_municipalities']} kommuner i analysen ({c['n_dropped']} utelatt pga.
-manglende data). Median dekning: **{c['coverage_median']} %**. Median vekst i
+{c['n_municipalities']} kommuner i analysen ({c['n_dropped']} rader utelatt:
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **{c['coverage_median']} %**. Median vekst i
 eldre befolkning: **{c['growth_median']} %**. Andel kommuner i
 høy-skvis-kvadranten: **{c['high_squeeze_share']}**.
 
@@ -551,7 +551,9 @@ lavest i **{comp_nb}**.
 
 - Analysen er **deskriptivt, ikke kausalt** — rangerer og beskriver; forklarer ikke.
 - Aldersgrenser: NO/SE 80+, FI 75+. Definisjoner av hjemmetjeneste varierer.
-- Kommuner med manglende data er utelatt og talt opp per land (se tabellene).
+- Utelatte rader er talt opp per land (se tabellene); for Norge omfatter de
+  både kommuner med supprimerte verdier og historiske kommunenummer fra
+  KOSTRA-/befolkningshistorikken.
 - Datakilder: SSB (KOSTRA 12209, befolkning 07459), Kolada/RKA (N21704,
   Socialstyrelsen-data), SCB (BefolkningNy), THL Sotkanet (5513, 171, 127),
   Helsedirektoratet/NAV KUHR. Åpne data, lisenser tillater viderebruk.

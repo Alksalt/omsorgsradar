@@ -76,3 +76,9 @@
   rapport + 3 figurer publisert fra live-kjøring (`reports/nordisk-omsorg/`). Tests: 184 → 218
   offline + 3 live. **Next: G3 — /magic-analyze + /add-dataset skills (security gate:
   base_url-allowlist + csv-path-containment er harde forutsetninger — se spec).**
+- **2026-06-12** — **G2 panel close-out.** Correctness/security/integration: 3× PASS.
+  Fixes landet: kolada `next_url` host-pinnet (+ cross-host-test, paritet med G1-standarden),
+  `repr()`-quoting i regen-skriptet, v1-manifestenes absolutte stier skrubbet (var allerede
+  offentlige — lav sensitivitet), ærlig `n_dropped`-formulering i rapporten (historiske
+  kommunenummer ≠ manglende data) + v1-forbehold i LIMITATIONS.md. Live-rapport regenerert
+  (168/168 kontroller). Tester: 219 offline + 4 live.

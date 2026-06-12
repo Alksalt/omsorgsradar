@@ -80,6 +80,26 @@ class TestRegistry:
         assert prov is not None and "SCB" in prov["institution"]
 
 
+class TestPagination:
+    def test_cross_host_next_url_refused(self, tmp_path, monkeypatch) -> None:
+        """A next_url pointing at a foreign host is never followed."""
+
+        class FakeResp:
+            def raise_for_status(self) -> None:
+                pass
+
+            def json(self) -> dict:
+                return {"values": [], "next_url": "https://attacker.example/x"}
+
+        monkeypatch.setattr(
+            "omsorgsradar.core.adapters.kolada.requests.get",
+            lambda url, headers=None, timeout=None: FakeResp(),
+        )
+        ad = KoladaAdapter(cache_dir=None)
+        with pytest.raises(RuntimeError, match="cross-host"):
+            ad.municipalities()
+
+
 @pytest.mark.live
 class TestLive:
     def test_live_n21704_has_many_kommuner(self) -> None:

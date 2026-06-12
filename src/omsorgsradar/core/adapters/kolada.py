@@ -20,6 +20,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.parse import urlparse
 
 import pandas as pd
 import requests
@@ -73,7 +74,16 @@ class KoladaAdapter:
                     break
                 page = self._get_json(url, cache_key=None)
                 entries.extend(page.get("values", []))
-                url = page.get("next_url")
+                nxt = page.get("next_url")
+                if nxt:
+                    host = urlparse(nxt).netloc.lower()
+                    base_host = urlparse(self.base_url).netloc.lower()
+                    if host != base_host:
+                        raise RuntimeError(
+                            f"kolada: next_url host {host!r} != base {base_host!r} "
+                            "— refusing cross-host pagination"
+                        )
+                url = nxt or None
             self.cache.save("kolada_municipalities", entries)
         return {m["id"]: m["title"] for m in entries if m.get("type") == "K"}
 

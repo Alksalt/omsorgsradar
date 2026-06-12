@@ -14,8 +14,8 @@ verifiseringsmodul før denne rapporten ble generert
 
 ### Norge (aldersgrense 80+)
 
-344 kommuner i analysen (157 utelatt pga.
-manglende data). Median dekning: **29.75 %**. Median vekst i
+344 kommuner i analysen (157 rader utelatt:
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **29.75 %**. Median vekst i
 eldre befolkning: **7.22 %**. Andel kommuner i
 høy-skvis-kvadranten: **0.3081**.
 
@@ -34,8 +34,8 @@ høy-skvis-kvadranten: **0.3081**.
 
 ### Sverige (aldersgrense 80+)
 
-290 kommuner i analysen (0 utelatt pga.
-manglende data). Median dekning: **16.5 %**. Median vekst i
+290 kommuner i analysen (0 rader utelatt:
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **16.5 %**. Median vekst i
 eldre befolkning: **12.83 %**. Andel kommuner i
 høy-skvis-kvadranten: **0.3138**.
 
@@ -54,8 +54,8 @@ høy-skvis-kvadranten: **0.3138**.
 
 ### Finland (aldersgrense 75+)
 
-299 kommuner i analysen (0 utelatt pga.
-manglende data). Median dekning: **15.2 %**. Median vekst i
+299 kommuner i analysen (0 rader utelatt:
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **15.2 %**. Median vekst i
 eldre befolkning: **15.22 %**. Andel kommuner i
 høy-skvis-kvadranten: **0.3144**.
 
@@ -87,7 +87,9 @@ Kontekst (KUHR, åpne helserefusjonsdata): 13 431 401 fastlegekonsultasjoner (ta
 
 - Analysen er **deskriptivt, ikke kausalt** — rangerer og beskriver; forklarer ikke.
 - Aldersgrenser: NO/SE 80+, FI 75+. Definisjoner av hjemmetjeneste varierer.
-- Kommuner med manglende data er utelatt og talt opp per land (se tabellene).
+- Utelatte rader er talt opp per land (se tabellene); for Norge omfatter de
+  både kommuner med supprimerte verdier og historiske kommunenummer fra
+  KOSTRA-/befolkningshistorikken.
 - Datakilder: SSB (KOSTRA 12209, befolkning 07459), Kolada/RKA (N21704,
   Socialstyrelsen-data), SCB (BefolkningNy), THL Sotkanet (5513, 171, 127),
   Helsedirektoratet/NAV KUHR. Åpne data, lisenser tillater viderebruk.

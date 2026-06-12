@@ -10,6 +10,8 @@ Accept: application/json ->
  "antall_regninger":57602,"sum_refusjon":4756525.0,
  "sum_egenandel_betalt_av_pasient":…,"sum_egenandel_dekket_av_folketrygden":…}]}
 Geography = practitioner's municipality. No auth.
+No geo_name column — KUHR exposes only practitioner kommune codes; names
+are not in the API. Downstream join on geo_id if a name is needed.
 """
 
 from __future__ import annotations

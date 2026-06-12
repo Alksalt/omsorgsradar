@@ -1,6 +1,5 @@
 """Sotkanet adapter — offline via pre-seeded cache + real trimmed fixtures."""
 
-import json
 import shutil
 from pathlib import Path
 

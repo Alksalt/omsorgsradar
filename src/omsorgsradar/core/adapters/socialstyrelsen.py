@@ -14,6 +14,9 @@ API shapes verified live 2026-06-12 (docs: sdb.socialstyrelsen.se/sdbapi.aspx):
 IMPORTANT 2026-06-12: The API provides NO server-side region/year filtering
 (path segments /region/… and /ar/… return 404; query params are ignored).
 All filtering is performed client-side after fetching the full dataset.
+aar is kept as the raw period string; the generic profiler cannot derive
+a numeric year_range for SE — downstream SE consumption is CSV (csv
+adapter), which carries integer aar.
 NB 2026-06-12: the topic list carries no aldreomsorg topic — Swedish elder-care
 data arrives via Socialstyrelsen open-data CSV files (csv adapter) in G2.
 """

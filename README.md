@@ -1,5 +1,7 @@
 # Kommunal Omsorgsradar
 
+**Live report site:** https://alksalt.github.io/omsorgsradar/ *(goes live once GitHub Pages is enabled in repo Settings → Pages → Source = "GitHub Actions")*
+
 **Agentic data-analysis pipeline over Norwegian open health data.**
 
 Computes a per-municipality *press index* combining projected 80+ population growth (to 2035) with current elder-care service coverage — ranking Norwegian municipalities by the likely severity of the demographic care squeeze. All analysis is deterministic, reproducible, and fully offline-runnable. An optional LLM narration step (Anthropic API) requires a key; the full pipeline runs without one.
@@ -16,20 +18,37 @@ Data: SSB PxWebAPI v2 (KOSTRA tabell 12209 + befolkning tabell 07459) og FHI NOK
 
 ---
 
+## Live report site
+
+Det offentlige nettstedet på https://alksalt.github.io/omsorgsradar/ publiserer bokmål-rapporter, figurer og et interaktivt marimo-utforskningsverktøy for alle analysene i repoet. Nettstedet er bygd av GitHub Actions fra committede artefakter — ingen rådata, ingen LLM-kall i CI.
+
+The public site at https://alksalt.github.io/omsorgsradar/ publishes the bokmål reports, figures, and an interactive [marimo](https://marimo.io/) exploration (runs in-browser via WASM — no server, aggregate data inlined). Built by GitHub Actions from committed artifacts; no row-level or individual data.
+
+See [`docs/site.md`](docs/site.md) for the one owner step (enable Pages) and how to publish updated analyses.
+
+---
+
 ## Architecture
+
+The v2 engine is **config-driven and multi-analysis**: each analysis lives in `analyses/<name>/`
+with its own `analysis.toml` (stages, sources, params). Config precedence:
+`analysis.toml` > `workflow.toml` > code defaults.
 
 ```mermaid
 flowchart TD
-    A[SSB PxWebAPI v2\nKOSTRA 12209\nPopulation 07459] --> B[ingest.py\nFetch + normalize\nkommune mergers]
-    C[FHI NOKKEL\nfolkehelsestatistikk] --> B
-    B --> D[(DuckDB\nomsorgsradar.duckdb)]
-    D --> E[profile.py\nData quality audit\nJSON report]
-    D --> F[analyze.py\n80+ projections\nPress index\nFindings JSON]
-    F --> G[verify.py\nTool receipts\nRecompute claims]
-    G --> H[report.py\nBokmål markdown\nMatplotlib figures]
-    F --> I[ml.py\nXGBoost walk-forward CV\nSHAP importance\nNaive baseline]
-    H --> J[reports/omsorgsradar_rapport.md\n+ figures/]
+    CFG[workflow.toml\n+ analyses/<name>/analysis.toml] --> ENG
+    A[SSB PxWebAPI v2\nKOSTRA / befolkning] --> ENG[Engine\ncore/config · registry\ncore/journal · adapters]
+    B[Nordic adapters\nsotkanet · socialstyrelsen\nkolada · kuhr · csv] --> ENG
+    ENG --> D[(DuckDB per analysis)]
+    D --> E[profile\nData quality audit]
+    D --> F[analyze\nPress index · findings JSON]
+    F --> G[verify\nTool receipts — recomputes every claim]
+    G --> H[report\nBokmål markdown + matplotlib figures]
+    F --> I[ml\nXGBoost walk-forward CV\nSHAP importance · naive baseline]
+    F --> AN[anonymize (opt.)\nk-anonymity + measured residual-risk receipt]
+    H --> J[reports/<name>_rapport.md\n+ figures/]
     I --> J
+    J --> SITE[omsorgsradar.site\nGitHub Pages]
 ```
 
 **Key design choice:** the LLM *narrates*, never *calculates*. Every statistic is computed by deterministic Python code; the verifier module recomputes every claim in the narrative from the structured findings JSON. This "tool receipts" pattern is the portfolio differentiator.
@@ -66,26 +85,31 @@ See [`docs/execution-modes.md`](docs/execution-modes.md) for the Normen privacy�
 
 ```bash
 # Clone and install
-git clone <repo>
+git clone https://github.com/Alksalt/omsorgsradar
 cd omsorgsradar
 uv sync
 
-# Run the full pipeline (fetches real SSB data, cached after first run)
+# Run the default (omsorgsradar) analysis — fetches live SSB data, cached after first run
 uv run python -m omsorgsradar.pipeline
+
+# Run a specific analysis by name (config in analyses/<name>/analysis.toml)
+uv run python -m omsorgsradar.pipeline --analysis nordisk-omsorg
 
 # Run tests (fully offline, no API key needed)
 uv run pytest
 
-# Optional: LLM narration (requires Anthropic API key)
+# Build the report site locally (from committed artifacts)
+uv run python -m omsorgsradar.site --reports-dir reports --out site
+
+# Optional: LLM narration (requires Anthropic API key; default mode is key-free)
 ANTHROPIC_API_KEY=sk-... uv run python -m omsorgsradar.pipeline
 ```
 
-Output files:
-- `reports/omsorgsradar_rapport.md` — bokmål report
-- `reports/figures/` — matplotlib figures
-- `data/findings.json` — structured analysis findings
-- `data/quality_profile.json` — data quality profile
-- `data/ml_results.json` — ML walk-forward CV results
+Output files (per analysis, under `reports/<name>/` or `reports/` for the default):
+- `*_rapport.md` — bokmål report
+- `figures/` — matplotlib figures
+- `analyses/<name>/data/findings.json` — structured analysis findings
+- `analyses/<name>/data/quality_profile.json` — data quality profile
 
 ---
 

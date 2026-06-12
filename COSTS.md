@@ -51,6 +51,20 @@ path uses `spacy.blank("nb")` (tokenizer only, bundled with spaCy). The optional
 `nb_core_news_lg` is a **one-time ~568 MB download** (`uv run python -m spacy download nb_core_news_lg`)
 and then runs locally on CPU — only needed for free-text name/location detection in live runs.
 
+## GitHub Pages + CI site build
+
+GitHub Pages is **free** for public repositories (GitHub Free plan). The CI site build job
+(`pages.yml`) runs on a GitHub-hosted `ubuntu-latest` runner — also **free** for public repos
+(no minutes consumed from any quota).
+
+The site build (`python -m omsorgsradar.site`) runs **no LLM calls and fetches no external
+data**. It is a pure transform of committed report artifacts (markdown → HTML + figure copy +
+marimo WASM export). Marginal cost per deploy: **$0.00**.
+
+The marimo WASM export (`marimo export html-wasm`) runs locally in the CI runner with no
+external calls. Inlined aggregate data adds a few hundred KB to the bundle — within standard
+Pages size limits (soft 1 GB repo, 100 MB per file).
+
 ## Compute
 
 Full pipeline run time (MacBook, cached ingest): ~45 seconds.

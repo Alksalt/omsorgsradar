@@ -76,6 +76,14 @@ Kartverket GeoJSON-grenser for kommuner (WFS/REST) er **ikke** inkludert i v0.1.
 
 Analysen er laget av en lege med helseinformatikk-kompetanse, ikke en dedikert statistiker eller økonom. Metodologiske valg (press-indeksformel, veksttakt-proxy, feature engineering) er fornuftige men ikke ekspert-validert. Framtidige versjoner bør inkludere peer review fra helsestatistiker.
 
+## Offentlig nettsted (report site)
+
+Det offentlige nettstedet på https://alksalt.github.io/omsorgsradar/ viser **kun aggregerte
+rapporter, bokmål-tekst og figurer**. Ingen rad-nivå- eller individdata publiseres — nettstedet
+er bygd fra committede `*_rapport.md`-filer og `figures/*.png`-bilder via en CI-pipeline som
+aldri berører rådata. Nettstedet bygges automatisk ved push og er reproducerbart fra committede
+artefakter.
+
 ## Kommunesammenslåinger — v1-tall (2026-06-11)
 
 v1-artefaktene (`data/findings.json`, «Key findings» i README) ble beregnet med en

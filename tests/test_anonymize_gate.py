@@ -229,6 +229,9 @@ class TestAnonymizeGate:
         assert receipt["verdict"] == "FAIL", (
             f"Expected FAIL verdict in receipt, got {receipt['verdict']}"
         )
+        # N14: the insufficiently-anonymized CSV must NOT remain on disk
+        leftover = list(data_dir.glob("*_anonymized.csv"))
+        assert not leftover, f"FAIL verdict must unlink the anonymized CSV, found {leftover}"
 
     def test_row_level_source_requires_anonymize(self, tmp_path: Path) -> None:
         """row_level=true source without 'anonymize' in stages → startup PipelineGateError."""

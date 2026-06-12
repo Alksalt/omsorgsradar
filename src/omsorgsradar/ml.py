@@ -583,6 +583,8 @@ def ml_results_summary_md(results: MLResults) -> str:
     Returns:
         Markdown string.
     """
+    from .fmt import nb
+
     lines = [
         "## ML-analyse — XGBoost walk-forward CV",
         "",
@@ -591,7 +593,7 @@ def ml_results_summary_md(results: MLResults) -> str:
         "",
         "**Nøkkelfunn:** Kommunal dekning er sterkt autoregressiv — "
         "årets dekning predikerer neste års dekning nesten like godt som en tunet modell. "
-        "Modelltillegg over naiv persistens er beskjedent (~0.2 pp MAE). "
+        "Modelltillegg over naiv persistens er beskjedent (~0,2 pp MAE). "
         "Modellens verdi er avviksflagging (kommuner som avviker fra egen trend), "
         "ikke punktprediksjon.",
         "",
@@ -602,11 +604,11 @@ def ml_results_summary_md(results: MLResults) -> str:
         )
 
         mean_line = (
-            f"**Gjennomsnittlig MAE:** XGBoost {results.mean_xgb_mae:.2f} pp "
-            f"vs naiv persistens {results.mean_naive_mae:.2f} pp"
+            f"**Gjennomsnittlig MAE:** XGBoost {nb(results.mean_xgb_mae, decimals=2)} pp "
+            f"vs naiv persistens {nb(results.mean_naive_mae, decimals=2)} pp"
         )
         if has_tabpfn and results.mean_tabpfn_mae is not None:
-            mean_line += f" vs TabPFN {results.mean_tabpfn_mae:.2f} pp"
+            mean_line += f" vs TabPFN {nb(results.mean_tabpfn_mae, decimals=2)} pp"
         lines.append(mean_line)
         lines.append("")
 
@@ -614,10 +616,10 @@ def ml_results_summary_md(results: MLResults) -> str:
             lines.append("| Fold | Testår | XGB MAE | Naiv MAE | TabPFN MAE |")
             lines.append("|------|--------|---------|----------|------------|")
             for fold in results.folds:
-                tabpfn_cell = f"{fold.tabpfn_mae:.2f}" if fold.tabpfn_mae is not None else "—"
+                tabpfn_cell = nb(fold.tabpfn_mae, decimals=2) if fold.tabpfn_mae is not None else "—"
                 lines.append(
                     f"| {fold.fold} | {fold.test_years[0] if fold.test_years else '—'} "
-                    f"| {fold.xgb_mae:.2f} | {fold.naive_mae:.2f} | {tabpfn_cell} |"
+                    f"| {nb(fold.xgb_mae, decimals=2)} | {nb(fold.naive_mae, decimals=2)} | {tabpfn_cell} |"
                 )
         else:
             lines.append("| Fold | Testår | XGB MAE | Naiv MAE |")
@@ -625,7 +627,7 @@ def ml_results_summary_md(results: MLResults) -> str:
             for fold in results.folds:
                 lines.append(
                     f"| {fold.fold} | {fold.test_years[0] if fold.test_years else '—'} "
-                    f"| {fold.xgb_mae:.2f} | {fold.naive_mae:.2f} |"
+                    f"| {nb(fold.xgb_mae, decimals=2)} | {nb(fold.naive_mae, decimals=2)} |"
                 )
         lines.append("")
     else:
@@ -646,7 +648,7 @@ def ml_results_summary_md(results: MLResults) -> str:
         lines.append("**SHAP — viktigste features:**")
         lines.append("")
         for feat in results.shap_top_features[:5]:
-            lines.append(f"- `{feat['feature']}`: mean |SHAP| = {feat['mean_abs_shap']:.4f}")
+            lines.append(f"- `{feat['feature']}`: mean |SHAP| = {nb(feat['mean_abs_shap'], decimals=2)}")
         lines.append("")
 
     # Include only non-TabPFN notes here (TabPFN status shown above)

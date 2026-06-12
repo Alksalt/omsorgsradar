@@ -203,9 +203,12 @@ class TestNordiskReport:
         f = ctx.state["nordic_findings"]
         assert "deskriptiv, ikke kausal" in report
         assert "75+" in report and "80+" in report
+        from omsorgsradar.fmt import nb
+
         for country in ("NO", "SE", "FI"):
             assert f["countries"][country]["top_squeeze"][0]["geo_name"] in report
-            assert str(f["countries"][country]["coverage_median"]) in report
+            # Report renders nb-NO (comma decimal, fixed 2 decimals)
+            assert nb(f["countries"][country]["coverage_median"], decimals=2) in report
         comp = f["comparison"]["lowest_high_squeeze_share_country"]
         comp_nb = {"NO": "Norge", "SE": "Sverige", "FI": "Finland"}[comp]
         assert comp_nb in report

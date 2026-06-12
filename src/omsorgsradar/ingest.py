@@ -36,7 +36,6 @@ from typing import Any
 
 import duckdb
 import pandas as pd
-import requests
 
 from .core.adapters.pxweb import (  # noqa: F401  (backwards-compat re-exports)
     PxWebAdapter,
@@ -76,9 +75,23 @@ PROJECTION_ALT_VAR_CANDIDATES = ("Framskriv", "Alternativ", "PerFramskrives")
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _discover_ssb_table(base_url: str, table_id: str) -> dict[str, Any]:
-    """Fetch the metadata for an SSB table to discover available variables."""
+    """Fetch the metadata for an SSB table to discover available variables.
+
+    Routed through safe_request so a redirect can never leave the configured
+    host (same pinning as every adapter request — a bare requests.get here was
+    the one residual allowlist bypass).
+    """
+    from urllib.parse import urlparse
+
+    from .core.adapters.http import safe_request
+
     url = f"{base_url.rstrip('/')}/{table_id}"
-    resp = requests.get(url, timeout=REQUEST_TIMEOUT)
+    host = (urlparse(base_url).hostname or "").lower()
+    resp = safe_request(
+        "GET", url,
+        allowed_hosts=frozenset({host} if host else set()),
+        timeout=REQUEST_TIMEOUT,
+    )
     resp.raise_for_status()
     return resp.json()
 

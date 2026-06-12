@@ -483,17 +483,21 @@ def _fig_top_no(table: pd.DataFrame, out_dir, top_n: int) -> str:
 
 
 def _country_section(name_nb: str, c: dict[str, Any]) -> str:
+    from omsorgsradar.fmt import nb as _nb
+
+    # nb-NO rendering with FIXED precision per column (ragged 2-vs-3-decimal
+    # float dumps read as data glitches): skvis 2 desimaler, %-kolonner 1.
     rows = "\n".join(
-        f"| {r['rank']} | {r['geo_name']} (`{r['geo_id']}`) | {r['squeeze']} "
-        f"| {r['coverage']} | {r['growth_pct']} |"
+        f"| {r['rank']} | {r['geo_name']} (`{r['geo_id']}`) | {_nb(r['squeeze'], decimals=2)} "
+        f"| {_nb(r['coverage'], decimals=1)} | {_nb(r['growth_pct'], decimals=1)} |"
         for r in c["top_squeeze"]
     )
     return f"""### {name_nb} (aldersgrense {c['age_cut']})
 
 {c['n_municipalities']} kommuner i analysen ({c['n_dropped']} rader utelatt:
-manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **{c['coverage_median']} %**. Median vekst i
-eldre befolkning: **{c['growth_median']} %**. Andel kommuner i
-høy-skvis-kvadranten: **{c['high_squeeze_share']}**.
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **{_nb(c['coverage_median'], decimals=2)} %**. Median vekst i
+eldre befolkning: **{_nb(c['growth_median'], decimals=2)} %**. Andel kommuner i
+høy-skvis-kvadranten: **{_nb(c['high_squeeze_share'] * 100, decimals=1)} %**.
 
 | # | Kommune | Skvis | Dekning (%) | Eldrevekst (%) |
 |---|---------|-------|-------------|----------------|
@@ -545,8 +549,8 @@ def stage_report_nordisk(ctx: StageContext) -> None:
         )
 
     sections = "\n".join(
-        _country_section(nb, f["countries"][cc])
-        for cc, nb in (("NO", "Norge"), ("SE", "Sverige"), ("FI", "Finland"))
+        _country_section(label, f["countries"][cc])
+        for cc, label in (("NO", "Norge"), ("SE", "Sverige"), ("FI", "Finland"))
     )
     report = f"""# Nordisk omsorgsradar: aldring vs. hjemmetjenestekapasitet
 

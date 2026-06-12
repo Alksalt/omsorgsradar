@@ -52,6 +52,24 @@ SPLIT_CODES_EXCLUDED: frozenset[str] = frozenset({
     "5012",  # Snillfjord / Heim / Hitra / Orkland
 })
 
+# Mixed-source new codes: municipalities whose post-reform code is the target
+# of BOTH a 1-to-1 rename (included in the table) AND one of the splits above.
+# Their pre-reform population series covers only the renamed predecessor, not
+# the split portion — so growth_pct 2019→2023 would be systematically
+# inflated.  Callers computing growth should treat these as having a
+# discontinuous baseline (equivalent to NaN elderly_base).
+#
+# Derived from KLASS: codes that appear as 1-to-1 targets where the same
+# new_knr is also a target of a split in SPLIT_CODES_EXCLUDED.
+MIXED_SOURCE_KNRS: frozenset[str] = frozenset({
+    "1806",  # Narvik   (1805+1854 -> 1806 as 1-to-1, PLUS 1850 split)
+    "1875",  # Hábmer - Hamarøy   (1849 -> 1875, PLUS 1850 split)
+    "5055",  # Heim     (1571+5011 -> 5055, PLUS 5012 split)
+    "5056",  # Hitra    (5013 -> 5056, PLUS 5012 split)
+    "5059",  # Orkland  (5016+5023+5024 -> 5059, PLUS 5012 split)
+    "5412",  # Dielddanuorri - Tjeldsund  (1913 -> 5412, PLUS 1852 split)
+})
+
 _ALL_CHANGES: list[MergerRecord] = [  # 358 entries
     MergerRecord("0101", "3001", "Halden", 2020),
     MergerRecord("0104", "3002", "Moss", 2020),

@@ -25,7 +25,7 @@ from omsorgsradar.core.contracts import (
 )
 from omsorgsradar.core.geo import make_geo_id
 from omsorgsradar.core.registry import PipelineGateError, StageContext, StageRegistry
-from omsorgsradar.kommune_mergers import normalize_knr_series
+from omsorgsradar.kommune_mergers import MIXED_SOURCE_KNRS, normalize_knr_series
 
 logger = logging.getLogger(__name__)
 
@@ -154,6 +154,8 @@ def _no_table(datasets: Mapping[str, pd.DataFrame], base: int, latest: int) -> p
     k["knr"] = normalize_knr_series(k[region_col].astype(str).str.zfill(4))
     k["aar"] = pd.to_numeric(k["Tid"], errors="coerce")
     k["value"] = pd.to_numeric(k["value"], errors="coerce")
+    # Build coverage WITHOUT dropping NaN — suppressed values must flow into
+    # squeeze_table so its dropna counts them in n_dropped.
     cov = (k[k["aar"] == latest]
            .groupby("knr")
            .agg(coverage=("value", "mean"),
@@ -172,9 +174,24 @@ def _no_table(datasets: Mapping[str, pd.DataFrame], base: int, latest: int) -> p
         "elderly_latest": sums.get(latest),
     }).reset_index(drop=True)
 
+    # Inner-merge on population: only municipalities with a population row in
+    # the latest year are "current". Defunct historical codes (no population)
+    # are silently excluded here. Municipalities WITH population but missing
+    # coverage retain NaN coverage and will be counted by squeeze_table.
     out = cov.merge(eld, on="knr", how="inner")
     out["geo_id"] = out["knr"].map(lambda c: make_geo_id("NO", c))
-    out = out.dropna(subset=["coverage"]).copy()
+    # Mixed-source codes: post-reform municipality is the target of BOTH a
+    # 1-to-1 rename AND a split — the 2019 baseline covers only the renamed
+    # predecessor, not the split portion.  Growth would be inflated.  Set
+    # elderly_base to NaN so squeeze_table counts them in n_dropped.
+    mixed_mask = out["knr"].isin(MIXED_SOURCE_KNRS)
+    out.loc[mixed_mask, "elderly_base"] = float("nan")
+    # Strip SSB era suffixes from names:
+    #   "Ålesund (2020-2023)" -> "Ålesund"
+    #   "Hamarøy - Hábmer (-2019)" -> "Hamarøy - Hábmer"
+    out["geo_name"] = out["geo_name"].str.replace(
+        r"\s*\(-?\d{4}[^)]*\)$", "", regex=True
+    )
     return out[["geo_id", "geo_name", "coverage", "elderly_base", "elderly_latest"]]
 
 

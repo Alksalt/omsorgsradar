@@ -128,11 +128,23 @@ class TestCountryTables:
         assert set(tables) == {"NO", "SE", "FI"}
         for country, t in tables.items():
             assert len(t) >= 3, country
-            assert t["coverage"].notna().all()
             assert t["geo_id"].str.startswith(country).all()
         no = tables["NO"]
         assert "NO-1505" in set(no["geo_id"])
         assert "Kristiansund" in " ".join(no["geo_name"].tolist())
+
+    def test_no_names_have_no_era_suffix_and_growth_is_sane(self) -> None:
+        mod = load_instance()
+        tables = mod.build_country_tables(
+            _fixture_datasets(), params={"base_year": 2019, "latest_year": 2023}
+        )
+        no = mod.squeeze_table(tables["NO"])
+        assert not no["geo_name"].str.contains(r"\(\d{4}", regex=True).any()
+        # with the KLASS-rebuilt merger map, 80+ growth artifacts are gone:
+        assert no["growth_pct"].max() < 60, no.nlargest(5, "growth_pct")[
+            ["geo_id", "geo_name", "growth_pct"]
+        ]
+        assert len(no) > 300   # full mapping connects most 2019 series
 
 
 class TestNordiskVerify:

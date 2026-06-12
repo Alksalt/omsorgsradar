@@ -177,6 +177,26 @@ class TestPagination:
             "https://sdb.socialstyrelsen.se/p2",  # http-> https rewritten
         ]
 
+    def test_cross_host_nasta_sida_refused(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A nasta_sida pointing at a foreign host is never followed."""
+
+        class FakeResp:
+            def raise_for_status(self) -> None:
+                pass
+
+            def json(self) -> dict:
+                return {"data": [], "nasta_sida": "http://attacker.example/x"}
+
+        monkeypatch.setattr(
+            "omsorgsradar.core.adapters.socialstyrelsen.requests.get",
+            lambda url, params=None, timeout=None: FakeResp(),
+        )
+        ad = SocialstyrelsenAdapter(cache_dir=None)
+        with pytest.raises(RuntimeError, match="cross-host"):
+            ad._fetch_all_pages("https://sdb.socialstyrelsen.se/p1", max_pages=5)
+
     def test_max_pages_exceeded_raises(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

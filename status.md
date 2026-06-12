@@ -113,3 +113,13 @@
   rader sluppet, 35 klasser, verify uavhengig). Planted-PII-test + inference-FAIL-abort + row_level-
   startup-test grønne. Tester: 247 → **270 offline + 5 live**. **Next: G4 close-out (opus-panel) +
   push.**
+- **2026-06-12** — **G4 panel close-out.** Correctness PASS (WP216-matten verifisert — attacker
+  advantage, l-diversitet, k-undertrykkings-invarianter; verify-uavhengighet bekreftet), integrasjon
+  PASS. Security BLOCK → 2 funn fikset: (1) `spacy_model` gikk uvalidert til `spacy.load()` (kan kjøre
+  modellkode) → allowlist av offisielle `nb_core_news_*`-navn, aldri sti (speiler G3 host-allowlist for
+  maskinskrevet config); (2) anonymisert CSV slapp hele fritekst-kolonnen (kun regex-redigert offline →
+  kan misse navn/adresse) → fritekst skannes/redigeres for kvitteringen men **slippes ikke** (drop som
+  standard, `keep_text_columns` opt-in) = datamininmering. Pluss opprydding: død `n_suppressed_below_k_zero`
+  fjernet, `sex`-dtype låst i verify. Security re-review PASS. Tester: **272 offline + 5 live**.
+  brfss-smoke: verdikt PASS, sluppet CSV = `state,age,sex,diabetes` (notes borte), 3 PII-entiteter
+  redigert. **G4 levert. Next: G5 — kjøremoduser (subscription/api/local) + lokal demo + Normen-mapping.**

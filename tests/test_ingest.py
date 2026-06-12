@@ -90,7 +90,7 @@ class TestRunIngestOffline:
 
     def test_unknown_source_id_raises(self, tmp_path: Path) -> None:
         sources = [{"id": "nonexistent_source", "base_url": "http://x", "table": "0"}]
-        with pytest.raises(ValueError, match="no fetcher for source id"):
+        with pytest.raises(ValueError, match="unknown adapter"):
             run_ingest(sources, db_path=tmp_path / "test.duckdb")
 
     def test_fetchers_dispatch_by_id(self, tmp_path: Path) -> None:

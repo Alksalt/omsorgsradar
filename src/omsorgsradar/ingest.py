@@ -556,17 +556,24 @@ def run_ingest(
     *,
     db_path: Path,
     cache_dir: Path | None = None,
+    base_dir: Path | None = None,
 ) -> dict[str, pd.DataFrame]:
-    """Fetch every configured source, persist to DuckDB, return DataFrames."""
+    """Fetch every configured source, persist to DuckDB, return DataFrames.
+
+    Legacy v1 source ids dispatch to their bespoke fetchers; anything else
+    goes through the adapter registry (core.adapters.make_adapter).
+    """
+    from .core.adapters import make_adapter
+
     datasets: dict[str, pd.DataFrame] = {}
     for src in sources:
         sid = src["id"]
         fetcher = _FETCHERS.get(sid)
-        if fetcher is None:
-            raise ValueError(
-                f"no fetcher for source id '{sid}' (known: {sorted(_FETCHERS)})"
-            )
-        df = fetcher(src, cache_dir)
+        if fetcher is not None:
+            df = fetcher(src, cache_dir)
+        else:
+            adapter = make_adapter(src, cache_dir=cache_dir, base_dir=base_dir)
+            df = adapter.fetch(src)
         if df is None:
             logger.warning("Source %s returned no data — skipped", sid)
             df = pd.DataFrame()

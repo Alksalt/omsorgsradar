@@ -32,7 +32,10 @@ def stage_ingest(ctx: StageContext) -> None:
                 datasets[src["id"]] = pd.DataFrame()
     else:
         datasets = run_ingest(
-            ctx.config.sources, db_path=db_path, cache_dir=ctx.data_dir / "cache"
+            ctx.config.sources,
+            db_path=db_path,
+            cache_dir=ctx.data_dir / "cache",
+            base_dir=ctx.config.analysis_dir,
         )
     ctx.state["datasets"] = datasets
     ctx.artifacts["duckdb"] = db_path

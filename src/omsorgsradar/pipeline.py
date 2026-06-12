@@ -63,6 +63,12 @@ def run_pipeline(
         datefmt="%H:%M:%S",
     )
     cfg = load_run_config(analysis_dir, workflow_path)
+
+    from .core.adapters import validate_source
+
+    for src in cfg.sources:
+        validate_source(src)
+
     data_dir, reports_dir = Path(data_dir), Path(reports_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
 

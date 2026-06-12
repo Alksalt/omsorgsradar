@@ -87,7 +87,9 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
                 "required": ["adapter", "id"],
                 "properties": {
                     "adapter": {"type": "string"},
-                    "id": {"type": "string"},
+                    # id becomes a DuckDB table name + cache-key fragment —
+                    # pattern-locked so config can never inject SQL/paths.
+                    "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
                 },
             },
         },

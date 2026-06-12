@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import date
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +44,20 @@ REPORT_MD_PATH = REPORT_DIR / "omsorgsradar_rapport.md"
 # ──────────────────────────────────────────────────────────────────────────────
 # Figures
 # ──────────────────────────────────────────────────────────────────────────────
+
+
+def _package_version() -> str:
+    try:
+        return _pkg_version("omsorgsradar")
+    except PackageNotFoundError:
+        return "dev"
+
+
+def _report_header_line() -> str:
+    return (
+        f"*Analysedato: {date.today().isoformat()} · "
+        f"Kilde: SSB KOSTRA + SSB befolkning · Versjon: {_package_version()}*"
+    )
 
 
 def _safe_name(navn: str, knr: str) -> str:
@@ -301,42 +317,47 @@ def render_template(
     Returns:
         Markdown report string.
     """
-    top = [km for km in result.kommuner[:n_top] if not np.isnan(km.press_index_norm)]
+    ranked = [km for km in result.kommuner if km.rank]
+    top = [km for km in ranked[:n_top] if not np.isnan(km.press_index_norm)]
     n_total = len(result.kommuner)
+    n_ranked = len(ranked)
     growth = result.national_growth_rate_2035
     baseline = result.national_80plus_latest
     projected = result.national_80plus_2035
 
-    rank1 = result.kommuner[0] if result.kommuner else None
+    rank1 = next((km for km in ranked if km.rank == 1), None)
     rank1_name = _safe_name(rank1.navn, rank1.knr) if rank1 else "N/A"
 
     n_high = sum(
-        1 for km in result.kommuner
+        1 for km in ranked
         if not np.isnan(km.press_index_norm) and km.press_index_norm >= 0.5
     )
 
-    rates = [km.coverage_rate for km in result.kommuner if not np.isnan(km.coverage_rate)]
+    rates = [km.coverage_rate for km in ranked if not np.isnan(km.coverage_rate)]
     mean_rate = np.mean(rates) if rates else float("nan")
 
     lines: list[str] = []
     lines.append("# Kommunal Omsorgsradar — rapport")
     lines.append("")
-    lines.append(f"*Analysedato: 2026-06-11 · Kilde: SSB KOSTRA + FHI NOKKEL · Versjon: 0.1.0*")
+    lines.append(_report_header_line())
     lines.append("")
     lines.append("---")
     lines.append("")
     lines.append("## Sammendrag")
     lines.append("")
     lines.append(
-        f"Analysen dekker **{n_total} kommuner** og beregner en press-indeks som kombinerer "
+        f"Analysen rangerer **{n_ranked} kommuner** (av {n_total} koderader — historiske "
+        f"kommunenummer er ekskludert fra rangeringen) etter en press-indeks som kombinerer "
         f"forventet vekst i 80+-befolkningen mot 2035 med dagens dekning av hjemmetjenester."
     )
     lines.append("")
     if not np.isnan(growth):
         lines.append(
-            f"På nasjonalt nivå vil 80+-befolkningen vokse med anslagsvis **{growth:.1f}%** "
+            f"På nasjonalt nivå vokser 80+-befolkningen med anslagsvis **{growth:.1f}%** "
             f"fra {baseline/1000:,.0f} 000 (siste datapunkt) til {projected/1000:,.0f} 000 i 2035 "
-            f"dersom SSB-trenden holder seg."
+            f"dersom hver kommunes historiske trend (2017–2026) fortsetter. Dette er en "
+            f"trendframskriving, ikke SSBs offisielle befolkningsframskriving — SSBs "
+            f"hovedalternativ ligger høyere for 80+ (se Begrensninger)."
         )
         lines.append("")
     lines.append(
@@ -344,7 +365,8 @@ def render_template(
     )
     if not np.isnan(mean_rate):
         lines.append(
-            f"Gjennomsnittlig dekning er **{mean_rate:.0f} hjemmebaserte brukere per 1 000 innbygger 80+**."
+            f"Gjennomsnittlig dekningsgrad er **{mean_rate:.0f} %** "
+            f"(andel innbyggere 80+ som mottar hjemmetjenester)."
         )
     lines.append("")
     lines.append("---")
@@ -429,13 +451,15 @@ def render_template(
     lines.append("")
     lines.append(
         "Se [`LIMITATIONS.md`](../LIMITATIONS.md) for fullstendig liste. Viktigste forbehold: "
-        "analysen er deskriptiv, ikke kausal; kommunesammenslåingstabell dekker 2020-bølgen; "
-        "framskrivinger er basert på nasjonal veksttakt, ikke kommunenivå-projeksjon."
+        "analysen er deskriptiv, ikke kausal; kommunesammenslåinger og omnummereringer håndteres "
+        "via tabell regenerert fra SSB KLASS (t.o.m. 2024-bølgen, splittelser ekskludert); "
+        "vekst per kommune er en trendframskriving (historisk CAGR 2017–2026 med vakter), ikke "
+        "SSBs kommuneframskrivinger (tabell 13873 er ikke offentlig tilgjengelig)."
     )
     lines.append("")
     lines.append("---")
     lines.append("")
-    lines.append("*Rapporten er generert av omsorgsradar-pipeline v0.1.0.*")
+    lines.append(f"*Rapporten er generert av omsorgsradar-pipeline v{_package_version()}.*")
     lines.append("*Utdannet lege (master i medisin) — Oleksandr Altukhov.*")
     lines.append("")
 
@@ -525,7 +549,7 @@ Ikke repeter tabellen. Ikke hallusiner nye tall. All tekst på bokmål."""
     # Replace the summary section with LLM narration
     report = f"""# Kommunal Omsorgsradar — rapport
 
-*Analysedato: 2026-06-11 · Kilde: SSB KOSTRA + FHI NOKKEL · Versjon: 0.1.0*
+{_report_header_line()}
 
 ---
 

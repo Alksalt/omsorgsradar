@@ -24,6 +24,7 @@ from __future__ import annotations
 import dataclasses
 import json
 import logging
+import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
@@ -531,6 +532,16 @@ def _compute_press_index(df: pd.DataFrame) -> pd.DataFrame:
 # ──────────────────────────────────────────────────────────────────────────────
 
 
+# SSB valueTexts mark historical codes with a validity range, e.g. "Frogn (-2019)"
+# or "Hvaler (2020-2023)". Strip ONLY year-range parentheticals — real disambiguators
+# like "Herøy (Nordland)" must survive.
+_SSB_VALIDITY_SUFFIX_RE = re.compile(r"\s*\(\d{0,4}-\d{0,4}\)\s*$")
+
+
+def _clean_kommune_name(name: str) -> str:
+    return _SSB_VALIDITY_SUFFIX_RE.sub("", str(name)).strip()
+
+
 def _build_name_lookup(df_kostra: pd.DataFrame) -> dict[str, str]:
     """Build a knr → municipality name dict from KOSTRA region labels.
 
@@ -546,8 +557,12 @@ def _build_name_lookup(df_kostra: pd.DataFrame) -> dict[str, str]:
             .set_index("knr")["knr_name"]
             .to_dict()
         )
-        # Filter out empty/missing names
-        return {k: v for k, v in lookup.items() if v and str(v).strip()}
+        # Filter out empty/missing names; strip SSB validity suffixes
+        return {
+            k: _clean_kommune_name(v)
+            for k, v in lookup.items()
+            if v and str(v).strip()
+        }
 
     # Fallback: parse from old "0301 Oslo" format
     label_col = "region_label" if "region_label" in df_kostra.columns else None

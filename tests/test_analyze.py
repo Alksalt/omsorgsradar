@@ -253,3 +253,27 @@ class TestNoMisleadingPopTotalField:
         d = result_to_dict(result)
         for km in d["kommuner"]:
             assert "pop_total_latest" not in km
+
+
+class TestNameLookupValiditySuffix:
+    """Published names must not carry SSB validity suffixes like 'Frogn (-2019)'."""
+
+    def test_validity_suffix_stripped(self) -> None:
+        from omsorgsradar.analyze import _build_name_lookup
+        df = pd.DataFrame({
+            "knr": ["3214", "3214", "3110"],
+            "knr_name": ["Frogn (-2019)", "Frogn", "Hvaler (2020-2023)"],
+        })
+        lookup = _build_name_lookup(df)
+        assert lookup["3214"] == "Frogn"
+        assert lookup["3110"] == "Hvaler"
+
+    def test_real_disambiguator_parenthetical_kept(self) -> None:
+        from omsorgsradar.analyze import _build_name_lookup
+        df = pd.DataFrame({
+            "knr": ["1818", "3018"],
+            "knr_name": ["Herøy (Nordland)", "Våler (Østfold)"],
+        })
+        lookup = _build_name_lookup(df)
+        assert lookup["1818"] == "Herøy (Nordland)"
+        assert lookup["3018"] == "Våler (Østfold)"

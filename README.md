@@ -1,10 +1,10 @@
 # Kommunal Omsorgsradar
 
-**Live report site:** https://alksalt.github.io/omsorgsradar/ *(goes live once GitHub Pages is enabled in repo Settings → Pages → Source = "GitHub Actions")*
+**Live report site:** https://alksalt.github.io/omsorgsradar/
 
 **Agentic data-analysis pipeline over Norwegian open health data.**
 
-Computes a per-municipality *press index* combining projected 80+ population growth (to 2035) with current elder-care service coverage — ranking Norwegian municipalities by the likely severity of the demographic care squeeze. All analysis is deterministic, reproducible, and fully offline-runnable. An optional LLM narration step (Anthropic API) requires a key; the full pipeline runs without one.
+Computes a per-municipality *press index* combining projected 80+ population growth to 2035 (per-municipality trend extrapolation with robustness guards — see LIMITATIONS) with current elder-care service coverage — ranking Norwegian municipalities by the likely severity of the demographic care squeeze. All analysis is deterministic, reproducible, and fully offline-runnable. An optional LLM narration step (Anthropic API) requires a key; the full pipeline runs without one.
 
 ---
 
@@ -12,7 +12,7 @@ Computes a per-municipality *press index* combining projected 80+ population gro
 
 Dette prosjektet beregner en **demografisk press-indeks** per norsk kommune for perioden frem mot 2035. Indeksen kombinerer forventet vekst i befolkningen 80 år og over med dagens dekning av kommunale hjemmetjenester (KOSTRA-data, SSB). Kommuner med rask demografisk vekst og lav tjenestedekning i dag rangeres høyt — det er disse som trenger tidligst planleggingsoppmerksomhet.
 
-Data: SSB PxWebAPI v2 (KOSTRA tabell 12209 + befolkning tabell 07459) og FHI NOKKEL (folkehelsestatistikk). Alle data er åpne og krever ingen søknadsprosess. Rapporten er på bokmål. Kildekode og pipeline er på engelsk.
+Data: SSB PxWebAPI v2 (KOSTRA tabell 12209 + befolkning tabell 07459). FHI NOKKEL var planlagt, men API-endepunktet er utilgjengelig (sist sjekket 2026-06-12). Alle data er åpne og krever ingen søknadsprosess. Rapporten er på bokmål. Kildekode og pipeline er på engelsk.
 
 **Analysen er deskriptiv, ikke kausal.** Se [`LIMITATIONS.md`](LIMITATIONS.md).
 
@@ -24,7 +24,7 @@ Det offentlige nettstedet på https://alksalt.github.io/omsorgsradar/ publiserer
 
 The public site at https://alksalt.github.io/omsorgsradar/ publishes the bokmål reports, figures, and an interactive [marimo](https://marimo.io/) exploration (runs in-browser via WASM — no server, aggregate data inlined). Built by GitHub Actions from committed artifacts; no row-level or individual data.
 
-See [`docs/site.md`](docs/site.md) for the one owner step (enable Pages) and how to publish updated analyses.
+See [`docs/site.md`](docs/site.md) for how to publish updated analyses.
 
 ---
 
@@ -63,7 +63,7 @@ flowchart TD
 | P0 Profile | `profile.py` | Data quality audit → `data/quality_profile.json` |
 | P1 Analysis | `analyze.py` | 80+ projections, coverage rates, press index → `data/findings.json` |
 | P2 Verify | `verify.py` | Recomputes every claimed statistic ("tool receipts") |
-| P3 Report | `report.py` | Bokmål markdown + matplotlib figures |
+| P3 Report | `report.py` + `maps.py` | Bokmål markdown + matplotlib figures + press-index choropleth (committed Kartverket-derived boundaries, no GIS deps) |
 | P4 ML | `ml.py` | XGBoost walk-forward CV + SHAP + naive baseline |
 | Anonymize (opt.) | `core/anonymize/` | Microdata → PII-redaction + k-anonymity + **measured residual-risk receipt** (EU WP216: singling-out / linkability / inference) |
 
@@ -120,30 +120,49 @@ Generated automatically by `profile.py` on the live SSB data.
 ### kostra_pleie
 - Source: SSB KOSTRA table 12209
 - Rows: 39,204
-- Municipalities: 849
+- Municipalities: 423 terminal kommune codes (after KLASS normalization)
 - Year range: 2015–2025
 - Variables: % of 80+ using home services, % with institutional care, cost per resident, FTE per user
 
 ### befolkning (population 80+)
 - Source: SSB table 07459 — folkemengde etter alder
 - Rows: 237,750
-- Municipalities: 908
+- Municipalities: 483 code rows (357 current kommuner + historical codes, kept but never ranked)
 - Year range: 2017–2026
 - Age groups: 80–104 år (1-year classes)
 
 ### Kommune merger handling
-The 2020 merger wave is handled via `kommune_mergers.py` (lookup table covering ~50 absorption events). Pre-2020 codes (e.g. old Molde 1502 → new 1506, old Trondheim 1601 → 5001) are normalized before joining. Rows with old codes that map to new codes are counted in the quality profile under `merger_adjusted_rows`. The SSB KOSTRA series already uses post-2020 codes from 2020 onward; the lookup guards against historical data joins.
+Mergers AND renumberings are handled via `kommune_mergers.py` — **regenerated from SSB KLASS
+(klassifikasjon 131), never hand-written**: 468 one-to-one mappings covering the 2020 merger wave
+and the 2024 county-reshuffle renumberings (e.g. Viken 30xx → 31xx/32xx/33xx), resolved
+**transitively to terminal codes** (old Hvaler 0111 → 3011 → maps directly to 3110, so each
+municipality has one contiguous time series). Genuine splits are excluded by design (1507 Ålesund
+→ 1508 + 1580, 1850 Tysfjord, 5012 Snillfjord) — their pre-split history cannot be attributed
+unambiguously. Only municipalities alive in the latest data year are ranked; an independent
+structural check in the verifier enforces this on every run.
 
 ---
 
-## Key findings (real data, 2025)
+## Key findings (real data, regenerated 2026-06-12)
 
-Based on KOSTRA 2025 + SSB population 2026:
+Based on KOSTRA 2025 + SSB population 2026, with the KLASS-corrected merger table and
+per-municipality growth rates (earlier published numbers used a flawed hand-written merger
+table and a uniform national growth rate — superseded by this run):
 
-- **908 municipalities** ranked by press index
-- **National 80+ population**: projected to grow ~36% by 2035 (using SSB 3.5% p.a. growth assumption — see LIMITATIONS)
-- **Highest press**: Hasvik (Troms), Bjerkreim (Rogaland), Tydal (Trøndelag) — rapid demographic growth combined with the lowest current home-care coverage rates (~15–16% of 80+ receiving services)
-- **ML**: XGBoost walk-forward CV MAE = **2.08 percentage points** vs naive baseline 2.28 pp — modest but consistent improvement; prior-year coverage (`coverage_rate_lag1`) is the dominant feature (SHAP mean |SHAP| = 5.03)
+- **357 municipalities** ranked by press index (historical code rows excluded from ranking)
+- **National 80+ population**: ~285,000 today → ~373,000 in 2035 (**+30.9%**) if each
+  municipality's 2017–2026 trend continues. This is a trend extrapolation, not an official SSB
+  projection — SSB's main alternative implies faster 80+ growth as the post-war cohorts age in
+  (see LIMITATIONS)
+- **Highest press**: Frogn, Vestby, Lørenskog, Hvaler — the Oslo-belt commuter municipalities,
+  where the 80+ population is growing fastest (+68–117% by 2035 on current trends) while
+  home-care coverage is among the lowest (~17–22% of 80+ receiving services). The squeeze is
+  suburban, not (only) rural — a materially different planning picture than the uniform-growth
+  v1 analysis suggested
+- **ML**: XGBoost walk-forward CV MAE = **2.05 percentage points** vs naive persistence baseline
+  2.27 pp — both barely beat carrying last year's value forward; prior-year coverage
+  (`coverage_rate_lag1`) dominates SHAP importance. Municipal coverage is strongly
+  autoregressive; the model's value is flagging deviations, not point prediction
 
 ---
 
@@ -153,10 +172,10 @@ XGBoost walk-forward CV (3 expanding windows) predicting % of 80+ using home ser
 
 | Fold | Test year | XGB MAE | Naive MAE |
 |------|-----------|---------|-----------|
-| 1 | 2023 | 2.17 pp | 2.28 pp |
-| 2 | 2024 | 2.02 pp | 2.25 pp |
-| 3 | 2025 | 2.05 pp | 2.30 pp |
-| **Mean** | — | **2.08 pp** | **2.28 pp** |
+| 1 | 2023 | 2.15 pp | 2.27 pp |
+| 2 | 2024 | 2.00 pp | 2.24 pp |
+| 3 | 2025 | 2.00 pp | 2.30 pp |
+| **Mean** | — | **2.05 pp** | **2.27 pp** |
 
 SHAP top feature: `coverage_rate_lag1` (prior-year rate dominates — kommunal dekning er sterkt autoregressiv). TabPFN-2.5 kan nå kjøres: registrer deg på [priorlabs.ai](https://ux.priorlabs.ai), sett `TABPFN_TOKEN=<din nøkkel>`, og kjør ml-steget på nytt.
 
@@ -167,8 +186,12 @@ SHAP top feature: `coverage_rate_lag1` (prior-year rate dominates — kommunal d
 ## API discovery notes
 
 Documented in [`docs/api_drift.md`](docs/api_drift.md). Key findings:
-- SSB table 13873 (municipality projections) returned 400 with the public API key — fallback to table 12880 (national-level)
-- FHI NOKKEL indicator endpoint (`/api/open/v1/datakilder/nokkel/indikatorer`) returns 404 — endpoint appears to have moved post-2025. FHI NOKKEL data was skipped gracefully; see LIMITATIONS.
+- SSB table 13873 (municipality projections) is **not accessible to anonymous API callers**
+  (confirmed 2026-06-12 against both PxWeb v0 and v2; a nonexistent table gives the same error
+  class). Per-municipality growth therefore uses historical trend extrapolation from table 07459
+  with robustness guards; national projections (table 12880) provide the fallback rate
+- FHI NOKKEL indicator endpoint returns 404 (re-checked 2026-06-12; no working replacement
+  found — `statistikk.fhi.no` is a frontend without a public REST API). FHI data is excluded
 - KOSTRA 12209 region variable code is `KOKkommuneregion0000` (not `Region`) — discovered at runtime
 
 ---

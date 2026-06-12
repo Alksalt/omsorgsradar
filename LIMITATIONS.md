@@ -20,16 +20,34 @@ Indeksen bør brukes som **startpunkt for videre analyse**, ikke som beslutnings
 - Noen kommuner har manglende KOSTRA-data for enkeltår. Kommuner uten rapporterte data er ekskludert fra rankingen (press_index = NaN).
 - Rapporteringsdefinisjoner kan ha endret seg over tid (særlig i 2020-bølgen av kommunesammenslåinger).
 
-### Kommunesammenslåinger
-- Merger-tabellen dekker **2020-bølgen** (de ~50 viktigste absorpsjonene). 
-- 2024-bølgen (noen nye sammenslåinger) er **ikke** dekket ennå.
-- Pre-2020 historiske koder fra KOSTRA-serien håndteres korrekt; eldre data kan ha gjenværende mismatches for kommuner som ble slått sammen i 2017–2019.
+### Kommunesammenslåinger og omnummereringer
+- Tabellen i `kommune_mergers.py` er **regenerert fra SSB KLASS** (klassifikasjon 131,
+  2026-06-12): 468 én-til-én-mappinger som dekker både 2020-bølgen og
+  2024-omnummereringene (fylkesoppløsningene: Viken 30xx → 31xx/32xx/33xx,
+  Telemark 38xx → 40xx, Troms/Finnmark 54xx → 55xx/56xx m.fl.).
+- Mappingene er **transitivt oppløst til terminale koder** (gamle Hvaler 0111 → 3011 → mappes
+  direkte til 3110), slik at hver kommune har én sammenhengende tidsserie.
+- **Ekte splittelser er ekskludert by design** ({1507 Ålesund → 1508 + 1580, 1850 Tysfjord,
+  5012 Snillfjord}): historikken før splittelsen kan ikke fordeles entydig på etterfølgerne.
+  For disse kommunene starter tidsserien ved splittelsen (Ålesund/Haram: 2024).
+- Kun kommuner som finnes i siste dataår rangeres; historiske koderader beholdes i
+  datagrunnlaget, men er ekskludert fra rangeringen. En uavhengig strukturell kontroll i
+  verifikatoren håndhever dette ved hver kjøring.
 
-### Befolkningsframskrivinger
-- SSB tabell 13873 (kommunevise framskrivinger 2023–2050) er ikke tilgjengelig via det offentlige PxWebAPI (HTTP 400, bekreftet re-sjekk 2026-06-12) — dokumentert i `docs/api_drift.md`.
-- Analysen bruker i stedet **historisk CAGR per kommune** beregnet fra SSB tabell 07459 (folkemengde etter alder og år). For kommuner med tilstrekkelig historikk (≥ 2 år med positive 80+-tall) beregnes en kommunespesifikk vekstrate; manglende kommuner faller tilbake på nasjonal rate (fra 12880) eller standardverdi 3,5% p.a.
-- En `growth_source`-kolonne i resultatene angir for hver kommune om raten er «kommune»-, «national»- eller «default»-basert.
-- Fremskrivinger er usikre utover 5 år. 2035-tallene bør leses som planleggingshorisonter, ikke presise prediksjoner.
+### Befolkningsframskrivinger — trendframskriving, ikke SSB-projeksjon
+- SSB tabell 13873 (kommunevise framskrivinger) er ikke tilgjengelig via det offentlige
+  PxWebAPI (bekreftet re-sjekk 2026-06-12, både v0 og v2) — dokumentert i `docs/api_drift.md`.
+- Veksten per kommune er derfor en **historisk trendframskriving**: CAGR per kommune beregnet
+  fra SSB tabell 07459 (80+-befolkning 2017–2026), ekstrapolert til 2035. Robusthetsvakter
+  (konfigurert i `analysis.toml`): minst 5 års datavindu, og årsrater utenfor et rimelighetsbånd
+  faller tilbake på nasjonal rate. `growth_source` per kommune angir hvilken kilde som ble brukt
+  («kommune», «national_short_window», «national_outlier_rate», «national», «default»).
+- **Metoden undervurderer trolig veksten.** De store etterkrigskullene begynner å passere 80 år
+  rundt 2025–2030; historisk CAGR fra 2017–2026 fanger ikke denne akselerasjonen. Aggregert gir
+  trendmetoden ~31 % nasjonal 80+-vekst til 2035, mens SSBs nasjonale hovedalternativ (tabell
+  12880) impliserer raskere vekst. Den **relative** rangeringen mellom kommuner påvirkes mindre
+  enn nivåene, men 2035-nivåene bør leses som nedre planleggingsanslag.
+- Fremskrivinger er usikre utover 5 år. 2035-tallene er planleggingshorisonter, ikke prediksjoner.
 
 ### FHI NOKKEL
 - FHI NOKKEL-endepunktet ble re-sjekket 2026-06-12: `statistikk-data.fhi.no/api/open/v1` returnerer fortsatt 404 for alle stier; det finnes ingen kjent offentlig REST-API som erstatter det. FHI-data er ekskludert fra analysen.
@@ -67,9 +85,12 @@ en k-anonymisert aggregat sammen med en **målt** restrisiko-kvittering. Viktige
 - **BRFSS-demoen bruker et syntetisk, BRFSS-formet fixture** (deterministisk generert). Den ekte
   CDC BRFSS-mikrodatafilen er dokumentert, men ikke inkludert i repoet.
 
-## Kartkoplinger (fremtidig arbeid)
+## Kartgrunnlag (koropletkartet)
 
-Kartverket GeoJSON-grenser for kommuner (WFS/REST) er **ikke** inkludert i v0.1. Et koropletkart ville øke visualiseringsverdien. Ikke ekskludert av tekniske grunner — nedprioritert for framdrift.
+Koropletkartet bruker **forenklede kommunegrenser** (committet GeoJSON, Kartverket-avledet,
+CC BY 4.0 — se `assets/geo/PROVENANCE.md`). Forenklingen gjør kystlinjer omtrentlige: kartet er
+en visualisering av press-indeksen, ikke et GIS-grunnlag. Kommuner uten data i siste år vises i
+grått med antall oppgitt i figurteksten.
 
 ## «Utdannet lege (master i medisin)» som forfatter
 
@@ -83,11 +104,12 @@ er bygd fra committede `*_rapport.md`-filer og `figures/*.png`-bilder via en CI-
 aldri berører rådata. Nettstedet bygges automatisk ved push og er reproducerbart fra committede
 artefakter.
 
-## Kommunesammenslåinger — v1-tall (2026-06-11)
+## Historikk: v1-tall (2026-06-11) — erstattet
 
-v1-artefaktene (`data/findings.json`, «Key findings» i README) ble beregnet med en
-håndskrevet sammenslåingstabell som hadde minst én feil (1504 → 1506; gamle Ålesund
-ble tilskrevet Molde). Tabellen er fra 2026-06-12 regenerert fra SSB KLASS
-(klassifikasjon 131, 358 endringer, splitter ekskludert). Tall for
-sammenslåtte kommuner i v1-artefaktene er upålitelige inntil v1-analysen kjøres
-på nytt; nordisk-omsorg-analysen bruker den korrigerte tabellen.
+v1-artefaktene ble beregnet med en håndskrevet sammenslåingstabell som hadde minst én feil
+(1504 → 1506; gamle Ålesund ble tilskrevet Molde) og en uniform nasjonal vekstrate for alle
+kommuner. Begge er rettet: tabellen er regenerert fra SSB KLASS (468 mappinger, transitiv
+oppløsning, splittelser ekskludert) og veksten beregnes per kommune. **Alle publiserte tall ble
+regenerert 2026-06-12 med den korrigerte metoden** — v1-toppen (Hasvik/Bjerkreim/Tydal) var i
+hovedsak et artefakt av uniform vekst kombinert med lav dekning; den korrigerte analysen peker
+på Oslo-belte-kommunene (Frogn, Vestby, Lørenskog) der 80+-veksten faktisk er raskest.

@@ -151,3 +151,46 @@ class TestSecuritySchema:
         )
         with pytest.raises(ConfigError, match="extra_allowed_hosts"):
             load_workflow_config(tmp_path / "workflow.toml")
+
+
+class TestEndpointSecurity:
+    def _wf(self, tmp_path, body: str):
+        p = tmp_path / "workflow.toml"
+        p.write_text(body, encoding="utf-8")
+        return p
+
+    def test_api_key_in_toml_rejected(self, tmp_path):
+        from omsorgsradar.core.config import load_workflow_config, ConfigError
+        import pytest
+        body = ('[endpoint]\nmode = "api"\n[endpoint.api]\nprovider = "anthropic"\n'
+                'api_key = "sk-leak"\n')
+        with pytest.raises(ConfigError, match="key material"):
+            load_workflow_config(self._wf(tmp_path, body))
+
+    def test_secret_named_field_anywhere_rejected(self, tmp_path):
+        from omsorgsradar.core.config import load_workflow_config, ConfigError
+        import pytest
+        body = '[endpoint]\nmode = "subscription"\n[models]\ntoken = "x"\n'
+        with pytest.raises(ConfigError, match="key material"):
+            load_workflow_config(self._wf(tmp_path, body))
+
+    def test_unknown_endpoint_field_rejected(self, tmp_path):
+        from omsorgsradar.core.config import load_workflow_config, ConfigError
+        import pytest
+        body = '[endpoint]\nmode = "subscription"\nflavour = "x"\n'
+        with pytest.raises(ConfigError):
+            load_workflow_config(self._wf(tmp_path, body))
+
+    def test_local_api_flavor_allowed(self, tmp_path):
+        from omsorgsradar.core.config import load_workflow_config
+        body = ('[endpoint]\nmode = "local"\n[endpoint.local]\n'
+                'base_url = "http://localhost:1234"\napi = "openai"\n')
+        cfg = load_workflow_config(self._wf(tmp_path, body))
+        assert cfg["endpoint"]["local"]["api"] == "openai"
+
+    def test_api_base_url_allowed(self, tmp_path):
+        from omsorgsradar.core.config import load_workflow_config
+        body = ('[endpoint]\nmode = "api"\n[endpoint.api]\n'
+                'provider = "openrouter"\nbase_url = "https://openrouter.ai/api/v1"\n')
+        cfg = load_workflow_config(self._wf(tmp_path, body))
+        assert cfg["endpoint"]["api"]["provider"] == "openrouter"

@@ -31,17 +31,24 @@ WORKFLOW_SCHEMA: dict[str, Any] = {
         "endpoint": {
             "type": "object",
             "required": ["mode"],
+            "additionalProperties": False,
             "properties": {
                 "mode": {"enum": ENDPOINT_MODES},
                 "api": {
                     "type": "object",
+                    "additionalProperties": False,
                     "properties": {
-                        "provider": {"enum": ["anthropic", "openai", "openrouter"]}
+                        "provider": {"enum": ["anthropic", "openai", "openrouter"]},
+                        "base_url": {"type": "string"},
                     },
                 },
                 "local": {
                     "type": "object",
-                    "properties": {"base_url": {"type": "string"}},
+                    "additionalProperties": False,
+                    "properties": {
+                        "base_url": {"type": "string"},
+                        "api": {"enum": ["anthropic", "openai"]},
+                    },
                 },
             },
         },
@@ -107,6 +114,27 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
 }
 
 
+_KEY_MATERIAL_NAMES = {"api_key", "apikey", "key", "token", "secret", "password",
+                       "access_key", "auth", "authorization", "bearer"}
+
+
+def _reject_key_material(node: Any, path: str = "") -> None:
+    """Refuse any config key that looks like a credential. Keys live in env only
+    (spec security gate) — never in workflow.toml, never in run journals."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if str(k).lower() in _KEY_MATERIAL_NAMES:
+                raise ConfigError(
+                    f"key material is not allowed in config ('{path}{k}') — "
+                    "set the API key in the environment (e.g. ANTHROPIC_API_KEY), "
+                    "never in workflow.toml"
+                )
+            _reject_key_material(v, f"{path}{k}.")
+    elif isinstance(node, list):
+        for i, item in enumerate(node):
+            _reject_key_material(item, f"{path}{i}.")
+
+
 def _load_toml(path: Path) -> dict[str, Any]:
     try:
         with open(path, "rb") as fh:
@@ -127,6 +155,7 @@ def _validate(payload: dict[str, Any], schema: dict[str, Any], path: Path) -> No
 
 def load_workflow_config(path: Path) -> dict[str, Any]:
     payload = _load_toml(path)
+    _reject_key_material(payload)
     _validate(payload, WORKFLOW_SCHEMA, path)
     return payload
 

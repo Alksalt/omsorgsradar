@@ -24,6 +24,7 @@ REQUEST_PAUSE = 0.5   # politeness pause between requests
 def jsonstat2_to_df(
     payload: dict[str, Any],
     use_codes: bool = False,
+    label_columns: bool = False,
 ) -> pd.DataFrame:
     """Convert a JSON-stat2 response (SSB PxWebAPI v2 format) to a DataFrame.
 
@@ -35,9 +36,14 @@ def jsonstat2_to_df(
             values instead of human-readable labels (e.g. "Halden").
             Default is False (use labels) for backwards compatibility with
             the test fixtures.
+        label_columns: If True, emit additional ``<dim>_label`` columns
+            alongside each dimension column. Useful when ``use_codes=True``
+            and you still want human-readable labels available. Default False.
 
     Returns:
         Tidy DataFrame with one column per dimension plus a ``value`` column.
+        If ``label_columns=True``, each dimension also has a ``<dim>_label``
+        column containing human-readable labels.
 
     Raises:
         KeyError: if the payload is missing required JSON-stat2 keys.
@@ -47,30 +53,29 @@ def jsonstat2_to_df(
     dim_sizes: list[int] = payload["size"]
     values: list[float | None] = payload["value"]
 
-    # Build index arrays (cartesian product of dimension categories)
     import itertools
 
-    category_lists = []
+    code_lists: list[list[str]] = []
+    label_lists: list[list[str]] = []
     for dim_id, size in zip(dim_ids, dim_sizes):
         cats = dims[dim_id]["category"]
         label_map = cats.get("label", {})
         index_map = cats.get("index", {})
-        # Reorder by index position
         if isinstance(index_map, dict):
             ordered = sorted(index_map.items(), key=lambda x: x[1])
             ordered_ids = [k for k, _ in ordered]
         else:
             ordered_ids = list(index_map)
-        if use_codes:
-            # Keep the raw codes (e.g. "3101", "KOShjtj80aarover0001", "2022")
-            category_lists.append(ordered_ids)
-        else:
-            # Use human-readable labels (e.g. "Halden", "Andel...", "2022")
-            labels = [label_map.get(k, k) for k in ordered_ids]
-            category_lists.append(labels)
+        code_lists.append(ordered_ids)
+        label_lists.append([label_map.get(k, k) for k in ordered_ids])
 
-    rows = list(itertools.product(*category_lists))
+    main_lists = code_lists if use_codes else label_lists
+    rows = list(itertools.product(*main_lists))
     df = pd.DataFrame(rows, columns=dim_ids)
+    if label_columns:
+        label_rows = list(itertools.product(*label_lists))
+        for i, dim_id in enumerate(dim_ids):
+            df[f"{dim_id}_label"] = [r[i] for r in label_rows]
     df["value"] = values
     return df
 
@@ -141,4 +146,8 @@ class PxWebAdapter:
             query=dict(source.get("query", {"query": []})),
             cache_key=source.get("cache_key"),
         )
-        return jsonstat2_to_df(payload)
+        return jsonstat2_to_df(
+            payload,
+            use_codes=bool(source.get("use_codes", False)),
+            label_columns=bool(source.get("label_columns", False)),
+        )

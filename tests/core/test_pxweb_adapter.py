@@ -29,3 +29,34 @@ class TestAdapterCache:
         )
         out = adapter.post_table("12209", query={"query": []})
         assert out == payload
+
+
+class TestFetchOptions:
+    def _payload(self) -> dict:
+        return {
+            "dimension": {
+                "Region": {"category": {
+                    "index": {"0301": 0, "1505": 1},
+                    "label": {"0301": "Oslo", "1505": "Kristiansund"},
+                }},
+            },
+            "id": ["Region"],
+            "size": [2],
+            "value": [10.0, 20.0],
+        }
+
+    def test_use_codes_and_labels(self, tmp_path: Path) -> None:
+        (tmp_path / "t1.json").write_text(json.dumps(self._payload()), encoding="utf-8")
+        adapter = PxWebAdapter(base_url="http://127.0.0.1:9/x", cache_dir=tmp_path)
+        source = {"table": "ignored", "cache_key": "t1",
+                  "use_codes": True, "label_columns": True}
+        df = adapter.fetch(source)
+        assert df["Region"].tolist() == ["0301", "1505"]
+        assert df["Region_label"].tolist() == ["Oslo", "Kristiansund"]
+
+    def test_default_fetch_unchanged(self, tmp_path: Path) -> None:
+        (tmp_path / "t2.json").write_text(json.dumps(self._payload()), encoding="utf-8")
+        adapter = PxWebAdapter(base_url="http://127.0.0.1:9/x", cache_dir=tmp_path)
+        df = adapter.fetch({"table": "ignored", "cache_key": "t2"})
+        assert df["Region"].tolist() == ["Oslo", "Kristiansund"]  # v1 label behavior
+        assert "Region_label" not in df.columns

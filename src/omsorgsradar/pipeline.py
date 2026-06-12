@@ -127,9 +127,17 @@ def main() -> None:
     )
     parser.add_argument("--skip-ingest", action="store_true")
     parser.add_argument("--skip-ml", action="store_true")
+    parser.add_argument("--data-dir", default=str(DEFAULT_DATA_DIR),
+                        help="artifact dir for this analysis (default: data/)")
+    parser.add_argument("--reports-dir", default=str(DEFAULT_REPORTS_DIR),
+                        help="report dir for this analysis (default: reports/)")
     args = parser.parse_args()
     run_pipeline(
-        args.analysis_dir, skip_ingest=args.skip_ingest, skip_ml=args.skip_ml
+        args.analysis_dir,
+        data_dir=args.data_dir,
+        reports_dir=args.reports_dir,
+        skip_ingest=args.skip_ingest,
+        skip_ml=args.skip_ml,
     )
 
 

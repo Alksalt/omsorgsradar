@@ -118,9 +118,14 @@ _KEY_MATERIAL_NAMES = {"api_key", "apikey", "key", "token", "secret", "password"
                        "access_key", "auth", "authorization", "bearer"}
 
 
+_URL_FIELD_NAMES = {"base_url", "url", "endpoint"}
+
+
 def _reject_key_material(node: Any, path: str = "") -> None:
     """Refuse any config key that looks like a credential. Keys live in env only
-    (spec security gate) — never in workflow.toml, never in run journals."""
+    (spec security gate) — never in workflow.toml, never in run journals. Also
+    refuses credentials smuggled into a URL's userinfo (``https://user:pw@host``),
+    which would otherwise pass the name check and land in the run journal."""
     if isinstance(node, dict):
         for k, v in node.items():
             if str(k).lower() in _KEY_MATERIAL_NAMES:
@@ -129,6 +134,14 @@ def _reject_key_material(node: Any, path: str = "") -> None:
                     "set the API key in the environment (e.g. ANTHROPIC_API_KEY), "
                     "never in workflow.toml"
                 )
+            if str(k).lower() in _URL_FIELD_NAMES and isinstance(v, str):
+                from urllib.parse import urlsplit
+                parts = urlsplit(v)
+                if parts.username or parts.password:
+                    raise ConfigError(
+                        f"credential in URL userinfo is not allowed ('{path}{k}') — "
+                        "put secrets in the environment, not in the URL"
+                    )
             _reject_key_material(v, f"{path}{k}.")
     elif isinstance(node, list):
         for i, item in enumerate(node):
@@ -157,6 +170,14 @@ def load_workflow_config(path: Path) -> dict[str, Any]:
     payload = _load_toml(path)
     _reject_key_material(payload)
     _validate(payload, WORKFLOW_SCHEMA, path)
+    # Fail fast (at load / --validate-only) on a local mode that would silently
+    # fall back to a cloud endpoint — the privacy guarantee depends on base_url.
+    endpoint = payload.get("endpoint", {})
+    if endpoint.get("mode") == "local" and not endpoint.get("local", {}).get("base_url"):
+        raise ConfigError(
+            f"{path}: endpoint.mode='local' requires [endpoint.local].base_url — "
+            "local mode must not fall back to a cloud endpoint"
+        )
     return payload
 
 

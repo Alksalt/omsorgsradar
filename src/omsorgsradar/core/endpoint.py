@@ -115,19 +115,29 @@ def build_client(workflow: Mapping[str, Any], role: str = "report") -> tuple[LLM
     if mode == "local":
         local = dict(endpoint.get("local", {}))
         base_url = local.get("base_url")
+        # Privacy guarantee: local mode means data stays on-machine. Without an
+        # explicit base_url the SDK would silently fall back to the CLOUD endpoint
+        # (and send the prompt there if a cloud key is in env). Refuse, loudly.
+        if not base_url:
+            raise ValueError(
+                "endpoint.mode='local' requires [endpoint.local].base_url — refusing "
+                "to fall back to a cloud endpoint (local data must stay on-machine)"
+            )
         flavor = local.get("api", "anthropic")
         if flavor == "openai":
             return OpenAIClient(api_key=os.environ.get("OPENAI_API_KEY"), base_url=base_url), model
         return AnthropicClient(api_key=os.environ.get("ANTHROPIC_API_KEY"), base_url=base_url), model
 
     if mode == "api":
-        provider = dict(endpoint.get("api", {})).get("provider", "anthropic")
+        api_cfg = dict(endpoint.get("api", {}))
+        provider = api_cfg.get("provider", "anthropic")
+        override_base = api_cfg.get("base_url")   # honor the documented optional override
         key = os.environ.get(_PROVIDER_ENV.get(provider, ""))
         if not key:
             return None, model
         if provider == "anthropic":
-            return AnthropicClient(api_key=key), model
+            return AnthropicClient(api_key=key, base_url=override_base), model
         if provider == "openrouter":
-            return OpenAIClient(api_key=key, base_url=_OPENROUTER_BASE), model
-        return OpenAIClient(api_key=key), model
+            return OpenAIClient(api_key=key, base_url=override_base or _OPENROUTER_BASE), model
+        return OpenAIClient(api_key=key, base_url=override_base), model
     return None, model

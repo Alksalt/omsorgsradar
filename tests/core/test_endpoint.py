@@ -79,3 +79,20 @@ def test_estimate_cost_known_model_and_unknown():
     known = estimate_cost("claude-fable-5", 1_000_000, 1_000_000)
     assert known is not None and known > 0
     assert estimate_cost("some-local-model", 100, 100) is None
+
+
+def test_local_without_base_url_refuses_cloud_fallback():
+    # privacy guarantee: local mode must not silently fall back to a cloud endpoint
+    wf = {"endpoint": {"mode": "local"}, "models": {"report": "m"}}
+    with pytest.raises(ValueError, match="local"):
+        build_client(wf, role="report")
+
+
+def test_api_base_url_override_honored(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-x")
+    wf = {"endpoint": {"mode": "api",
+                       "api": {"provider": "openai", "base_url": "https://gw.example/v1"}},
+          "models": {"report": "gpt-x"}}
+    client, _ = build_client(wf, role="report")
+    assert isinstance(client, OpenAIClient)
+    assert client.base_url == "https://gw.example/v1"

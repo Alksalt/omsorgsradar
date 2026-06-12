@@ -194,3 +194,18 @@ class TestEndpointSecurity:
                 'provider = "openrouter"\nbase_url = "https://openrouter.ai/api/v1"\n')
         cfg = load_workflow_config(self._wf(tmp_path, body))
         assert cfg["endpoint"]["api"]["provider"] == "openrouter"
+
+    def test_local_mode_requires_base_url(self, tmp_path):
+        from omsorgsradar.core.config import load_workflow_config, ConfigError
+        import pytest
+        body = '[endpoint]\nmode = "local"\n'
+        with pytest.raises(ConfigError, match="base_url"):
+            load_workflow_config(self._wf(tmp_path, body))
+
+    def test_credential_in_url_userinfo_rejected(self, tmp_path):
+        from omsorgsradar.core.config import load_workflow_config, ConfigError
+        import pytest
+        body = ('[endpoint]\nmode = "local"\n[endpoint.local]\n'
+                'base_url = "https://user:secret@localhost:1234"\n')
+        with pytest.raises(ConfigError, match="userinfo"):
+            load_workflow_config(self._wf(tmp_path, body))

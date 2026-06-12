@@ -9,21 +9,21 @@ The full pipeline has two rendering paths. The key-free template path has zero L
 - Produces the same structured report from the same findings JSON using a deterministic template renderer.
 - All analysis, press index, figures, and verifier are unaffected.
 
-### LLM narration path (optional, requires `ANTHROPIC_API_KEY`)
+### LLM narration path (optional; `api`/`local` mode)
 
-Measured token estimate for a typical report narration call:
+Since G5 the model is **config-driven** (`[models].report`, default `claude-fable-5`) and the cost is
+estimated from `core/endpoint.MODEL_PRICING`. Measured token estimate for a typical report narration call:
 
-| Item | Tokens | Price (claude-sonnet-4-5) |
-|------|--------|--------------------------|
-| System + findings JSON prompt | ~2,500 input | $0.0075 |
-| Bokmål narrative output | ~800 output | $0.012 |
-| **Total per run** | ~3,300 | **~$0.02** |
+| Item | Tokens | Price (claude-fable-5: $1 in / $5 out per MTok) |
+|------|--------|--------------------------------------------------|
+| System + findings JSON prompt | ~2,500 input | $0.0025 |
+| Bokmål narrative output | ~800 output | $0.004 |
+| **Total per run** | ~3,300 | **~$0.007** |
 
-Pricing based on claude-sonnet-4-5: $3.00 / MTok input, $15.00 / MTok output (as of 2026-06-11).
+Heavier models cost more in proportion (e.g. `claude-sonnet-4-6` ≈ $0.02/run; `claude-opus-4-8` ≈ $0.10/run).
+`local` mode is $0 marginal. Pricing in `MODEL_PRICING` is dated 2026-06; refine as rates change.
 
-**Estimated cost per full pipeline run with LLM narration: ~$0.02 USD.**
-
-If run daily for one year: ~$7/year. Negligible.
+**Estimated cost per full run with cloud narration: under ~$0.02 USD on the default model.** Negligible.
 
 ### TabPFN-2.5
 

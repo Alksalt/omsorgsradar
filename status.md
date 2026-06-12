@@ -134,3 +134,12 @@
   (Normen personvern→plassering: åpen→sky, pseudonymisert→EU-hostet Bedrock/Vertex [dokumentert mål,
   ikke implementert], sensitiv→lokal). `openai`-dep lagt til (lazy). Alle tre analyser validerer mot
   herdet skjema. Tester: 272 → **290 offline + 5 live**. **Next: G5 close-out (opus-panel) + push.**
+- **2026-06-12** — **G5 panel close-out.** Correctness/security/integration: 3× PASS (ingen BLOCK).
+  To VIKTIGE funn fikset likevel (begge ~5 linjer): (1) **personvern-hull** — `mode=local` uten
+  `base_url` falt stille tilbake til Anthropic-SKY hvis nøkkel i env (motsatt av «ingenting forlater
+  maskinen»); nå hard feil ved load (`--validate-only`) + vakt i `build_client`. (2) **brutt config-
+  kontrakt** — `[endpoint.api].base_url` var skjema-gyldig + dokumentert men ignorert av `build_client`;
+  nå trådet inn for alle providere. Pluss MINOR: legitimasjon i URL-userinfo (`https://user:pw@host`)
+  avvises nå (ville ellers havne i journal); COSTS.md-prising oppdatert fra utdatert sonnet-4-5 til
+  config-drevet fable-5. 4 nye tester. Tester: **294 offline + 5 live**. **G5 levert. Next: G6 — marimo
+  + GitHub Pages site + README/LIMITATIONS/COSTS-finpuss + push.**

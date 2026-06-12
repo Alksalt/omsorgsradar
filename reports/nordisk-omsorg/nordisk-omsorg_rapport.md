@@ -16,62 +16,62 @@ verifiseringsmodul før denne rapporten ble generert
 ### Norge (aldersgrense 80+)
 
 346 kommuner i analysen (25 rader utelatt:
-manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **29.85 %**. Median vekst i
-eldre befolkning: **7.43 %**. Andel kommuner i
-høy-skvis-kvadranten: **0.3064**.
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **29,85 %**. Median vekst i
+eldre befolkning: **7,43 %**. Andel kommuner i
+høy-skvis-kvadranten: **30,6 %**.
 
 | # | Kommune | Skvis | Dekning (%) | Eldrevekst (%) |
 |---|---------|-------|-------------|----------------|
-| 1 | Vestby (`NO-3216`) | 4.35 | 23.0 | 38.18 |
-| 2 | Austrheim (`NO-4632`) | 3.963 | 20.9 | 31.34 |
-| 3 | Frogn (`NO-3214`) | 3.835 | 19.8 | 28.48 |
-| 4 | Holtålen (`NO-5026`) | 3.819 | 22.6 | 32.48 |
-| 5 | Birkenes (`NO-4216`) | 3.716 | 27.5 | 38.75 |
-| 6 | Enebakk (`NO-3220`) | 3.439 | 20.2 | 25.26 |
-| 7 | Randaberg (`NO-1127`) | 3.172 | 25.6 | 30.69 |
-| 8 | Salangen (`NO-5522`) | 3.168 | 22.6 | 26.21 |
-| 9 | Bjerkreim (`NO-1114`) | 3.056 | 16.5 | 16.09 |
-| 10 | Nittedal (`NO-3232`) | 2.899 | 23.0 | 24.21 |
+| 1 | Vestby (`NO-3216`) | 4,35 | 23,0 | 38,2 |
+| 2 | Austrheim (`NO-4632`) | 3,96 | 20,9 | 31,3 |
+| 3 | Frogn (`NO-3214`) | 3,83 | 19,8 | 28,5 |
+| 4 | Holtålen (`NO-5026`) | 3,82 | 22,6 | 32,5 |
+| 5 | Birkenes (`NO-4216`) | 3,72 | 27,5 | 38,8 |
+| 6 | Enebakk (`NO-3220`) | 3,44 | 20,2 | 25,3 |
+| 7 | Randaberg (`NO-1127`) | 3,17 | 25,6 | 30,7 |
+| 8 | Salangen (`NO-5522`) | 3,17 | 22,6 | 26,2 |
+| 9 | Bjerkreim (`NO-1114`) | 3,06 | 16,5 | 16,1 |
+| 10 | Nittedal (`NO-3232`) | 2,90 | 23,0 | 24,2 |
 
 ### Sverige (aldersgrense 80+)
 
 290 kommuner i analysen (0 rader utelatt:
-manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **16.5 %**. Median vekst i
-eldre befolkning: **12.83 %**. Andel kommuner i
-høy-skvis-kvadranten: **0.3138**.
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **16,50 %**. Median vekst i
+eldre befolkning: **12,83 %**. Andel kommuner i
+høy-skvis-kvadranten: **31,4 %**.
 
 | # | Kommune | Skvis | Dekning (%) | Eldrevekst (%) |
 |---|---------|-------|-------------|----------------|
-| 1 | Nykvarn (`SE-0140`) | 5.356 | 13.85 | 52.57 |
-| 2 | Håbo (`SE-0305`) | 4.969 | 13.99 | 49.53 |
-| 3 | Värmdö (`SE-0120`) | 4.401 | 13.47 | 43.17 |
-| 4 | Vaxholm (`SE-0187`) | 4.275 | 14.78 | 45.51 |
-| 5 | Trosa (`SE-0488`) | 4.024 | 14.81 | 43.38 |
-| 6 | Staffanstorp (`SE-1230`) | 3.583 | 10.05 | 26.98 |
-| 7 | Kävlinge (`SE-1261`) | 3.17 | 11.54 | 27.28 |
-| 8 | Höganäs (`SE-1284`) | 3.165 | 11.1 | 26.07 |
-| 9 | Alingsås (`SE-1489`) | 3.009 | 8.14 | 16.92 |
-| 10 | Linköping (`SE-0580`) | 2.953 | 6.07 | 10.97 |
+| 1 | Nykvarn (`SE-0140`) | 5,36 | 13,8 | 52,6 |
+| 2 | Håbo (`SE-0305`) | 4,97 | 14,0 | 49,5 |
+| 3 | Värmdö (`SE-0120`) | 4,40 | 13,5 | 43,2 |
+| 4 | Vaxholm (`SE-0187`) | 4,28 | 14,8 | 45,5 |
+| 5 | Trosa (`SE-0488`) | 4,02 | 14,8 | 43,4 |
+| 6 | Staffanstorp (`SE-1230`) | 3,58 | 10,1 | 27,0 |
+| 7 | Kävlinge (`SE-1261`) | 3,17 | 11,5 | 27,3 |
+| 8 | Höganäs (`SE-1284`) | 3,17 | 11,1 | 26,1 |
+| 9 | Alingsås (`SE-1489`) | 3,01 | 8,1 | 16,9 |
+| 10 | Linköping (`SE-0580`) | 2,95 | 6,1 | 11,0 |
 
 ### Finland (aldersgrense 75+)
 
 299 kommuner i analysen (0 rader utelatt:
-manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **15.2 %**. Median vekst i
-eldre befolkning: **15.22 %**. Andel kommuner i
-høy-skvis-kvadranten: **0.3144**.
+manglende/supprimerte verdier eller historiske kommunenummer). Median dekning: **15,20 %**. Median vekst i
+eldre befolkning: **15,22 %**. Andel kommuner i
+høy-skvis-kvadranten: **31,4 %**.
 
 | # | Kommune | Skvis | Dekning (%) | Eldrevekst (%) |
 |---|---------|-------|-------------|----------------|
-| 1 | Jomala (`FI-170`) | 4.912 | 10.0 | 47.89 |
-| 2 | Siuntio (`FI-755`) | 4.488 | 12.0 | 48.0 |
-| 3 | Järvenpää (`FI-186`) | 4.007 | 9.9 | 39.69 |
-| 4 | Tuusula (`FI-858`) | 3.588 | 8.8 | 33.87 |
-| 5 | Kerava (`FI-245`) | 3.476 | 8.9 | 33.07 |
-| 6 | Lemland (`FI-417`) | 3.442 | 8.7 | 32.38 |
-| 7 | Kontiolahti (`FI-276`) | 3.153 | 7.8 | 28.09 |
-| 8 | Pirkkala (`FI-604`) | 3.121 | 9.0 | 30.12 |
-| 9 | Muurame (`FI-500`) | 3.034 | 10.0 | 31.29 |
-| 10 | Naantali (`FI-529`) | 2.925 | 11.0 | 32.25 |
+| 1 | Jomala (`FI-170`) | 4,91 | 10,0 | 47,9 |
+| 2 | Siuntio (`FI-755`) | 4,49 | 12,0 | 48,0 |
+| 3 | Järvenpää (`FI-186`) | 4,01 | 9,9 | 39,7 |
+| 4 | Tuusula (`FI-858`) | 3,59 | 8,8 | 33,9 |
+| 5 | Kerava (`FI-245`) | 3,48 | 8,9 | 33,1 |
+| 6 | Lemland (`FI-417`) | 3,44 | 8,7 | 32,4 |
+| 7 | Kontiolahti (`FI-276`) | 3,15 | 7,8 | 28,1 |
+| 8 | Pirkkala (`FI-604`) | 3,12 | 9,0 | 30,1 |
+| 9 | Muurame (`FI-500`) | 3,03 | 10,0 | 31,3 |
+| 10 | Naantali (`FI-529`) | 2,92 | 11,0 | 32,2 |
 
 
 ## Sammenligning på tvers — med forbehold

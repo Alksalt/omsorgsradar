@@ -3,7 +3,7 @@
   "path": "data/findings.json",
   "sha256": "3d3f48e00d7b469c49d9c34578c059c24c9772bd3f7b6562ff19abce6dfcc9d3",
   "schema_version": "1",
-  "created_at": "2026-06-12T17:26:31.436711+00:00",
+  "created_at": "2026-06-12T17:40:21.963679+00:00",
   "producer": "analyze",
   "inputs": [
     "data/quality_profile.json"

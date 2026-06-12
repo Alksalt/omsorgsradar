@@ -99,25 +99,25 @@ Se [`LIMITATIONS.md`](../LIMITATIONS.md) for fullstendig liste. Viktigste forbeh
 **Mål:** coverage_rate  
 **Ramme:** planleggingsstøtte — ikke klinisk beslutningsstøtte
 
-**Nøkkelfunn:** Kommunal dekning er sterkt autoregressiv — årets dekning predikerer neste års dekning nesten like godt som en tunet modell. Modelltillegg over naiv persistens er beskjedent (~0.2 pp MAE). Modellens verdi er avviksflagging (kommuner som avviker fra egen trend), ikke punktprediksjon.
+**Nøkkelfunn:** Kommunal dekning er sterkt autoregressiv — årets dekning predikerer neste års dekning nesten like godt som en tunet modell. Modelltillegg over naiv persistens er beskjedent (~0,2 pp MAE). Modellens verdi er avviksflagging (kommuner som avviker fra egen trend), ikke punktprediksjon.
 
-**Gjennomsnittlig MAE:** XGBoost 2.05 pp vs naiv persistens 2.27 pp
+**Gjennomsnittlig MAE:** XGBoost 2,05 pp vs naiv persistens 2,27 pp
 
 | Fold | Testår | XGB MAE | Naiv MAE |
 |------|--------|---------|----------|
-| 1 | 2023 | 2.15 | 2.27 |
-| 2 | 2024 | 2.00 | 2.24 |
-| 3 | 2025 | 2.00 | 2.30 |
+| 1 | 2023 | 2,15 | 2,27 |
+| 2 | 2024 | 2,00 | 2,24 |
+| 3 | 2025 | 2,00 | 2,30 |
 
 *TabPFN-2.5 ikke kjørt — krever konto/token hos priorlabs.ai (se COSTS.md). Sett miljøvariabelen TABPFN_TOKEN og kjør ml-steget på nytt.*
 
 **SHAP — viktigste features:**
 
-- `coverage_rate_lag1`: mean |SHAP| = 4.8234
-- `year`: mean |SHAP| = 0.8476
-- `coverage_rate_lag2`: mean |SHAP| = 0.6482
-- `log_pop_80plus`: mean |SHAP| = 0.3973
-- `inst_per_1000_80plus`: mean |SHAP| = 0.2597
+- `coverage_rate_lag1`: mean |SHAP| = 4,82
+- `year`: mean |SHAP| = 0,85
+- `coverage_rate_lag2`: mean |SHAP| = 0,65
+- `log_pop_80plus`: mean |SHAP| = 0,40
+- `inst_per_1000_80plus`: mean |SHAP| = 0,26
 
 
 ---

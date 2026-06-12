@@ -49,6 +49,7 @@ def run_pipeline(
     skip_ingest: bool = False,
     skip_ml: bool = False,
     use_llm: bool | None = None,
+    until: str | None = None,
 ) -> Path | None:
     """Run one analysis instance through its configured stages.
 
@@ -82,6 +83,13 @@ def run_pipeline(
     stages = resolve_stage_list(cfg.stage_list)
     if skip_ml and "ml" in stages:
         stages.remove("ml")
+
+    if until is not None:
+        if until not in stages:
+            raise ValueError(
+                f"--until stage '{until}' is not in the resolved stage list {stages}"
+            )
+        stages = stages[: stages.index(until) + 1]
 
     journal = RunJournal.start(
         Path(runs_dir) if runs_dir is not None
@@ -135,13 +143,35 @@ def main() -> None:
                         help="artifact dir for this analysis (default: data/)")
     parser.add_argument("--reports-dir", default=str(DEFAULT_REPORTS_DIR),
                         help="report dir for this analysis (default: reports/)")
+    parser.add_argument(
+        "--until", default=None, metavar="STAGE",
+        help="stop after STAGE (e.g. 'profile' — the /magic-analyze owner gate)",
+    )
+    parser.add_argument(
+        "--validate-only", action="store_true",
+        help="load + validate config and sources (incl. host allowlist), then exit",
+    )
     args = parser.parse_args()
+    if args.validate_only:
+        from .core.adapters import validate_source, validate_source_host
+
+        cfg = load_run_config(args.analysis_dir, DEFAULT_WORKFLOW)
+        extra = frozenset(
+            cfg.workflow.get("security", {}).get("extra_allowed_hosts", [])
+        )
+        for src in cfg.sources:
+            validate_source(src)
+            validate_source_host(src, extra)
+        print(f"OK: {cfg.name} — {len(cfg.sources)} sources valid, "
+              f"stages: {cfg.stage_list}")
+        return
     run_pipeline(
         args.analysis_dir,
         data_dir=args.data_dir,
         reports_dir=args.reports_dir,
         skip_ingest=args.skip_ingest,
         skip_ml=args.skip_ml,
+        until=args.until,
     )
 
 
